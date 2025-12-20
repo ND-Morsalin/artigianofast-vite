@@ -22,12 +22,12 @@ import {
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { Badge } from "../../components/ui/badge";
 import { LanguageSelector } from "../../components/ui/language-selector";
 import { useTranslation } from "react-i18next";
 import { useArtisanPermissions } from "../../hooks/useArtisanPermissions";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 export default function ArtisanDashboard() {
   const [, setLocation] = useLocation();
@@ -60,7 +60,7 @@ export default function ArtisanDashboard() {
     canViewCalendar,
     canViewSettings,
   } = useArtisanPermissions();
-console.log(planConfig)
+  console.log(planConfig);
   // Force re-render when language changes
   const [, forceUpdate] = useState({});
 
@@ -78,20 +78,20 @@ console.log(planConfig)
 
   // Fetch user subscription and plan features (for display purposes)
   const { data: userSubscription, isLoading: subscriptionLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/user-subscription`],
+    queryKey: [`/api/mobile/user-subscription`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/user-subscription`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/user-subscription`)
+        .then((res) => res.data),
     enabled: true,
   });
 
   const { data: subscriptionPlans, isLoading: plansLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/subscription-plans`],
+    queryKey: [`/api/mobile/subscription-plans`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/subscription-plans`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/subscription-plans`)
+        .then((res) => res.data),
     enabled: true,
   });
 
@@ -115,11 +115,9 @@ console.log(planConfig)
 
   // Get current user data
   const { data: currentUser } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/user`],
+    queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/user`).then((res) =>
-        res.json()
-      ),
+      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
 
@@ -134,11 +132,11 @@ console.log(planConfig)
     isLoading: clientsLoading,
     error: clientsError,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/clients`],
+    queryKey: [`/api/mobile/clients`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/clients`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/clients`)
+        .then((res) => res.data),
     enabled: canViewClients && !permissionsLoading,
     retry: false,
   });
@@ -148,11 +146,11 @@ console.log(planConfig)
     isLoading: jobsLoading,
     error: jobsError,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+    queryKey: [`/api/mobile/all-jobs`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/all-jobs`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/all-jobs`)
+        .then((res) => res.data),
     enabled: canViewJobs && !permissionsLoading,
     retry: false,
   });
@@ -162,11 +160,11 @@ console.log(planConfig)
     isLoading: collaboratorsLoading,
     error: collaboratorsError,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/collaborators`],
+    queryKey: [`/api/mobile/collaborators`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/collaborators`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/collaborators`)
+        .then((res) => res.data),
     enabled: canManageCollaborators && !permissionsLoading,
     retry: false,
   });
@@ -176,11 +174,11 @@ console.log(planConfig)
     isLoading: invoicesLoading,
     error: invoicesError,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/invoices`],
+    queryKey: [`/api/mobile/invoices`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/invoices`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/invoices`)
+        .then((res) => res.data),
     enabled: canManageInvoices && !permissionsLoading,
     retry: false,
   });

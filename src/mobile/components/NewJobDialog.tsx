@@ -34,8 +34,7 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 import { Camera, X } from "lucide-react";
-import { mobileApiCall } from "../utils/mobileApi";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 const getJobSchema = (t: any) =>
   z.object({
@@ -101,14 +100,11 @@ export function NewJobDialog({
 
   // Queries per ottenere i clienti
   const { data: clients = [] } = useQuery<any[]>({
-    queryKey: [`${BASE_URL}/api/mobile/all-clients`],
+    queryKey: [`/api/mobile/all-clients`],
     queryFn: async () => {
-      const response = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/mobile/all-clients`
-      );
-      if (!response.ok) throw new Error("Errore nel recuperare i clienti");
-      return response.json();
+      const response = await axiosInstance.get(`/api/mobile/all-clients`);
+      if (!response.data) throw new Error("Errore nel recuperare i clienti");
+      return response.data;
     },
     enabled: isOpen,
   });

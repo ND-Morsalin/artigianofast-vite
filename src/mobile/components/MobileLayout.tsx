@@ -23,10 +23,10 @@ import {
   AvatarImage,
 } from "../../components/ui/avatar";
 import { useMobileAuth } from "../contexts/MobileAuthContext";
-import { mobileApiCall } from "../utils/mobileApi";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -50,9 +50,9 @@ export default function MobileLayout({
   showNavButtons = false,
   prevPage,
   nextPage,
-  // showBackButton = false,
-  // onBackClick,
-}: MobileLayoutProps) {
+}: // showBackButton = false,
+// onBackClick,
+MobileLayoutProps) {
   const [location, setLocation] = useLocation();
   console.log(location);
   const { user, logout } = useMobileAuth();
@@ -60,9 +60,9 @@ export default function MobileLayout({
 
   const handleLogout = async () => {
     try {
-      const response = await mobileApiCall("POST", `${BASE_URL}/api/logout`);
+      const response = await axiosInstance.post(`${BASE_URL}/api/logout`);
 
-      if (response.ok) {
+      if (response.data) {
         await logout(); // Aggiorna il contesto locale
         setLocation("/mobile/welcome");
       } else {

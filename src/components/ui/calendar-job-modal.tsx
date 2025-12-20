@@ -5,7 +5,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { useToast } from "../../hooks/use-toast";
 
 import {
@@ -37,6 +36,7 @@ import {
 import { QuickClientModal } from "./modals/quick-client-modal";
 import { QuickJobTypeModal } from "./modals/quick-jobtype-modal";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 const jobSchema = z.object({
   title: z.string().min(1, "Il titolo è richiesto"),
@@ -81,13 +81,13 @@ export function CalendarJobModal({
 
   // Queries per ottenere i clienti
   const { data: clients = [] } = useQuery<any[]>({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
     enabled: isOpen,
   });
 
   // Query per ottenere i tipi di lavoro personalizzati
   const { data: jobTypes = [] } = useQuery<any[]>({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
     enabled: isOpen,
   });
   console.log(jobTypes);
@@ -120,15 +120,15 @@ export function CalendarJobModal({
   // Mutation per creare un nuovo lavoro
   const createJob = useMutation({
     mutationFn: (values: JobFormValues) => {
-      return apiRequest("POST", `${BASE_URL}/api/jobs`, values);
+      return axiosInstance.post(`${BASE_URL}/api/jobs`, values);
     },
     onSuccess: () => {
       toast({
         title: "Lavoro creato",
         description: "Il nuovo lavoro è stato creato con successo",
       });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobs`] });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/stats`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobs`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/stats`] });
       form.reset();
       onClose();
       if (onJobAdded) onJobAdded();
@@ -161,7 +161,7 @@ export function CalendarJobModal({
   // Handler per l'aggiunta di un nuovo cliente
   const handleClientAdded = (clientId: number) => {
     form.setValue("clientId", clientId);
-    queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/clients`] });
+    queryClient.invalidateQueries({ queryKey: [`/api/clients`] });
     setShowClientModal(false);
 
     // Cerchiamo il cliente appena aggiunto per ottenere l'indirizzo
@@ -178,7 +178,7 @@ export function CalendarJobModal({
     console.log(jobTypeId);
     // In questo caso non facciamo nulla con il tipo di lavoro aggiunto perché
     // stiamo usando i tipi predefiniti (repair, installation, etc.) per il form del job
-    queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
+    queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
     setShowJobTypeModal(false);
     toast({
       title: "Tipo di lavoro aggiunto",

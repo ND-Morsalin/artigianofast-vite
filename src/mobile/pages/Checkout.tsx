@@ -40,12 +40,11 @@ import {
   Landmark,
 } from "lucide-react";
 import MobileLayout from "../components/MobileLayout";
-import { mobileApiCall } from "../utils/mobileApi";
 import StripePaymentForm from "../../components/StripePaymentForm";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Use the centralized mobile API utility
-const apiCall = mobileApiCall;
 
 // Schema di validazione per i dati di pagamento
 const paymentSchema = z.object({
@@ -156,17 +155,16 @@ export default function MobileCheckout() {
 
       try {
         setLoading(true);
-        const response = await apiCall(
-          "GET",
+        const response = await axiosInstance.get(
           `${BASE_URL}/api/mobile/subscription-plans/${planId}`
         );
-        if (response.ok) {
-          const data = await response.json();
+        if (response.data) {
+          const data = await response.data;
           setPlanDetails(data);
         } else {
           console.error(
             "Errore nel caricamento del piano:",
-            await response.text()
+            await response.data
           );
           toast({
             title: "Errore",
@@ -235,8 +233,7 @@ export default function MobileCheckout() {
         "Creating subscription with payment intent:",
         paymentIntent.id
       );
-      const response = await apiCall(
-        "POST",
+      const response = await axiosInstance.post(
         `${BASE_URL}/api/mobile/subscriptions`,
         {
           planId,
@@ -246,9 +243,9 @@ export default function MobileCheckout() {
         }
       );
 
-      console.log("Subscription response:", response.status, response.ok);
+      console.log("Subscription response:", response.status, response.data);
 
-      if (response.ok) {
+      if (response.data) {
         console.log(
           "Subscription created successfully, redirecting to dashboard"
         );
@@ -263,7 +260,7 @@ export default function MobileCheckout() {
           setLocation("/mobile/dashboard");
         }, 1500);
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data;
         console.error("Subscription creation failed:", errorData);
         throw new Error(
           errorData.error || "Errore durante l'elaborazione del pagamento"
@@ -352,8 +349,7 @@ export default function MobileCheckout() {
       }
 
       // Invia la richiesta di abbonamento all'API (solo per bank_transfer e free plans)
-      const response = await apiCall(
-        "POST",
+      const response = await axiosInstance.post(
         `${BASE_URL}/api/mobile/subscriptions`,
         {
           planId,
@@ -363,7 +359,7 @@ export default function MobileCheckout() {
         }
       );
 
-      if (response.ok) {
+      if (response.data) {
         // Gestione diversa in base al tipo di piano
         if (isFreePlan) {
           toast({
@@ -388,7 +384,7 @@ export default function MobileCheckout() {
 
         setLocation("/mobile/dashboard");
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data;
         throw new Error(
           errorData.error || "Errore durante l'elaborazione del pagamento"
         );

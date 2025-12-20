@@ -12,9 +12,9 @@ import {
 } from "../../components/ui/card";
 import { ArrowLeft, Loader2, Check, CreditCard } from "lucide-react";
 import MobileLayout from "../components/MobileLayout";
-import { mobileApiCall } from "../utils/mobileApi";
 import StripePaymentForm from "../../components/StripePaymentForm";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface SubscriptionPlan {
   id: number;
@@ -61,22 +61,20 @@ export default function ChangePlan() {
       setLoading(true);
 
       // Load subscription plans
-      const plansResponse = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/mobile/subscription-plans`
+      const plansResponse = await axiosInstance.get(
+        `/api/mobile/subscription-plans`
       );
-      if (plansResponse.ok) {
-        const plansData = await plansResponse.json();
+      if (plansResponse.data) {
+        const plansData = await plansResponse.data;
         setPlans(plansData);
       }
 
       // Load current subscription
-      const subscriptionResponse = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/mobile/subscription`
+      const subscriptionResponse = await axiosInstance.get(
+        `/api/mobile/subscription`
       );
-      if (subscriptionResponse.ok) {
-        const subscriptionData = await subscriptionResponse.json();
+      if (subscriptionResponse.data) {
+        const subscriptionData = await subscriptionResponse.data;
         setCurrentSubscription(subscriptionData);
         if (subscriptionData) {
           setBillingType(subscriptionData.billingFrequency);
@@ -119,8 +117,7 @@ export default function ChangePlan() {
         "Updating subscription with payment intent:",
         paymentIntent.id
       );
-      const response = await mobileApiCall(
-        "PUT",
+      const response = await axiosInstance.put(
         `${BASE_URL}/api/mobile/subscriptions/${currentSubscription.id}`,
         {
           planId: selectedPlan,
@@ -133,10 +130,10 @@ export default function ChangePlan() {
       console.log(
         "Subscription update response:",
         response.status,
-        response.ok
+        response.data
       );
 
-      if (response.ok) {
+      if (response.data) {
         console.log(
           "Subscription updated successfully, redirecting to dashboard"
         );
@@ -147,7 +144,7 @@ export default function ChangePlan() {
         });
         setLocation("/mobile/dashboard");
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data;
         console.error("Subscription update failed:", errorData);
         throw new Error(
           errorData.error || "Errore durante l'aggiornamento del piano"
@@ -184,8 +181,7 @@ export default function ChangePlan() {
     try {
       setProcessingPayment(true);
 
-      const response = await mobileApiCall(
-        "PUT",
+      const response = await axiosInstance.put(
         `${BASE_URL}/api/mobile/subscriptions/${currentSubscription.id}`,
         {
           planId: selectedPlan,
@@ -194,7 +190,7 @@ export default function ChangePlan() {
         }
       );
 
-      if (response.ok) {
+      if (response.data) {
         toast({
           title: "Successo",
           description: "Piano aggiornato con successo!",
@@ -202,7 +198,7 @@ export default function ChangePlan() {
         });
         setLocation("/mobile/dashboard");
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data;
         throw new Error(
           errorData.error || "Errore durante l'aggiornamento del piano"
         );

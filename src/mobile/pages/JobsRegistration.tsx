@@ -45,7 +45,7 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { Label } from "../../components/ui/label";
 import { cn } from "../../lib/utils";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Tipi di lavoro e stati
 const jobTypes = [
@@ -107,20 +107,19 @@ export default function JobsRegistration() {
   // console.log("Rerender JobsRegistration",isNewJobOpen, isJobRegistrationOpen);
   // Fetch jobs e clienti
   const { data: jobs = [], isLoading: isJobsLoading } = useQuery<JobData[]>({
-    queryKey: [`${BASE_URL}/api/jobs`],
+    queryKey: [`/api/jobs`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/jobs`);
-      if (!response.ok) throw new Error("Errore nel recuperare i lavori");
-      return response.json();
+      const response = await axiosInstance.get(`/api/jobs`);
+      return response.data;
     },
   });
 
   const { data: clients = [] } = useQuery({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/clients`);
-      if (!response.ok) throw new Error("Errore nel recuperare i clienti");
-      return response.json();
+      const response = await axiosInstance.get(`/api/clients`);
+
+      return response.data;
     },
     enabled: jobs.length > 0,
   });
@@ -258,7 +257,7 @@ export default function JobsRegistration() {
   // Gestisci la creazione di un nuovo lavoro
   // const handleNewJobSubmit = async (formData: FormData) => {
   //   try {
-  //     const response = await fetch(`${BASE_URL}/api/jobs`, {
+  //     const response = await axiosInstance.(`${BASE_URL}/api/jobs`, {
   //       method: "POST",
   //       body: formData,
   //     });
@@ -269,7 +268,7 @@ export default function JobsRegistration() {
 
   //     // Invalida la query dei lavori per aggiornare la lista
   //     await queryClient.invalidateQueries({
-  //       queryKey: [`${BASE_URL}/api/jobs`],
+  //       queryKey: [`/api/jobs`],
   //     });
 
   //     setIsNewJobOpen(false);

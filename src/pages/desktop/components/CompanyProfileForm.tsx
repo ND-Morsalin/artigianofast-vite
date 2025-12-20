@@ -6,7 +6,6 @@ import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Input } from "../../../components/ui/input";
-import { apiRequest } from "../../../lib/queryClient";
 import {
   Select,
   SelectContent,
@@ -29,6 +28,7 @@ import {
   FormMessage,
 } from "../../../components/ui/form";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Schema di validazione per i dati aziendali - will be created dynamically with translations
 
@@ -155,10 +155,11 @@ export function CompanyProfileForm({
 
   // Query per ottenere settori
   const { data: sectors = [] } = useQuery({
-    queryKey: [`${BASE_URL}/api/sectors`],
+    queryKey: [`/api/sectors`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/sectors`)
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/sectors`)
+        .then((res) => res.data)
         .catch(() => []),
   });
 

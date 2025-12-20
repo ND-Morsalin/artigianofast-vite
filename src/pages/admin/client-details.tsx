@@ -63,6 +63,7 @@ import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Schema per il form di modifica del piano personalizzato
 const planCustomizationSchema = z.object({
@@ -88,10 +89,10 @@ export default function ClientDetailsPage() {
 
   // Query per ottenere i dettagli del cliente
   const { data: client, isLoading: isClientLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/clients/${clientId}`],
+    queryKey: [`/api/clients/${clientId}`],
     queryFn: async () => {
-      const response = await apiRequest(`${BASE_URL}/api/clients/${clientId}`);
-      return await response.json();
+      const response = await axiosInstance.get(`${BASE_URL}/api/clients/${clientId}`);
+      return await response.data;
     },
     enabled: !!clientId,
   });
@@ -99,13 +100,13 @@ export default function ClientDetailsPage() {
   // Query per ottenere il piano attuale del cliente
   const { data: clientSubscription, isLoading: isSubscriptionLoading } =
     useQuery({
-      queryKey: [`${BASE_URL}/api/clients/${clientId}/subscription`],
+      queryKey: [`/api/clients/${clientId}/subscription`],
       queryFn: async () => {
         try {
-          const response = await apiRequest(
+          const response = await axiosInstance.get(
             `${BASE_URL}/api/clients/${clientId}/subscription`
           );
-          return await response.json();
+          return await response.data;
         } catch (error) {
           console.log(error);
           console.error("Error fetching client subscription:", error);
@@ -117,13 +118,13 @@ export default function ClientDetailsPage() {
 
   // Query per ottenere tutti i piani disponibili
   const { data: plans = [], isLoading: arePlansLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/subscription-plans`],
+    queryKey: [`/api/subscription-plans`],
     queryFn: async () => {
-      const response = await apiRequest(`${BASE_URL}/api/subscription-plans`);
-      return await response.json();
+      const response = await axiosInstance.get(`${BASE_URL}/api/subscription-plans`);
+      return await response.data;
     },
   });
-console.log(arePlansLoading)
+  console.log(arePlansLoading);
   // Form per la personalizzazione del piano
   const form = useForm<PlanCustomizationFormValues>({
     resolver: zodResolver(
@@ -169,7 +170,7 @@ console.log(arePlansLoading)
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/clients/${clientId}/subscription`],
+        queryKey: [`/api/clients/${clientId}/subscription`],
       });
       toast({
         title: t("admin.settings.clientDetails.planUpdated"),

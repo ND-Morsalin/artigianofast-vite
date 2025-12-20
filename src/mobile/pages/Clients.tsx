@@ -8,8 +8,8 @@ import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import MobileLayout from "../components/MobileLayout";
 import { usePlanFeatures } from "../hooks/usePlanFeatures";
-import { mobileGet, mobileDelete } from "../utils/mobileApi";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Definire l'interfaccia per il cliente
 interface Client {
@@ -33,14 +33,14 @@ export default function ClientsSettings() {
   const { data: clients = [], isLoading: isClientsLoading } = useQuery<
     Client[]
   >({
-    queryKey: [`${BASE_URL}/api/mobile/all-clients`],
+    queryKey: [`/api/mobile/all-clients`],
     queryFn: async () => {
       try {
-        const response = await mobileGet("/all-clients");
-        if (!response.ok) {
+        const response = await axiosInstance.get("/all-clients");
+        if (!response.data) {
           throw new Error("Errore nel recuperare i clienti");
         }
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore:", error);
@@ -64,14 +64,14 @@ export default function ClientsSettings() {
   // Mutation per eliminare un cliente
   const deleteClient = useMutation({
     mutationFn: async (id: number) => {
-      const response = await mobileDelete(
+      const response = await axiosInstance.delete(
         `${BASE_URL}/api/mobile/clients/${id}`
       );
 
-      if (!response.ok) {
+      if (!response.data) {
         // Try to parse JSON error; if it fails, throw generic
         try {
-          const errorData = await response.json();
+          const errorData = await response.data;
           throw new Error(
             errorData.error || "Errore durante l'eliminazione del cliente"
           );
@@ -89,7 +89,7 @@ export default function ClientsSettings() {
         description: "Il cliente è stato eliminato con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/all-clients`],
+        queryKey: [`/api/mobile/all-clients`],
       });
       // Optimistic remove from local list to avoid any caching artifact
       queryClient.setQueryData<Client[]>(

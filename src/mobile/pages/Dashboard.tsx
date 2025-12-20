@@ -8,7 +8,7 @@ import { useMobileAuth } from "../contexts/MobileAuthContext";
 import { Button } from "../../components/ui/button";
 import { User, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 export default function MobileDashboard() {
   const [, setLocation] = useLocation();
@@ -63,14 +63,11 @@ export default function MobileDashboard() {
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
       try {
-        const response = await mobileApiCall(
-          "GET",
-          `${BASE_URL}/api/mobile/stats`
-        );
-        if (!response.ok) {
+        const response = await axiosInstance.get(`/api/mobile/stats`);
+        if (!response.data) {
           throw new Error(`Stats API failed: ${response.status}`);
         }
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Error fetching stats:", error);
@@ -84,14 +81,13 @@ export default function MobileDashboard() {
     queryKey: ["today-appointments"],
     queryFn: async () => {
       try {
-        const response = await mobileApiCall(
-          "GET",
-          `${BASE_URL}/api/mobile/today-appointments`
+        const response = await axiosInstance.get(
+          `/api/mobile/today-appointments`
         );
-        if (!response.ok) {
+        if (!response.data) {
           throw new Error(`Appointments API failed: ${response.status}`);
         }
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Error fetching appointments:", error);

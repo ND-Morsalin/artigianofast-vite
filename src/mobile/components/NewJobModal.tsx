@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { useToast } from "../../hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import {
@@ -22,8 +21,8 @@ import {
   FileText,
 } from "lucide-react";
 import { usePermissions } from "../contexts/PermissionContext";
-import { mobileApiCall } from "../utils/mobileApi";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface Client {
   id: number;
@@ -151,7 +150,7 @@ export function NewJobModal() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { t } = useTranslation();
-console.log(getClientSchema,getJobTypeSchema)
+  console.log(getClientSchema, getJobTypeSchema);
   // Get permissions for permission-based UI rendering
   const { hasPermission, isLoading: permissionsLoading } = usePermissions();
 
@@ -182,20 +181,17 @@ console.log(getClientSchema,getJobTypeSchema)
   // const canViewJobCost = hasPermission("canViewJobCost");
 
   const { data: clients = [] } = useQuery<Client[]>({
-    queryKey: [`${BASE_URL}/api/mobile/all-clients`],
+    queryKey: [`/api/mobile/all-clients`],
     queryFn: async () => {
-      const response = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/mobile/all-clients`
-      );
-      if (!response.ok) throw new Error("Errore nel recuperare i clienti");
-      return response.json();
+      const response = await axiosInstance.get(`/api/mobile/all-clients`);
+      if (!response.data) throw new Error("Errore nel recuperare i clienti");
+      return response.data;
     },
     enabled: isOpen,
   });
 
   const { data: jobTypes = [] } = useQuery<JobType[]>({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
     enabled: isOpen,
   });
 
@@ -235,7 +231,7 @@ console.log(getClientSchema,getJobTypeSchema)
 
   // Query per ottenere tutte le attività disponibili
   const { data: allActivities = [] } = useQuery<Activity[]>({
-    queryKey: [`${BASE_URL}/api/mobile/activities`],
+    queryKey: [`/api/mobile/activities`],
     enabled: isOpen,
     staleTime: 0, // Disabilita la cache per ottenere sempre dati freschi
     refetchOnMount: true, // Aggiorna sempre i dati quando il componente viene montato
@@ -244,25 +240,19 @@ console.log(getClientSchema,getJobTypeSchema)
   // Note: availableActivities logic moved to filteredActivities below
 
   const { data: availableCollaborators = [] } = useQuery<Collaborator[]>({
-    queryKey: [`${BASE_URL}/api/collaborators`],
+    queryKey: [`/api/collaborators`],
     enabled: isOpen,
   });
 
   // Check activity management permissions
   const { data: activityPermissions } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/permissions/activity-management`],
+    queryKey: [`/api/mobile/permissions/activity-management`],
     queryFn: async () => {
-      const response = await fetch(
-        `${BASE_URL}/api/mobile/permissions/activity-management`,
-        {
-          headers: {
-            "x-mobile-session-id":
-              localStorage.getItem("mobileSessionId") || "",
-          },
-        }
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/mobile/permissions/activity-management`
       );
-      if (!response.ok) throw new Error("Failed to fetch permissions");
-      return response.json();
+
+      return response.data;
     },
     enabled: isOpen,
   });
@@ -353,12 +343,14 @@ console.log(getClientSchema,getJobTypeSchema)
   }, [watchedType, allActivities]);
 
   const { data: selectedJob } = useQuery({
-    queryKey: [`${BASE_URL}/api/jobs`, selectedJobId],
+    queryKey: [`/api/jobs`, selectedJobId],
     queryFn: async () => {
       if (!selectedJobId) return null;
-      const response = await fetch(`${BASE_URL}/api/jobs/${selectedJobId}`);
-      if (!response.ok) throw new Error("Errore nel recuperare il lavoro");
-      return response.json();
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/jobs/${selectedJobId}`
+      );
+
+      return response.data;
     },
     enabled: !!selectedJobId && isOpen,
   });
@@ -564,19 +556,18 @@ console.log(getClientSchema,getJobTypeSchema)
       };
 
       if (editMode && selectedJobId) {
-        await apiRequest(
-          "PATCH",
+        await axiosInstance.patch(
           `${BASE_URL}/api/mobile/jobs/${selectedJobId}`,
           jobData
         );
 
         // Invalidate all job queries, including job range queries for calendar
-        queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobs`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/jobs`] });
         queryClient.invalidateQueries({
-          queryKey: [`${BASE_URL}/api/jobs`, selectedJobId],
+          queryKey: [`/api/jobs`, selectedJobId],
         });
         queryClient.invalidateQueries({
-          queryKey: [`${BASE_URL}/api/jobs/range`],
+          queryKey: [`/api/jobs/range`],
         });
 
         toast({
@@ -584,24 +575,20 @@ console.log(getClientSchema,getJobTypeSchema)
           description: t("mobile.jobs.modal.newJob.form.jobUpdatedDescription"),
         });
       } else {
-        const response = await mobileApiCall(
-          "POST",
-          `${BASE_URL}/api/mobile/jobs`,
-          jobData
-        );
+        const response = await axiosInstance.post(`/api/mobile/jobs`, jobData);
 
-        if (!response.ok) {
-          const errorData = await response.json();
+        if (!response.data) {
+          const errorData = await response.data;
           throw new Error(errorData.error || "Failed to create job");
         }
 
         // Invalidate all job queries, including mobile job queries
         queryClient.invalidateQueries({
-          queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+          queryKey: [`/api/mobile/all-jobs`],
         });
-        queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobs`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/jobs`] });
         queryClient.invalidateQueries({
-          queryKey: [`${BASE_URL}/api/jobs/range`],
+          queryKey: [`/api/jobs/range`],
         });
 
         toast({
@@ -702,15 +689,11 @@ console.log(getClientSchema,getJobTypeSchema)
 
   const handleClientAdd = async (client: ClientFormData) => {
     try {
-      const response = await mobileApiCall(
-        "POST",
-        `${BASE_URL}/api/mobile/clients`,
-        client
-      );
-      const newClient = await response.json();
+      const response = await axiosInstance.post(`/api/mobile/clients`, client);
+      const newClient = await response.data;
 
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/all-clients`],
+        queryKey: [`/api/mobile/all-clients`],
       });
 
       setValue("clientId", newClient.id);
@@ -735,14 +718,10 @@ console.log(getClientSchema,getJobTypeSchema)
 
   const handleJobTypeAdd = async (jobType: JobTypeFormData) => {
     try {
-      const response = await apiRequest(
-        "POST",
-        `${BASE_URL}/api/jobtypes`,
-        jobType
-      );
-      const newJobType = await response.json();
+      const response = await axiosInstance.post(`/api/jobtypes`, jobType);
+      const newJobType = await response.data;
 
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
 
       setValue("type", newJobType.id.toString());
 
@@ -1010,11 +989,11 @@ console.log(getClientSchema,getJobTypeSchema)
 
   // Fetch plan configuration to gate collaborator feature as well
   const { data: planConfig } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/plan-configuration`],
+    queryKey: [`/api/mobile/plan-configuration`],
     queryFn: async () => {
-      const res = await fetch(`${BASE_URL}/api/mobile/plan-configuration`);
-      if (!res.ok) return null;
-      return res.json();
+      const res = await axiosInstance.get(`/api/mobile/plan-configuration`);
+
+      return res.data;
     },
   });
   const collaboratorFeatureEnabled =

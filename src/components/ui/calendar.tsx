@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -25,7 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./dialog";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface Job {
   id: number;
@@ -73,23 +74,23 @@ export function Calendar() {
     isLoading,
     refetch: refetchJobs,
   } = useQuery<Job[]>({
-    queryKey: [`${BASE_URL}/api/jobs/range`, { start, end }],
+    queryKey: [`/api/jobs/range`, { start, end }],
     queryFn: async ({ queryKey }) => {
       const [_, { start, end }] = queryKey as [
         string,
         { start: string; end: string }
       ];
-      const response = await fetch(
-        `${BASE_URL}/api/jobs/range?start=${start}&end=${end}`
+      const res = await axiosInstance.get(
+        `/api/jobs/range?start=${start}&end=${end}`
       );
-      if (!response.ok) throw new Error("Failed to fetch jobs");
-      return response.json();
+
+      return res.data;
     },
   });
 
   // Query for client data to associate with jobs
   const { data: clients = [] } = useQuery<any[]>({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
     enabled: jobs.length > 0,
   });
 

@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import { useToast } from "../../hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import {
   Dialog,
   DialogContent,
@@ -53,6 +52,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Client type definition
 type Client = {
@@ -106,14 +106,12 @@ export default function ClientsPage() {
 
   // Check if user has client management permissions
   const { data: currentUser } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/user`],
+    queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/user`).then((res) =>
-        res.json()
-      ),
+      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
-console.log("Current User:", currentUser);
+  console.log("Current User:", currentUser);
   // Check if user has client creation permission - use correct feature names
   const hasClientPermission =
     currentUser?.permissions?.includes("client.create") ||
@@ -146,11 +144,11 @@ console.log("Current User:", currentUser);
     isLoading,
     error,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/clients`],
+    queryKey: [`/api/mobile/clients`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/clients`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/clients`)
+        .then((res) => res.data),
     enabled: true,
     retry: false, // Don't retry on permission errors
   });
@@ -158,12 +156,12 @@ console.log("Current User:", currentUser);
   // Create client mutation - use mobile API for permission checks
   const createClientMutation = useMutation({
     mutationFn: (data: ClientFormData) =>
-      apiRequest("POST", `${BASE_URL}/api/mobile/clients`, data).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .post(`${BASE_URL}/api/mobile/clients`, data)
+        .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/clients`],
+        queryKey: [`/api/mobile/clients`],
       });
       toast({
         title: t("clients.messages.created"),
@@ -185,12 +183,12 @@ console.log("Current User:", currentUser);
   // Update client mutation - use mobile API for permission checks
   const updateClientMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: ClientFormData }) =>
-      apiRequest("PUT", `${BASE_URL}/api/mobile/clients/${id}`, data).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .put(`${BASE_URL}/api/mobile/clients/${id}`, data)
+        .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/clients`],
+        queryKey: [`/api/mobile/clients`],
       });
       toast({
         title: t("clients.messages.updated"),
@@ -212,12 +210,12 @@ console.log("Current User:", currentUser);
   // Delete client mutation - use mobile API for permission checks
   const deleteClientMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest("DELETE", `${BASE_URL}/api/mobile/clients/${id}`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .delete(`${BASE_URL}/api/mobile/clients/${id}`)
+        .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/clients`],
+        queryKey: [`/api/mobile/clients`],
       });
       toast({
         title: t("clients.messages.deleted"),

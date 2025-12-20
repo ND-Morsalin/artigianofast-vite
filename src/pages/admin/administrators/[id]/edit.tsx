@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../../../lib/queryClient";
 import { useToast } from "../../../../hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,6 +38,7 @@ import { Skeleton } from "../../../../components/ui/skeleton";
 import { Switch } from "../../../../components/ui/switch";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../../../../constant";
+import { axiosInstance } from "../../../../lib/axios";
 
 // Schema di validazione per il modulo amministratore
 const adminSchema = z.object({
@@ -67,19 +67,19 @@ export default function AdminEditPage(props: AdminEditPageProps) {
 
   // Carica i dati dell'amministratore
   const { data: admin, isLoading: adminLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/administrators/${adminId}`],
+    queryKey: [`/api/administrators/${adminId}`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/administrators/${adminId}`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/administrators/${adminId}`)
+        .then((res) => res.data),
     enabled: !!adminId,
   });
 
   // Carica i ruoli disponibili
   const { data: roles = [], isLoading: rolesLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/roles`],
+    queryKey: [`/api/roles`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/roles`).then((res) => res.json()),
+      axiosInstance.get(`${BASE_URL}/api/roles`).then((res) => res.data),
   });
 
   // Configurazione del form
@@ -112,11 +112,9 @@ export default function AdminEditPage(props: AdminEditPageProps) {
   // Mutation per aggiornare l'amministratore
   const updateMutation = useMutation({
     mutationFn: (data: AdminFormValues) => {
-      return apiRequest(
-        "PUT",
-        `${BASE_URL}/api/administrators/${adminId}`,
-        data
-      ).then((res) => res.json());
+      return axiosInstance
+        .put(`${BASE_URL}/api/administrators/${adminId}`, data)
+        .then((res) => res.data);
     },
     onSuccess: () => {
       toast({
@@ -125,10 +123,10 @@ export default function AdminEditPage(props: AdminEditPageProps) {
         variant: "default",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/administrators/${adminId}`],
+        queryKey: [`/api/administrators/${adminId}`],
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/administrators`],
+        queryKey: [`/api/administrators`],
       });
     },
     onError: (error) => {

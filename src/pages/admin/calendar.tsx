@@ -12,9 +12,9 @@ import { Badge } from "../../components/ui/badge";
 import { ArrowLeft, Calendar, Clock, MapPin, User, Plus } from "lucide-react";
 // import { useToast } from "../../hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 export default function CalendarPage() {
   const [, setLocation] = useLocation();
@@ -23,30 +23,28 @@ export default function CalendarPage() {
 
   // Check if user has calendar permissions
   const { data: currentUser } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/user`],
+    queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/user`).then((res) =>
-        res.json()
-      ),
+      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
 
   // Fetch user subscription and plan features (same as dashboard)
   const { data: userSubscription } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/user-subscription`],
+    queryKey: [`/api/mobile/user-subscription`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/user-subscription`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/user-subscription`)
+        .then((res) => res.data),
     enabled: true,
   });
 
   const { data: subscriptionPlans } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/subscription-plans`],
+    queryKey: [`/api/mobile/subscription-plans`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/subscription-plans`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/subscription-plans`)
+        .then((res) => res.data),
     enabled: true,
   });
 
@@ -73,15 +71,15 @@ export default function CalendarPage() {
     isLoading: jobsLoading,
     error: jobsError,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+    queryKey: [`/api/mobile/all-jobs`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/all-jobs`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/all-jobs`)
+        .then((res) => res.data),
     enabled: hasCalendarPermission,
     retry: false,
   });
-console.log(jobsLoading, currentUser );
+  console.log(jobsLoading, currentUser);
   // Filter jobs for calendar view (upcoming and scheduled)
   const calendarJobs = jobs.filter(
     (job: any) =>

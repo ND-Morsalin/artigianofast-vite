@@ -56,6 +56,7 @@ import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
 import type { OptionType } from "../../../components/ui/multi-select";
 import { LanguageSelector } from "../../../components/ui/language-selector";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Permission categories - will be populated with translations
 const getPermissionCategories = (t: any) => [
@@ -228,19 +229,21 @@ export default function AdminRolesPage() {
 
   // Query per ottenere i ruoli
   const { data: roles = [], isLoading: isLoadingRoles } = useQuery({
-    queryKey: [`${BASE_URL}/api/roles`],
+    queryKey: [`/api/roles`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/roles`)
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/roles`)
+        .then((res) => res.data)
         .catch(() => []),
   });
 
   // Query per ottenere i settori
   const { data: sectors = [], isLoading: isLoadingSectors } = useQuery({
-    queryKey: [`${BASE_URL}/api/sectors`],
+    queryKey: [`/api/sectors`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/sectors`)
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/sectors`)
+        .then((res) => res.data)
         .catch(() => []),
   });
 
@@ -294,10 +297,10 @@ export default function AdminRolesPage() {
             ? parseInt(data.sectorId)
             : null,
       };
-      return apiRequest("POST", `${BASE_URL}/api/roles`, formattedData);
+      return axiosInstance.post( `${BASE_URL}/api/roles`, formattedData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/roles`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/roles`] });
       toast({
         title: t("admin.roles.roleCreated"),
         description: t("admin.roles.roleCreatedDescription"),
@@ -320,7 +323,7 @@ export default function AdminRolesPage() {
     mutationFn: ({ id, data }: { id: number; data: RoleFormValues }) =>
       apiRequest("PUT", `${BASE_URL}/api/roles/${id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/roles`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/roles`] });
       toast({
         title: t("admin.roles.roleUpdated"),
         description: t("admin.roles.roleUpdatedDescription"),
@@ -344,7 +347,7 @@ export default function AdminRolesPage() {
     mutationFn: (id: number) =>
       apiRequest("DELETE", `${BASE_URL}/api/roles/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/roles`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/roles`] });
       toast({
         title: t("admin.roles.roleDeleted"),
         description: t("admin.roles.roleDeletedDescription"),

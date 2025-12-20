@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import { useToast } from "../../hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import {
   Dialog,
   DialogContent,
@@ -58,6 +57,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Job type definition
 type Job = {
@@ -146,22 +146,22 @@ export default function JobsPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+    queryKey: [`/api/mobile/all-jobs`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/all-jobs`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/all-jobs`)
+        .then((res) => res.data),
     enabled: true,
     retry: false, // Don't retry on permission errors
   });
 
   // Fetch clients for dropdown - use mobile API for permission checks
   const { data: clients = [] } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/clients`],
+    queryKey: [`/api/mobile/clients`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/clients`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/clients`)
+        .then((res) => res.data),
     enabled: true,
     retry: false, // Don't retry on permission errors
   });
@@ -169,12 +169,12 @@ export default function JobsPage() {
   // Create job mutation - use mobile API for permission checks
   const createJobMutation = useMutation({
     mutationFn: (data: JobFormData) =>
-      apiRequest("POST", `${BASE_URL}/api/mobile/jobs`, data).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .post(`${BASE_URL}/api/mobile/jobs`, data)
+        .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+        queryKey: [`/api/mobile/all-jobs`],
       });
       toast({
         title: t("jobs.messages.created"),
@@ -196,12 +196,12 @@ export default function JobsPage() {
   // Update job mutation - use mobile API for permission checks
   const updateJobMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: JobFormData }) =>
-      apiRequest("PUT", `${BASE_URL}/api/mobile/jobs/${id}`, data).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .put(`${BASE_URL}/api/mobile/jobs/${id}`, data)
+        .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+        queryKey: [`/api/mobile/all-jobs`],
       });
       toast({
         title: t("jobs.messages.updated"),
@@ -223,12 +223,12 @@ export default function JobsPage() {
   // Delete job mutation - use mobile API for permission checks
   const deleteJobMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest("DELETE", `${BASE_URL}/api/mobile/jobs/${id}`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .delete(`${BASE_URL}/api/mobile/jobs/${id}`)
+        .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+        queryKey: [`/api/mobile/all-jobs`],
       });
       toast({
         title: t("jobs.messages.deleted"),

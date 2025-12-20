@@ -25,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/ui/form";
-import { BASE_URL } from "../constant";
+import { axiosInstance } from "../lib/axios";
 
 type ActivationStatus = "pending" | "success" | "error";
 
@@ -88,20 +88,14 @@ export default function ActivatePage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${BASE_URL}/api/collaborators/activate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token,
-          password: values.password,
-        }),
+      const response = await axiosInstance.post(`/api/collaborators/activate`, {
+        token,
+        password: values.password,
       });
 
-      const data = await response.json();
+      const data = await response.data;
 
-      if (response.ok) {
+      if (response.data) {
         setActivationStatus("success");
         toast({
           title: "Account attivato",

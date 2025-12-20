@@ -10,8 +10,8 @@ import { Avatar, AvatarFallback } from "../../components/ui/avatar";
 import MobileLayout from "../components/MobileLayout";
 import FeatureGate from "../components/FeatureGate";
 import { usePlanFeatures } from "../hooks/usePlanFeatures";
-import { mobileGet, mobileDelete } from "../utils/mobileApi";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Definisci l'interfaccia per il collaboratore
 interface Collaborator {
@@ -39,16 +39,16 @@ export default function CollaboratorsSettings() {
   // Carica i collaboratori
   const { data: collaborators = [], isLoading: isCollaboratorsLoading } =
     useQuery<Collaborator[]>({
-      queryKey: [`${BASE_URL}/api/mobile/collaborators`],
+      queryKey: [`/api/mobile/collaborators`],
       queryFn: async () => {
         try {
-          const response = await mobileGet(
+          const response = await axiosInstance.get(
             `${BASE_URL}/api/mobile/collaborators`
           );
-          if (!response.ok) {
+          if (!response.data) {
             throw new Error("Errore nel recuperare i collaboratori");
           }
-          return response.json();
+          return response.data;
         } catch (error) {
           console.log(error);
           console.error("Errore:", error);
@@ -59,14 +59,16 @@ export default function CollaboratorsSettings() {
 
   // Carica i ruoli per associarli ai collaboratori
   const { data: roles = [] } = useQuery<Role[]>({
-    queryKey: [`${BASE_URL}/api/mobile/roles`],
+    queryKey: [`/api/mobile/roles`],
     queryFn: async () => {
       try {
-        const response = await mobileGet(`${BASE_URL}/api/mobile/roles`);
-        if (!response.ok) {
+        const response = await axiosInstance.get(
+          `${BASE_URL}/api/mobile/roles`
+        );
+        if (!response.data) {
           throw new Error("Errore nel recuperare i ruoli");
         }
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore:", error);
@@ -88,15 +90,15 @@ export default function CollaboratorsSettings() {
   // Mutation per eliminare un collaboratore
   const deleteCollaborator = useMutation({
     mutationFn: async (id: number) => {
-      const response = await mobileDelete(
+      const response = await axiosInstance.delete(
         `${BASE_URL}/api/mobile/collaborators/${id}`
       );
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error("Errore durante l'eliminazione del collaboratore");
       }
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       toast({
@@ -104,7 +106,7 @@ export default function CollaboratorsSettings() {
         description: "Il collaboratore è stato eliminato con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/collaborators`],
+        queryKey: [`/api/mobile/collaborators`],
       });
     },
     onError: (error: Error) => {

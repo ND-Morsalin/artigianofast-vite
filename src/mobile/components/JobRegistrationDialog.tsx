@@ -7,8 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { apiRequest } from "../../lib/queryClient";
-import { mobileApiCall } from "../utils/mobileApi";
 import { useToast } from "../../hooks/use-toast";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
@@ -39,6 +37,7 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Schema per la validazione del form
 const getRegistrationSchema = (t: any) =>
@@ -115,12 +114,12 @@ export function JobRegistrationDialog({
 
   // Query per ottenere i dettagli del lavoro selezionato
   const { data: job = {}, isLoading: isJobLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/jobs`, jobId],
+    queryKey: [`/api/mobile/jobs`, jobId],
     queryFn: async () => {
       if (!jobId) return {};
-      const response = await mobileApiCall("GET", `${BASE_URL}/jobs/${jobId}`);
-      if (!response.ok) throw new Error("Errore nel recuperare il lavoro");
-      return response.json();
+      const response = await axiosInstance.get(`/jobs/${jobId}`);
+      if (!response.data) throw new Error("Errore nel recuperare il lavoro");
+      return response.data;
     },
     enabled: !!jobId && isOpen,
   });
@@ -128,19 +127,16 @@ export function JobRegistrationDialog({
   // Query per ottenere tutte le attività disponibili
   const { data: allActivities = [], isLoading: isActivitiesLoading } = useQuery(
     {
-      queryKey: [`${BASE_URL}/api/mobile/activities`],
+      queryKey: [`/api/mobile/activities`],
       queryFn: async () => {
-        const response = await mobileApiCall(
-          "GET",
-          `${BASE_URL}/api/mobile/activities`
-        );
-        if (!response.ok) {
-          const errorText = await response.text();
+        const response = await axiosInstance.get(`/api/mobile/activities`);
+        if (!response.data) {
+          const errorText = await response.data;
           throw new Error(
             `Errore nel recuperare le attività: ${response.status} ${errorText}`
           );
         }
-        return response.json();
+        return response.data;
       },
       enabled: isOpen,
     }
@@ -148,14 +144,11 @@ export function JobRegistrationDialog({
 
   // Query per ottenere tutti i lavori disponibili (se jobId non è fornito)
   const { data: allJobs = [], isLoading: isJobsLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+    queryKey: [`/api/mobile/all-jobs`],
     queryFn: async () => {
-      const response = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/mobile/all-jobs`
-      );
-      if (!response.ok) throw new Error("Errore nel recuperare i lavori");
-      return response.json();
+      const response = await axiosInstance.get(`/api/mobile/all-jobs`);
+      if (!response.data) throw new Error("Errore nel recuperare i lavori");
+      return response.data;
     },
     enabled: !jobId && isOpen,
   });
@@ -257,11 +250,7 @@ export function JobRegistrationDialog({
         formData.append("photos", file);
       });
 
-      return apiRequest({
-        method: "POST",
-        url: `${BASE_URL}/api/job-activities`,
-        data: formData,
-      });
+      return axiosInstance.post(`${BASE_URL}/api/job-activities`, formData);
     },
     onSuccess: () => {
       console.log("🎉 Activity registered successfully!");
@@ -274,13 +263,13 @@ export function JobRegistrationDialog({
 
       // Invalida le query per aggiornare i dati
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/activities`],
+        queryKey: [`/api/mobile/activities`],
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+        queryKey: [`/api/mobile/all-jobs`],
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/jobs`],
+        queryKey: [`/api/mobile/jobs`],
       });
 
       // Resetta il form e chiudi il dialog

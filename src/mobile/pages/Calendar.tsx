@@ -114,13 +114,13 @@
 
 //   // Query per ottenere TUTTI i lavori (per garantire coerenza con il resto dell'app)
 //   const { data: jobs = [], isLoading } = useQuery<Job[]>({
-//     queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+//     queryKey: [`/api/mobile/all-jobs`],
 //     queryFn: async () => {
 //       try {
 //         // Carica TUTTI i lavori invece di filtrarli per data nel backend
 //         const response = await mobileApiCall('GET', '/all-jobs');
 //         if (!response.ok) throw new Error("Errore nel recuperare i lavori");
-//         const allJobs = await response.json();
+//         const allJobs = await response.data;
 //         console.log(`Calendario: caricati ${allJobs.length} lavori totali`);
 //         return allJobs;
 //        } catch (error) {
@@ -133,12 +133,12 @@
 //   console.log("jobs", jobs);
 //   // Query per ottenere i clienti
 //   const { data: clients = [] } = useQuery({
-//     queryKey: [`${BASE_URL}/api/mobile/all-clients`],
+//     queryKey: [`/api/mobile/all-clients`],
 //     queryFn: async () => {
 //       try {
 //         const response = await mobileApiCall('GET', `${BASE_URL}/api/mobile/all-clients`);
 //         if (!response.ok) throw new Error("Errore nel recuperare i clienti");
-//         return response.json();
+//         return response.data;
 //        } catch (error) {
 // console.log(error);
 //         console.error("Errore:", error);
@@ -1103,7 +1103,7 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 moment.locale("en"); // change if needed
 const localizer = momentLocalizer(moment);
@@ -1151,11 +1151,11 @@ const CustomDateCellWrapper: React.FC<
 
 const JobCalendar: React.FC = () => {
   const { data: jobs = [], isLoading } = useQuery<any[]>({
-    queryKey: [`${BASE_URL}/api/jobs`],
+    queryKey: [`/api/jobs`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/jobs`);
-      if (!response.ok) throw new Error("Failed to fetch jobs");
-      return response.json();
+      const response = await axiosInstance.get(`/api/jobs`);
+
+      return response.data;
     },
   });
 

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { X } from "lucide-react";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 /**
  * Componente wrapper che gestisce tutti gli spot promozionali per l'app mobile.
@@ -29,16 +30,12 @@ export default function PromoSpotWrapper() {
         let response;
         try {
           console.log("Tentativo endpoint dedicato /api/spots...");
-          response = await fetch(`${BASE_URL}/api/spots`);
-          if (!response.ok) {
-            throw new Error(`Errore API spots: ${response.status}`);
-          }
+          response = await axiosInstance.get(`${BASE_URL}/api/spots`);
         } catch (apiError) {
           console.log("Fallback all'endpoint originale:", apiError);
-          response = await fetch(`${BASE_URL}/api/mobile/promotional-spots`);
-          if (!response.ok) {
-            throw new Error(`Errore HTTP: ${response.status}`);
-          }
+          response = await axiosInstance.get(
+            `${BASE_URL}/api/mobile/promotional-spots`
+          );
         }
 
         // Creiamo uno spot di test forzato sul lato client
@@ -58,7 +55,7 @@ export default function PromoSpotWrapper() {
 
         // Tenta di analizzare la risposta come JSON
         let data;
-        const responseText = await response.text();
+        const responseText = await response.data;
         try {
           data = JSON.parse(responseText);
         } catch (jsonError) {

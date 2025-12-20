@@ -1,7 +1,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface AnalyticsData {
   totalUsers: number;
@@ -30,11 +30,9 @@ const Analytics: React.FC = () => {
   } = useQuery<AnalyticsData>({
     queryKey: ["mobile-analytics"],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/analytics`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch analytics data");
-      }
-      return response.json();
+      const response = await axiosInstance.get(`/api/analytics`);
+
+      return response.data;
     },
     refetchInterval: 300000, // Refetch every 5 minutes
   });

@@ -22,7 +22,7 @@ import {
 } from "../../components/ui/select";
 import { Badge } from "../../components/ui/badge";
 import { JobRegistrationDialog } from "../components/JobRegistrationDialog";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface Job {
   id: number;
@@ -50,22 +50,21 @@ export default function MobileRegistration() {
 
   // Fetch dei lavori
   const { data: jobs = [], isLoading } = useQuery<Job[]>({
-    queryKey: [`${BASE_URL}/api/jobs`],
+    queryKey: [`/api/jobs`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/jobs`);
-      if (!response.ok) throw new Error("Errore nel recuperare i lavori");
-      return response.json();
+      const response = await axiosInstance.get(`/api/jobs`);
+
+      return response.data;
     },
   });
 
   // Fetch dei tipi di lavoro per il filtro
   const { data: jobTypes = [] } = useQuery<{ id: number; name: string }[]>({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/jobtypes`);
-      if (!response.ok)
-        throw new Error("Errore nel recuperare i tipi di lavoro");
-      return response.json();
+      const response = await axiosInstance.get(`/api/jobtypes`);
+
+      return response.data;
     },
   });
 

@@ -9,8 +9,8 @@ import {
   useMemo,
 } from "react";
 import { useMobileAuth } from "./MobileAuthContext";
-import { mobileGet } from "../utils/mobileApi";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Permission types based on our collaborator schema
 export interface MobilePermissions {
@@ -430,10 +430,12 @@ export const PermissionProvider = ({ children }: PermissionProviderProps) => {
         setError(null);
 
         // Fetch user permissions from API
-        const response = await mobileGet(`${BASE_URL}/api/mobile/permissions`);
+        const response = await axiosInstance.get(
+          `${BASE_URL}/api/mobile/permissions`
+        );
 
-        if (response.ok) {
-          const userPermissions = await response.json();
+        if (response.data) {
+          const userPermissions = await response.data;
           setPermissions(userPermissions.permissions || defaultPermissions);
         } else {
           // If no permissions endpoint, use default permissions

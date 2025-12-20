@@ -5,7 +5,7 @@ import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../../../../lib/queryClient";
-import { z } from "zod"; 
+import { z } from "zod";
 
 import { Button } from "../../../../components/ui/button";
 import {
@@ -38,6 +38,7 @@ import {
 import { toast } from "../../../../hooks/use-toast";
 import { ArrowLeft, Save } from "lucide-react";
 import { BASE_URL } from "../../../../constant";
+import { axiosInstance } from "../../../../lib/axios";
 
 // Estendi lo schema di inserimento con validazioni aggiuntive
 const formSchema = z.object({
@@ -61,7 +62,6 @@ const formSchema = z.object({
   isHomepage: z.boolean().optional().default(false),
   type: z.enum(["desktop", "mobile"]).default("desktop"),
   status: z.enum(["draft", "published"]).default("draft"),
-
 });
 
 export default function NewWebPage() {
@@ -75,7 +75,9 @@ export default function NewWebPage() {
 
   // Configura il form con i valori predefiniti
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema) as unknown as Resolver<z.infer<typeof formSchema>>,
+    resolver: zodResolver(formSchema) as unknown as Resolver<
+      z.infer<typeof formSchema>
+    >,
     defaultValues: {
       title: "",
       slug: "",
@@ -91,26 +93,11 @@ export default function NewWebPage() {
   // Effettua la chiamata API per creare la pagina
   const createMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      const response = await fetch(`${BASE_URL}/api/admin/web-pages`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(
-          error.message ||
-            "Si è verificato un errore durante la creazione della pagina"
-        );
-      }
-
-      return response.json();
+      const response = await axiosInstance.post(`${BASE_URL}/api/admin/web-pages`,data );
+      return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/admin/web-pages`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/admin/web-pages`] });
       toast({
         title: "Pagina creata",
         description: "La pagina è stata creata con successo",

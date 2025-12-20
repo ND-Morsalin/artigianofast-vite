@@ -20,13 +20,12 @@ import {
 } from "../../components/ui/form";
 import { Input } from "../../components/ui/input";
 import MobileLayout from "../components/MobileLayout";
-import { mobileApiCall } from "../utils/mobileApi";
 import { ArrowLeft, Loader2, Plus, X } from "lucide-react";
 // Removed unused Select import
 import { Badge } from "../../components/ui/badge";
 import { MultiSelect } from "../../components/ui/multi-select";
 import { Switch } from "../../components/ui/switch";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Schema per il form
 const collaboratorSchema = z.object({
@@ -101,28 +100,24 @@ export default function CollaboratorForm() {
 
   // Carica i ruoli
   const { data: roles = [] } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/roles`],
+    queryKey: [`/api/mobile/roles`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/mobile/roles`);
-      if (!response.ok) {
-        throw new Error("Errore nel recuperare i ruoli");
-      }
-      return response.json();
+      const response = await axiosInstance.get(`/api/mobile/roles`);
+
+      return response.data;
     },
   });
 
   // Carica i dati del collaboratore se siamo in modalità modifica
   const { isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/collaborators/${collaboratorId}`],
+    queryKey: [`/api/mobile/collaborators/${collaboratorId}`],
     queryFn: async () => {
       if (!collaboratorId) return undefined;
-      const response = await fetch(
-        `${BASE_URL}/api/mobile/collaborators/${collaboratorId}`
+      const response = await axiosInstance.get(
+        `/api/mobile/collaborators/${collaboratorId}`
       );
-      if (!response.ok) {
-        throw new Error("Errore nel recuperare i dati del collaboratore");
-      }
-      return response.json();
+
+      return response.data;
     },
     enabled: isEditMode,
   });
@@ -157,13 +152,11 @@ export default function CollaboratorForm() {
     const loadCollaboratorData = async () => {
       if (isEditMode && collaboratorId && !isDataLoaded) {
         try {
-          const response = await fetch(
-            `${BASE_URL}/api/mobile/collaborators/${collaboratorId}`
+          const response = await axiosInstance.get(
+            `/api/mobile/collaborators/${collaboratorId}`
           );
-          if (!response.ok) {
-            throw new Error("Errore nel recuperare i dati del collaboratore");
-          }
-          const data = await response.json();
+
+          const data = await response.data;
 
           if (data) {
             // Assicuriamoci che skills sia un array
@@ -213,9 +206,8 @@ export default function CollaboratorForm() {
         if (dataToSend.selectedRoles && dataToSend.selectedRoles.length > 0) {
           dataToSend.roleIds = JSON.stringify(dataToSend.selectedRoles);
         }
-        const response = await mobileApiCall(
-          "POST",
-          `${BASE_URL}/api/mobile/collaborators`,
+        const response = await axiosInstance.post(
+          `/api/mobile/collaborators`,
           dataToSend
         );
 
@@ -225,15 +217,15 @@ export default function CollaboratorForm() {
           response.statusText
         );
 
-        if (!response.ok) {
-          const errorText = await response.text();
+        if (!response.data) {
+          const errorText = await response.data;
           console.error("Errore nella risposta:", errorText);
           throw new Error(
             `Errore durante la creazione del collaboratore: ${errorText}`
           );
         }
 
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore nella chiamata API:", error);
@@ -247,7 +239,7 @@ export default function CollaboratorForm() {
         description: "Il collaboratore è stato creato con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/collaborators`],
+        queryKey: [`/api/mobile/collaborators`],
       });
       setLocation("/mobile/settings/collaborators");
     },
@@ -279,9 +271,8 @@ export default function CollaboratorForm() {
         if (dataToSend.selectedRoles && dataToSend.selectedRoles.length > 0) {
           dataToSend.roleIds = JSON.stringify(dataToSend.selectedRoles);
         }
-        const response = await mobileApiCall(
-          "PATCH",
-          `${BASE_URL}/api/mobile/collaborators/${collaboratorId}`,
+        const response = await axiosInstance.patch(
+          `/api/mobile/collaborators/${collaboratorId}`,
           dataToSend
         );
 
@@ -291,15 +282,15 @@ export default function CollaboratorForm() {
           response.statusText
         );
 
-        if (!response.ok) {
-          const errorText = await response.text();
+        if (!response.data) {
+          const errorText = await response.data;
           console.error("Errore nella risposta:", errorText);
           throw new Error(
             `Errore durante l'aggiornamento del collaboratore: ${errorText}`
           );
         }
 
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore nella chiamata API:", error);
@@ -313,7 +304,7 @@ export default function CollaboratorForm() {
         description: "Il collaboratore è stato aggiornato con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/collaborators`],
+        queryKey: [`/api/mobile/collaborators`],
       });
       setLocation("/mobile/settings/collaborators");
     },

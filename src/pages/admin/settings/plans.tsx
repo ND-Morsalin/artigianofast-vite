@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "../../../lib/queryClient";
+import { queryClient } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
@@ -54,6 +55,7 @@ import {
 } from "../../../components/ui/table";
 import { LanguageSelector } from "../../../components/ui/language-selector";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Definizione delle funzionalità disponibili nel sistema
 const availableFeatures = [
@@ -151,10 +153,12 @@ export default function AdminSettingsPlansPage() {
 
   // Richiesta per ottenere i piani
   const { data: plans, isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/subscription-plans`],
+    queryKey: [`/api/subscription-plans`],
     queryFn: async () => {
-      const response = await apiRequest(`${BASE_URL}/api/subscription-plans`);
-      return await response.json();
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/subscription-plans`
+      );
+      return await response.data;
     },
   });
 
@@ -178,18 +182,14 @@ export default function AdminSettingsPlansPage() {
   // Mutation per creare un nuovo piano
   const createMutation = useMutation({
     mutationFn: (data: FormValues) =>
-      apiRequest({
-        method: "POST",
-        url: `${BASE_URL}/api/subscription-plans`,
-        data,
-      }),
+      axiosInstance.post(`${BASE_URL}/api/subscription-plans`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       // Ricarica i dati dei piani
       queryClient.refetchQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       toast({
         title: t("admin.settings.plans.form.save"),
@@ -211,18 +211,14 @@ export default function AdminSettingsPlansPage() {
   // Mutation per aggiornare un piano esistente
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: FormValues }) =>
-      apiRequest({
-        method: "PUT",
-        url: `${BASE_URL}/api/subscription-plans/${id}`,
-        data,
-      }),
+      axiosInstance.put(`${BASE_URL}/api/subscription-plans/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       // Ricarica i dati dei piani
       queryClient.refetchQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       toast({
         title: t("plan_updated"),
@@ -245,17 +241,14 @@ export default function AdminSettingsPlansPage() {
   // Mutation per eliminare un piano
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest({
-        method: "DELETE",
-        url: `${BASE_URL}/api/subscription-plans/${id}`,
-      }),
+      axiosInstance.delete(`${BASE_URL}/api/subscription-plans/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       // Ricarica i dati dei piani
       queryClient.refetchQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       toast({
         title: t("plan_deleted"),

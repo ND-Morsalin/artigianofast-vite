@@ -26,8 +26,8 @@ import {
 } from "../../components/ui/card";
 import { ArrowLeft, Check, Mail } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
-import { apiRequest } from "../../lib/queryClient";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Schema di validazione
 const forgotPasswordSchema = z.object({
@@ -55,11 +55,7 @@ export default function ForgotPasswordPage() {
     try {
       // Simula invio email di recupero
       // In un'implementazione reale, questo sarebbe un endpoint API
-      const res = await apiRequest(
-        "POST",
-        `${BASE_URL}/api/forgot-password`,
-        data
-      );
+      const res = await axiosInstance.post(`${BASE_URL}/api/forgot-password`, data);
       console.log(res);
       // Simula successo
       // await new Promise((resolve) => setTimeout(resolve, 1500));

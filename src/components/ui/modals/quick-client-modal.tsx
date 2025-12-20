@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../dialog";
@@ -28,6 +27,7 @@ import {
 } from "../select";
 import { Textarea } from "../textarea";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 const clientSchema = z.object({
   name: z.string().min(1, "Il nome è richiesto"),
@@ -74,7 +74,7 @@ export function QuickClientModal({
   const createClient = useMutation({
     mutationFn: (values: ClientFormValues) => {
       setIsSaving(true);
-      return apiRequest("POST", `${BASE_URL}/api/clients`, values);
+      return axiosInstance.post(`${BASE_URL}/api/clients`, values);
     },
     onSuccess: (data: any) => {
       setIsSaving(false);
@@ -82,7 +82,7 @@ export function QuickClientModal({
         title: "Cliente creato",
         description: "Il nuovo cliente è stato creato con successo",
       });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/clients`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/clients`] });
       if (onClientAdded && data.id) {
         onClientAdded(data.id);
       }

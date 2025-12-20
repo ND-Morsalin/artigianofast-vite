@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 // import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
-import { mobileApiCall } from "../utils/mobileApi";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import {
@@ -53,6 +52,7 @@ import { cn } from "../../lib/utils";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { BASE_URL } from "../../constant";
 import { useLocation } from "wouter";
+import { axiosInstance } from "../../lib/axios";
 
 // Tipi di lavoro e stati - verranno tradotti dinamicamente
 const getJobTypes = (t: any) => [
@@ -126,26 +126,22 @@ export default function Jobs(props: any) {
 
   // Fetch jobs e clienti
   const { data: jobs = [], isLoading: isJobsLoading } = useQuery<JobData[]>({
-    queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+    queryKey: [`/api/mobile/all-jobs`],
     queryFn: async () => {
-      const response = await mobileApiCall(
-        "GET",
+      const response = await axiosInstance.get(
         `${BASE_URL}/api/mobile/all-jobs`
       );
-      if (!response.ok) throw new Error("Errore nel recuperare i lavori");
-      return response.json();
+      if (!response.data) throw new Error("Errore nel recuperare i lavori");
+      return response.data;
     },
   });
 
   const { data: clients = [] } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/all-clients`],
+    queryKey: [`/api/mobile/all-clients`],
     queryFn: async () => {
-      const response = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/mobile/all-clients`
-      );
-      if (!response.ok) throw new Error("Errore nel recuperare i clienti");
-      return response.json();
+      const response = await axiosInstance.get(`/api/mobile/all-clients`);
+      if (!response.data) throw new Error("Errore nel recuperare i clienti");
+      return response.data;
     },
     enabled: jobs.length > 0,
   });
@@ -296,7 +292,7 @@ export default function Jobs(props: any) {
   // Gestisci la creazione di un nuovo lavoro
   // const handleNewJobSubmit = async (formData: FormData) => {
   //   try {
-  //     const response = await mobileApiCall(
+  //     const response = await axiosInstance.(
   //       "POST",
   //       `${BASE_URL}/api/mobile/jobs`,
   //       formData
@@ -308,7 +304,7 @@ export default function Jobs(props: any) {
 
   //     // Invalida la query dei lavori per aggiornare la lista
   //     await queryClient.invalidateQueries({
-  //       queryKey: [`${BASE_URL}/api/jobs`],
+  //       queryKey: [`/api/jobs`],
   //     });
 
   //     setIsNewJobOpen(false);
@@ -392,15 +388,16 @@ export default function Jobs(props: any) {
                     // Conferma annullamento
                     if (confirm(t("mobile.jobs.actions.confirmCancel"))) {
                       // Chiamata API per annullare il lavoro
-                      mobileApiCall("PATCH", `${BASE_URL}/api/jobs/${job.id}`, {
-                        status: "cancelled",
-                      })
+                      axiosInstance
+                        .patch(`/api/jobs/${job.id}`, {
+                          status: "cancelled",
+                        })
                         .then((response) => {
-                          if (!response.ok)
+                          if (!response.data)
                             throw new Error(
                               t("mobile.jobs.actions.cancelError")
                             );
-                          return response.json();
+                          return response.data;
                         })
                         .then(() => {
                           // Mostra notifica di successo
@@ -413,10 +410,10 @@ export default function Jobs(props: any) {
 
                           // Invalida le query per aggiornare i dati
                           queryClient.invalidateQueries({
-                            queryKey: [`${BASE_URL}/api/jobs`],
+                            queryKey: [`/api/jobs`],
                           });
                           queryClient.invalidateQueries({
-                            queryKey: [`${BASE_URL}/api/jobs/range`],
+                            queryKey: [`/api/jobs/range`],
                           });
                         })
                         .catch((error) => {
@@ -493,14 +490,14 @@ export default function Jobs(props: any) {
       ? "Registrazioni"
       : "Lavori";
 
-      useEffect(() => {
-        // set location in base a isRegistrationPage
-        if (isRegistrationPage) {
-          setLocation("/mobile/registration");
-        } else {
-          setLocation("/mobile/jobs");
-        }
-      }, [location]);
+  useEffect(() => {
+    // set location in base a isRegistrationPage
+    if (isRegistrationPage) {
+      setLocation("/mobile/registration");
+    } else {
+      setLocation("/mobile/jobs");
+    }
+  }, [location]);
 
   return (
     <MobileLayout

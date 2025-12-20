@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../dialog";
@@ -20,6 +19,7 @@ import { Input } from "../input";
 import { Button } from "../button";
 import { Textarea } from "../textarea";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 const jobTypeSchema = z.object({
   name: z.string().min(1, "Il nome è richiesto"),
@@ -54,7 +54,7 @@ export function QuickJobTypeModal({
   const createJobType = useMutation({
     mutationFn: (values: JobTypeFormValues) => {
       setIsSaving(true);
-      return apiRequest("POST", `${BASE_URL}/api/jobtypes`, values);
+      return axiosInstance.post(`${BASE_URL}/api/jobtypes`, values);
     },
     onSuccess: (data: any) => {
       setIsSaving(false);
@@ -62,7 +62,7 @@ export function QuickJobTypeModal({
         title: "Tipo di lavoro creato",
         description: "Il nuovo tipo di lavoro è stato creato con successo",
       });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
       if (onJobTypeAdded && data.id) {
         onJobTypeAdded(data.id);
       }

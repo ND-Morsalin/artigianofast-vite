@@ -18,11 +18,10 @@ import {
 } from "../../components/ui/tabs";
 import { ArrowRight, Check } from "lucide-react";
 import MobileLayout from "../components/MobileLayout";
-import { mobileApiCall } from "../utils/mobileApi";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Use the centralized mobile API utility
-const apiCall = mobileApiCall;
 
 // Interfaccia per i piani di abbonamento
 interface SubscriptionPlan {
@@ -53,19 +52,18 @@ export default function MobileSubscriptionPlans() {
     async function loadPlans() {
       try {
         setLoading(true);
-        const response = await apiCall(
-          "GET",
+        const response = await axiosInstance.get(
           `${BASE_URL}/api/mobile/subscription-plans`
         );
-        if (response.ok) {
-          const data = await response.json();
+        if (response.data) {
+          const data = await response.data;
           setPlans(
             data.filter((plan: SubscriptionPlan) => plan.isActive === true)
           );
         } else {
           console.error(
             "Errore nel caricamento dei piani:",
-            await response.text()
+            await response.data
           );
           toast({
             title: "Errore",
@@ -145,8 +143,7 @@ export default function MobileSubscriptionPlans() {
         console.log(
           "Piano gratuito selezionato, attivazione diretta senza pagamento"
         );
-        const response = await apiCall(
-          "POST",
+        const response = await axiosInstance.post(
           `${BASE_URL}/api/mobile/subscriptions`,
           {
             planId: selectedPlan,
@@ -154,7 +151,7 @@ export default function MobileSubscriptionPlans() {
           }
         );
 
-        if (response.ok) {
+        if (response.data) {
           toast({
             title: "Abbonamento attivato",
             description: "Hai attivato con successo il piano gratuito",
@@ -162,7 +159,7 @@ export default function MobileSubscriptionPlans() {
           setLocation("/mobile/dashboard");
           return;
         } else {
-          const errorData = await response.json();
+          const errorData = await response.data;
           throw new Error(
             errorData.error || "Errore durante l'attivazione del piano"
           );

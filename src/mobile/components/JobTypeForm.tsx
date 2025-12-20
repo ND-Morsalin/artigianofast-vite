@@ -20,6 +20,7 @@ import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 const jobTypeSchema = z.object({
   name: z.string().min(1, "Il nome è richiesto"),
@@ -47,14 +48,12 @@ export default function JobTypeForm() {
 
   // Fetch job type data if in edit mode
   const { data, isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/jobtypes/${jobTypeId}`],
+    queryKey: [`/api/jobtypes/${jobTypeId}`],
     queryFn: async () => {
       if (!jobTypeId) return undefined;
-      const response = await fetch(`${BASE_URL}/api/jobtypes/${jobTypeId}`);
-      if (!response.ok) {
-        throw new Error("Errore nel recuperare i dati del tipo di lavoro");
-      }
-      return response.json();
+      const response = await axiosInstance.get(`api/jobtypes/${jobTypeId}`);
+
+      return response.data;
     },
     enabled: isEditMode,
   });
@@ -70,22 +69,9 @@ export default function JobTypeForm() {
   const createJobType = useMutation({
     mutationFn: async (values: JobTypeFormValues) => {
       setIsSaving(true);
-      const response = await fetch(`${BASE_URL}/api/jobtypes`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      const response = await axiosInstance.post(` /api/jobtypes`, values);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Errore durante la creazione del tipo di lavoro"
-        );
-      }
-
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       setIsSaving(false);
@@ -93,7 +79,7 @@ export default function JobTypeForm() {
         title: "Tipo di lavoro creato",
         description: "Il nuovo tipo di lavoro è stato creato con successo",
       });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
       setLocation("/mobile/settings/jobtypes");
     },
     onError: (error: Error) => {
@@ -114,22 +100,12 @@ export default function JobTypeForm() {
       if (!jobTypeId) throw new Error("ID tipo di lavoro mancante");
       setIsSaving(true);
 
-      const response = await fetch(`${BASE_URL}/api/jobtypes/${jobTypeId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      const response = await axiosInstance.put(
+        `${BASE_URL}/api/jobtypes/${jobTypeId}`,
+        values
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Errore durante l'aggiornamento del tipo di lavoro"
-        );
-      }
-
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       setIsSaving(false);
@@ -137,7 +113,7 @@ export default function JobTypeForm() {
         title: "Tipo di lavoro aggiornato",
         description: "Il tipo di lavoro è stato aggiornato con successo",
       });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
       setLocation("/mobile/settings/jobtypes");
     },
     onError: (error: Error) => {

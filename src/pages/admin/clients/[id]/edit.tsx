@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../../../lib/queryClient";
 import { useToast } from "../../../../hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,6 +36,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { Skeleton } from "../../../../components/ui/skeleton";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../../../../constant";
+import { axiosInstance } from "../../../../lib/axios";
 
 // Schema di validazione per il modulo client
 const clientSchema = z.object({
@@ -73,11 +73,11 @@ export default function ClientEditPage(props: ClientEditPageProps) {
 
   // Carica i dati del cliente
   const { data: client, isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/clients/${clientId}`],
+    queryKey: [`/api/clients/${clientId}`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/clients/${clientId}`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/clients/${clientId}`)
+        .then((res) => res.data),
     enabled: !!clientId,
   });
 
@@ -113,11 +113,9 @@ export default function ClientEditPage(props: ClientEditPageProps) {
   // Mutation per aggiornare il cliente
   const updateMutation = useMutation({
     mutationFn: (data: ClientFormValues) => {
-      return apiRequest(
-        "PUT",
-        `${BASE_URL}/api/clients/${clientId}`,
-        data
-      ).then((res) => res.json());
+      return axiosInstance
+        .put(`${BASE_URL}/api/clients/${clientId}`, data)
+        .then((res) => res.data);
     },
     onSuccess: () => {
       toast({
@@ -126,9 +124,9 @@ export default function ClientEditPage(props: ClientEditPageProps) {
         variant: "default",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/clients/${clientId}`],
+        queryKey: [`/api/clients/${clientId}`],
       });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/clients`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/clients`] });
     },
     onError: (error) => {
       console.log(error);

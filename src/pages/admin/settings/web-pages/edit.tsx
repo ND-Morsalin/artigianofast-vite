@@ -48,6 +48,7 @@ import {
 } from "../../../../components/ui/alert-dialog";
 import { ArrowLeft, Save, Trash2, Eye } from "lucide-react";
 import { BASE_URL } from "../../../../constant";
+import { axiosInstance } from "../../../../lib/axios";
 
 // Schema per il form di modifica
 const formSchema = z.object({
@@ -107,16 +108,12 @@ export default function EditWebPage(props: { params: { id: string } }) {
     isLoading,
     error,
   } = useQuery<WebPage | null>({
-    queryKey: [`${BASE_URL}/api/admin/web-pages/${pageId}`],
+    queryKey: [`/api/admin/web-pages/${pageId}`],
     enabled: !!pageId,
     queryFn: async () => {
-      const res = await fetch(`${BASE_URL}/api/admin/web-pages/${pageId!}`);
-      if (!res.ok) {
-        throw new Error(
-          "Si è verificato un errore durante il caricamento della pagina"
-        );
-      }
-      return (await res.json()) as WebPage;
+      const res = await axiosInstance.get(`/api/admin/web-pages/${pageId!}`);
+
+      return res.data as WebPage;
     },
   });
 
@@ -139,33 +136,27 @@ export default function EditWebPage(props: { params: { id: string } }) {
   // Mutation per aggiornare la pagina
   const updateMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      const response = await fetch(
-        `${BASE_URL}/api/admin/web-pages/${pageId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
+      const response = await axiosInstance.patch(
+        `/api/admin/web-pages/${pageId}`,
+        data
       );
 
-      if (!response.ok) {
-        const error = await response.json();
+      if (!response.data) {
+        const error = await response.data;
         throw new Error(
           error.message ||
             "Si è verificato un errore durante l'aggiornamento della pagina"
         );
       }
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/web-pages`],
+        queryKey: [`/api/admin/web-pages`],
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/web-pages/${pageId}`],
+        queryKey: [`/api/admin/web-pages/${pageId}`],
       });
       toast({
         title: "Pagina aggiornata",
@@ -186,27 +177,21 @@ export default function EditWebPage(props: { params: { id: string } }) {
   // Mutation per eliminare la pagina
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(
-        `${BASE_URL}/api/admin/web-pages/${pageId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      const response = await axiosInstance.delete(
+        `/api/admin/web-pages/${pageId}`
       );
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error(
           "Si è verificato un errore durante l'eliminazione della pagina"
         );
       }
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/web-pages`],
+        queryKey: [`/api/admin/web-pages`],
       });
       toast({
         title: "Pagina eliminata",

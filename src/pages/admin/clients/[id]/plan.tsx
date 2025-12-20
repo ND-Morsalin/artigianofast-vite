@@ -40,7 +40,6 @@ import {
 } from "../../../../components/ui/table";
 import { useToast } from "../../../../hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../../../lib/queryClient";
 import {
   ArrowLeft,
   Save,
@@ -53,6 +52,7 @@ import { format, differenceInDays, addMonths, addYears } from "date-fns";
 import { it } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../../../../constant";
+import { axiosInstance } from "../../../../lib/axios";
 
 interface ClientPlanPageProps {
   id?: string;
@@ -69,42 +69,40 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
 
   // Carica i dati del cliente
   const { data: client, isLoading: clientLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/clients/${clientId}`],
+    queryKey: [`/api/clients/${clientId}`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/clients/${clientId}`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/clients/${clientId}`)
+        .then((res) => res.data),
     enabled: !!clientId,
   });
 
   // Carica la sottoscrizione del cliente
   const { data: subscription, isLoading: subscriptionLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/users/${clientId}/subscription`],
+    queryKey: [`/api/users/${clientId}/subscription`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/users/${clientId}/subscription`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/users/${clientId}/subscription`)
+        .then((res) => res.data),
     enabled: !!clientId,
   });
 
   // Carica tutti i piani disponibili
   const { data: plans = [], isLoading: plansLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/subscription-plans`],
+    queryKey: [`/api/subscription-plans`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/subscription-plans`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/subscription-plans`)
+        .then((res) => res.data),
   });
 
   // Carica la configurazione personalizzata del piano
   const { data: planConfig, isLoading: configLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/plan-configurations?userId=${clientId}`],
+    queryKey: [`/api/plan-configurations?userId=${clientId}`],
     queryFn: () =>
-      apiRequest(
-        "GET",
-        `${BASE_URL}/api/plan-configurations?userId=${clientId}`
-      )
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/plan-configurations?userId=${clientId}`)
+        .then((res) => res.data)
         .catch(() => null),
     enabled: !!clientId,
   });
@@ -189,19 +187,15 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
     mutationFn: (data: any) => {
       // Se esiste già la sottoscrizione, aggiornala
       if (subscription?.id) {
-        return apiRequest(
-          "PUT",
-          `${BASE_URL}/api/user-subscriptions/${subscription.id}`,
-          data
-        ).then((res) => res.json());
+        return axiosInstance
+          .put(`${BASE_URL}/api/user-subscriptions/${subscription.id}`, data)
+          .then((res) => res.data);
       }
       // Altrimenti crea una nuova sottoscrizione
       else {
-        return apiRequest(
-          "POST",
-          `${BASE_URL}/api/user-subscriptions`,
-          data
-        ).then((res) => res.json());
+        return axiosInstance
+          .post(`${BASE_URL}/api/user-subscriptions`, data)
+          .then((res) => res.data);
       }
     },
     onSuccess: () => {
@@ -211,7 +205,7 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
         variant: "default",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/users/${clientId}/subscription`],
+        queryKey: [`/api/users/${clientId}/subscription`],
       });
     },
     onError: (error) => {
@@ -316,18 +310,14 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
     mutationFn: (data: any) => {
       if (planConfig?.id) {
         // Aggiorna una configurazione esistente
-        return apiRequest(
-          "PUT",
-          `${BASE_URL}/api/plan-configurations/${planConfig.id}`,
-          data
-        ).then((res) => res.json());
+        return axiosInstance
+          .put(`${BASE_URL}/api/plan-configurations/${planConfig.id}`, data)
+          .then((res) => res.data);
       } else {
         // Crea una nuova configurazione
-        return apiRequest(
-          "POST",
-          `${BASE_URL}/api/plan-configurations`,
-          data
-        ).then((res) => res.json());
+        return axiosInstance
+          .post(`${BASE_URL}/api/plan-configurations`, data)
+          .then((res) => res.data);
       }
     },
     onSuccess: () => {
@@ -337,7 +327,7 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
         variant: "default",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/plan-configurations?userId=${clientId}`],
+        queryKey: [`/api/plan-configurations?userId=${clientId}`],
       });
     },
     onError: (error) => {

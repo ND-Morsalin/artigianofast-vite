@@ -54,6 +54,7 @@ import {
 } from "../../../components/ui/multi-select";
 import { LanguageSelector } from "../../../components/ui/language-selector";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Schema per la validazione del form
 const jobTypeSchema = z.object({
@@ -76,22 +77,24 @@ export default function AdminJobTypesPage() {
 
   // Query per ottenere i tipi di lavoro
   const { data: jobTypes = [], isLoading: isLoadingJobTypes } = useQuery({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/jobtypes`)
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/jobtypes`)
+        .then((res) => res.data)
         .catch(() => []),
   });
 
   // Query per ottenere i settori
   const { data: sectors = [], isLoading: isLoadingSectors } = useQuery({
-    queryKey: [`${BASE_URL}/api/sectors`],
+    queryKey: [`/api/sectors`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/sectors`)
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/sectors`)
+        .then((res) => res.data)
         .catch(() => []),
   });
-console.log(isLoadingSectors)
+  console.log(isLoadingSectors);
   // Prepara le opzioni per il multi-select dei settori
   useEffect(() => {
     if (Array.isArray(sectors)) {
@@ -124,10 +127,10 @@ console.log(isLoadingSectors)
         ...data,
         sectorIds: JSON.stringify(data.sectorIds),
       };
-      return apiRequest("POST", `${BASE_URL}/api/jobtypes`, formattedData);
+      return axiosInstance.post( `${BASE_URL}/api/jobtypes`, formattedData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
       toast({
         title: t("jobTypes.jobTypeCreated"),
         description: t("jobTypes.jobTypeCreatedDescription"),
@@ -150,7 +153,7 @@ console.log(isLoadingSectors)
     mutationFn: ({ id, data }: { id: number; data: JobTypeFormValues }) =>
       apiRequest("PUT", `${BASE_URL}/api/jobtypes/${id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
       toast({
         title: t("jobTypes.jobTypeUpdated"),
         description: t("jobTypes.jobTypeUpdatedDescription"),
@@ -177,7 +180,7 @@ console.log(isLoadingSectors)
     },
     onSuccess: () => {
       console.log("✅ Job type deleted successfully");
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
       toast({
         title: t("jobTypes.jobTypeDeleted"),
         description: t("jobTypes.jobTypeDeletedDescription"),

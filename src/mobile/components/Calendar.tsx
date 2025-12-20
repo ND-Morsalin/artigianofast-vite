@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { format, addDays, subDays, startOfWeek, endOfWeek } from "date-fns";
@@ -8,7 +9,7 @@ import { ScrollArea } from "../../components/ui/scroll-area";
 import { Button } from "../../components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "../../lib/utils";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface Job {
   id: number;
@@ -54,23 +55,23 @@ export default function MobileCalendar() {
 
   // Query per ottenere i lavori nel range di date
   const { data: jobs = [], isLoading } = useQuery<Job[]>({
-    queryKey: [`${BASE_URL}/api/jobs/range`, { start, end }],
+    queryKey: [`/api/jobs/range`, { start, end }],
     queryFn: async ({ queryKey }) => {
       const [_, { start, end }] = queryKey as [
         string,
         { start: string; end: string }
       ];
-      const response = await fetch(
-        `${BASE_URL}/api/jobs/range?start=${start}&end=${end}`
+      const response = await axiosInstance.get(
+        `/api/jobs/range?start=${start}&end=${end}`
       );
-      if (!response.ok) throw new Error("Failed to fetch jobs");
-      return response.json();
+
+      return response.data;
     },
   });
 
   // Query per clienti (per associare nomi ai job)
   const { data: clients = [] } = useQuery({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
     enabled: jobs.length > 0,
   });
 

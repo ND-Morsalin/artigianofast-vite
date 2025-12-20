@@ -3,11 +3,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 import { QuickClientModal } from "./quick-client-modal";
 import { QuickJobTypeModal } from "./quick-jobtype-modal";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 interface Client {
   id: number;
@@ -47,12 +47,12 @@ export function NewJobModal() {
   const { toast } = useToast();
 
   const { data: clients = [] } = useQuery<Client[]>({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
     enabled: isOpen,
   });
 
   const { data: jobTypes = [] } = useQuery<JobType[]>({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
     enabled: isOpen,
   });
 
@@ -138,7 +138,7 @@ export function NewJobModal() {
   // Handler per l'aggiunta di un nuovo cliente
   const handleClientAdded = (clientId: number) => {
     setValue("clientId", clientId);
-    queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/clients`] });
+    queryClient.invalidateQueries({ queryKey: [`/api/clients`] });
     setShowClientModal(false);
 
     // Tentativo di aggiornare l'indirizzo se disponibile
@@ -153,7 +153,7 @@ export function NewJobModal() {
   // Handler per l'aggiunta di un nuovo tipo di lavoro personalizzato
   const handleJobTypeAdded = (jobTypeId: string) => {
     console.log("Nuovo tipo di lavoro aggiunto con ID:", jobTypeId);
-    queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
+    queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
     setShowJobTypeModal(false);
     toast({
       title: "Tipo di lavoro aggiunto",
@@ -172,13 +172,9 @@ export function NewJobModal() {
         photos: photos, // Aggiungi i file all'oggetto job
       };
 
-      await apiRequest({
-        url: `${BASE_URL}/api/jobs`,
-        method: "POST",
-        data: jobData,
-      });
+      await axiosInstance.post(`${BASE_URL}/api/jobs`, jobData);
 
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobs`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobs`] });
 
       toast({
         title: "Lavoro creato",

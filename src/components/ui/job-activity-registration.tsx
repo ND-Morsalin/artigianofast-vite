@@ -44,6 +44,7 @@ import {
   CardTitle,
 } from "../../components/ui/card";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface Job {
   id: number;
@@ -135,7 +136,7 @@ export function JobActivityRegistration({
 
   // Ottieni i tipi di lavoro
   const { data: jobTypes = [] } = useQuery<any[]>({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
     enabled: isOpen,
   });
 
@@ -185,18 +186,11 @@ export function JobActivityRegistration({
 
   // Ottieni tutte le attività e poi filtrale sul client
   const { data: allActivities = [] } = useQuery<Activity[]>({
-    queryKey: [`${BASE_URL}/api/activities`],
+    queryKey: [`/api/activities`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/activities`, {
-        method: "GET",
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error(
-          `Errore nel recupero delle attività: ${response.statusText}`
-        );
-      }
-      return await response.json();
+      const response = await axiosInstance.get(`/api/activities`);
+
+      return await response.data;
     },
     enabled: isOpen,
   });
@@ -246,7 +240,7 @@ export function JobActivityRegistration({
 
   // Ottieni i collaboratori
   const { data: collaborators = [] } = useQuery<Collaborator[]>({
-    queryKey: [`${BASE_URL}/api/collaborators`],
+    queryKey: [`/api/collaborators`],
     enabled: isOpen,
   });
 
@@ -254,21 +248,13 @@ export function JobActivityRegistration({
   const { data: jobActivities = [], refetch: refetchJobActivities } = useQuery<
     JobActivity[]
   >({
-    queryKey: [`${BASE_URL}/api/collaborators`, job.id, "activities"],
+    queryKey: [`/api/collaborators`, job.id, "activities"],
     queryFn: async () => {
-      const response = await fetch(
-        `${BASE_URL}/api/jobs/${job.id}/activities`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/jobs/${job.id}/activities`
       );
-      if (!response.ok) {
-        throw new Error(
-          `Errore nel recupero delle attività di lavoro: ${response.statusText}`
-        );
-      }
-      return await response.json();
+
+      return await response.data;
     },
     enabled: isOpen,
   });
@@ -300,30 +286,16 @@ export function JobActivityRegistration({
   // Mutation per registrare l'attività
   const registerActivity = useMutation({
     mutationFn: async (values: JobActivityRegistrationFormValues) => {
-      const response = await fetch(
+      const response = await axiosInstance.post(
         `${BASE_URL}/api/jobs/${job.id}/activities`,
         {
-          method: "POST",
-          body: JSON.stringify({
-            ...values,
-            photos,
-            status: saveAsDraft ? "in_progress" : values.status,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
+          ...values,
+          photos,
+          status: saveAsDraft ? "in_progress" : values.status,
         }
       );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Errore nella registrazione attività: ${response.status} ${errorText}`
-        );
-      }
-
-      return await response.json();
+      return await response.data;
     },
     onSuccess: () => {
       toast({
@@ -335,12 +307,12 @@ export function JobActivityRegistration({
           : "L'attività è stata registrata con successo.",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/collaborators`, job.id, "activities"],
+        queryKey: [`/api/collaborators`, job.id, "activities"],
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/collaborators`],
+        queryKey: [`/api/collaborators`],
       });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/stats`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/stats`] });
       setIsOpen(false);
       refetchJobActivities();
       if (onCompleted) onCompleted();

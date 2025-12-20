@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import MobileLayout from "../components/MobileLayout";
 import { useMobileAuth } from "../contexts/MobileAuthContext";
-import { mobileApiCall } from "../utils/mobileApi";
 import { Button } from "../../components/ui/button";
 import {
   Card,
@@ -47,6 +46,7 @@ import {
 import { useToast } from "../../hooks/use-toast";
 import { Switch } from "../../components/ui/switch";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Schema per la validazione dei dati del profilo
 const profileSchema = z.object({
@@ -170,9 +170,9 @@ export default function MobileProfile() {
   // Gestione del logout
   const handleLogout = async () => {
     try {
-      const response = await mobileApiCall("POST", `${BASE_URL}/api/logout`);
+      const response = await axiosInstance.post(`${BASE_URL}/api/logout`);
 
-      if (response.ok) {
+      if (response.data) {
         await logout(); // Aggiorna il contesto locale
         toast({
           title: "Logout effettuato",

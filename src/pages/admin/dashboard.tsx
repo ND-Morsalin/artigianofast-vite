@@ -30,7 +30,6 @@ import {
 import { Button } from "../../components/ui/button";
 import { useToast } from "../../hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { Badge } from "../../components/ui/badge";
 import { Skeleton } from "../../components/ui/skeleton";
 import { format, differenceInDays } from "date-fns";
@@ -47,6 +46,7 @@ import {
   Legend,
 } from "recharts";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 // Tipo di dati per il client
 type Client = {
   id: number;
@@ -135,9 +135,11 @@ export default function AdminDashboard() {
   useEffect(() => {
     const checkUserRole = async () => {
       try {
-        const response = await apiRequest(`${BASE_URL}/api/admin/session`);
-        if (response.ok) {
-          const session = await response.json();
+        const response = await axiosInstance.get(
+          `${BASE_URL}/api/admin/session`
+        );
+        if (response.data) {
+          const session = await response.data;
           if (session.user && session.user.role !== "superadmin") {
             // Redirect non-super-admin users to artisan dashboard
             setLocation("/admin/artisan-dashboard");
@@ -170,59 +172,57 @@ export default function AdminDashboard() {
     },
     isLoading: statsLoading,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/admin/stats`],
+    queryKey: [`/api/admin/stats`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/admin/stats`).then((res) =>
-        res.json()
-      ),
+      axiosInstance.get(`${BASE_URL}/api/admin/stats`).then((res) => res.data),
     retry: 3, // retry a few times in case of network issues
     retryDelay: 1000, // 1 second between retries
   });
-console.log({statsLoading});
+  console.log({ statsLoading });
   // Query per i clienti
   const { data: clients = [], isLoading: clientsLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/clients`).then((res) => res.json()),
+      axiosInstance.get(`${BASE_URL}/api/clients`).then((res) => res.data),
     enabled: activeTab === "clients",
   });
 
   // Query per i piani di abbonamento
   const { data: plans = [], isLoading: plansLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/subscription-plans`],
+    queryKey: [`/api/subscription-plans`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/subscription-plans`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/subscription-plans`)
+        .then((res) => res.data),
     enabled: true, // Always fetch plans since they're needed for administrators section
   });
 
   // Query per gli abbonamenti degli utenti
   const { data: subscriptions = [], isLoading: subscriptionsLoading } =
     useQuery({
-      queryKey: [`${BASE_URL}/api/user-subscriptions`],
+      queryKey: [`/api/user-subscriptions`],
       queryFn: () =>
-        apiRequest("GET", `${BASE_URL}/api/user-subscriptions`).then((res) =>
-          res.json()
-        ),
+        axiosInstance
+          .get(`${BASE_URL}/api/user-subscriptions`)
+          .then((res) => res.data),
       enabled: activeTab === "clients" || activeTab === "admins",
     });
 
   // Query per i settori
   useQuery({
-    queryKey: [`${BASE_URL}/api/sectors`],
+    queryKey: [`/api/sectors`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/sectors`).then((res) => res.json()),
+      axiosInstance.get(`${BASE_URL}/api/sectors`).then((res) => res.data),
     enabled: activeTab === "clients",
   });
 
   // Query per gli utenti amministratori
   const { data: administrators = [], isLoading: adminsLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/administrators`],
+    queryKey: [`/api/administrators`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/administrators`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/administrators`)
+        .then((res) => res.data),
     enabled: activeTab === "admins",
   });
 

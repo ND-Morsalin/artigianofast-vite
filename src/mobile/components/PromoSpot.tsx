@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useLocation } from "wouter";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Interfaccia per lo spot promozionale
 interface PromotionalSpot {
@@ -44,15 +44,12 @@ export default function PromoSpot({ position }: PromoSpotProps) {
     isLoading,
     error,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/promotional-spots`],
+    queryKey: [`/api/mobile/promotional-spots`],
     queryFn: async () => {
       console.log("Chiamata API per spot promozionali iniziata");
-      const res = await fetch(`${BASE_URL}/api/mobile/promotional-spots`);
-      if (!res.ok) {
-        console.error("Errore API:", res.status, res.statusText);
-        throw new Error("Errore nel caricamento degli spot promozionali");
-      }
-      const data = await res.json();
+      const res = await axiosInstance.get(`/api/mobile/promotional-spots`);
+
+      const data = res.data;
       console.log(
         "Dati spot promozionali ricevuti:",
         JSON.stringify(data, null, 2)
@@ -61,8 +58,7 @@ export default function PromoSpot({ position }: PromoSpotProps) {
     },
   });
 
-  console.log("Tutti gli spot disponibili:", spots, isLoading,
-    error,);
+  console.log("Tutti gli spot disponibili:", spots, isLoading, error);
 
   // Filtra gli spot per la posizione specificata e per le pagine visibili
   const filteredSpots =

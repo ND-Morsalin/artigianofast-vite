@@ -29,7 +29,6 @@ import {
 import { Button } from "../../../components/ui/button";
 import { Label } from "../../../components/ui/label";
 import { Card, CardContent } from "../../../components/ui/card";
-import { BASE_URL } from "../../../constant";
 
 export interface ReportFilterOptions {
   year?: number;
@@ -70,7 +69,7 @@ export default function ReportFilters({ onApplyFilters }: ReportFiltersProps) {
       collaborators: [],
     },
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/filter-options`],
+    queryKey: [`/api/filter-options`],
     refetchOnWindowFocus: false,
   }) as { data: any };
 

@@ -25,8 +25,7 @@ import { Loader2, Globe } from "lucide-react";
 import { Separator } from "../components/ui/separator";
 import { useToast } from "../hooks/use-toast";
 import { useTranslation } from "react-i18next";
-import { mobileApiCall } from "../mobile/utils/mobileApi";
-import { BASE_URL } from "../constant";
+import { axiosInstance } from "../lib/axios";
 
 // Schema di validazione
 const loginSchema = z.object({
@@ -97,21 +96,17 @@ export default function LoginPage() {
       setError(null);
       setIsLoading(true);
 
-      const response = await mobileApiCall(
-        "POST",
-        `${BASE_URL}/api/mobile/login`,
-        {
-          email: data.email,
-          password: data.password,
-        }
-      );
+      const response = await axiosInstance.post(`/api/mobile/login`, {
+        email: data.email,
+        password: data.password,
+      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response.data) {
+        const errorData = await response.data;
         throw new Error(errorData.error || "Errore durante il login");
       }
 
-      await response.json();
+      await response.data;
 
       toast({
         title: currentText.loginSuccess,

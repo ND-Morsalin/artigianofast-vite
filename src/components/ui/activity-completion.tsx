@@ -109,13 +109,13 @@ export function ActivityCompletion({
         title: "Attività completata",
         description: "L'attività è stata registrata come completata.",
       });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobs`] });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/stats`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobs`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/stats`] });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/jobactivities`],
+        queryKey: [`/api/jobactivities`],
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/jobs`, jobActivity.jobId, "activities"],
+        queryKey: [`/api/jobs`, jobActivity.jobId, "activities"],
       });
       setIsOpen(false);
       if (onCompleted) onCompleted();

@@ -22,8 +22,7 @@ import { useToast } from "../../hooks/use-toast";
 import { Link } from "wouter";
 import { Workflow, Briefcase, Calendar, Users, Shield } from "lucide-react";
 import { LanguageSelector } from "../../components/ui/language-selector";
-import { mobileApiCall } from "../../mobile/utils/mobileApi";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 export default function AuthPage() {
   const [location, setLocation] = useLocation();
@@ -75,16 +74,12 @@ export default function AuthPage() {
     try {
       setIsLoggingIn(true);
 
-      const response = await mobileApiCall(
-        "POST",
-        `${BASE_URL}/api/mobile/login`,
-        {
-          email: loginUsername,
-          password: loginPassword,
-        }
-      );
+      const response = await axiosInstance.post(`/api/mobile/login`, {
+        email: loginUsername,
+        password: loginPassword,
+      });
 
-      if (response.ok) {
+      if (response.data) {
         toast({
           title: t("auth.loginSuccess", "Login effettuato"),
           description: t("auth.welcomeMessage", "Benvenuto su ProjectPro!"),
@@ -95,7 +90,7 @@ export default function AuthPage() {
           setLocation("/admin/artisan-dashboard");
         }, 1500);
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data;
         toast({
           title: t("errors.loginError", "Errore di login"),
           description:
@@ -158,19 +153,15 @@ export default function AuthPage() {
     try {
       setIsRegistering(true);
 
-      const response = await mobileApiCall(
-        "POST",
-        `${BASE_URL}/api/mobile/register`,
-        {
-          email: registerEmail,
-          password: registerPassword,
-          fullName: registerCompanyName,
-          username: registerUsername,
-        }
-      );
+      const response = await axiosInstance.post(`/api/mobile/register`, {
+        email: registerEmail,
+        password: registerPassword,
+        fullName: registerCompanyName,
+        username: registerUsername,
+      });
 
-      if (response.ok) {
-        const userData = await response.json();
+      if (response.data) {
+        const userData = await response.data;
 
         toast({
           title: t("auth.registrationSuccess", "Registrazione completata"),
@@ -204,7 +195,7 @@ export default function AuthPage() {
           setLocation("/plans");
         }
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data;
         toast({
           title: t("errors.registrationError", "Errore di registrazione"),
           description:

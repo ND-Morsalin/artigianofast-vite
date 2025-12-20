@@ -5,7 +5,6 @@ import * as z from "zod";
 import { useLocation, useParams } from "wouter";
 import { useToast } from "../../../../hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../../../lib/queryClient";
 
 import { Button } from "../../../../components/ui/button";
 import {
@@ -29,6 +28,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { Separator } from "../../../../components/ui/separator";
 import { Skeleton } from "../../../../components/ui/skeleton";
 import { BASE_URL } from "../../../../constant";
+import { axiosInstance } from "../../../../lib/axios";
 
 // Schema di validazione
 const passwordSchema = z
@@ -61,11 +61,11 @@ export default function AdministratorPasswordPage(props: PasswordPageProps) {
 
   // Carica dati dell'utente
   const { data: user, isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/administrators/${userId}`],
+    queryKey: [`/api/administrators/${userId}`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/administrators/${userId}`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/administrators/${userId}`)
+        .then((res) => res.data),
     enabled: !!userId,
   });
 
@@ -80,20 +80,19 @@ export default function AdministratorPasswordPage(props: PasswordPageProps) {
   // Mutation per cambiare la password
   const updatePasswordMutation = useMutation({
     mutationFn: async (data: { password: string }) => {
-      const response = await apiRequest(
-        "PATCH",
+      const response = await axiosInstance.patch(
         `${BASE_URL}/api/administrators/${userId}/password`,
         data
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response.data) {
+        const errorData = await response.data;
         throw new Error(
           errorData.message || "Errore durante l'aggiornamento della password"
         );
       }
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       toast({
@@ -102,7 +101,7 @@ export default function AdministratorPasswordPage(props: PasswordPageProps) {
       });
 
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/administrators/${userId}`],
+        queryKey: [`/api/administrators/${userId}`],
       });
 
       // Redirect alla dashboard

@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../hooks/use-toast";
-import { mobileGet, mobilePatch } from "../utils/mobileApi";
 import { Button } from "../../components/ui/button";
 import {
   Form,
@@ -33,6 +32,7 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Schema for notification settings
 const notificationSettingsSchema = z.object({
@@ -133,28 +133,30 @@ export default function NotificationSettings({
 
   // Load activities for activity-specific settings
   const { data: activities = [] } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/activities`],
+    queryKey: [`/api/mobile/activities`],
     queryFn: async () => {
-      const response = await mobileGet(`${BASE_URL}/api/mobile/activities`);
-      if (!response.ok) {
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/mobile/activities`
+      );
+      if (!response.data) {
         throw new Error("Failed to fetch activities");
       }
-      return response.json();
+      return response.data;
     },
   });
 
   // Load saved notification settings
   const { data: savedSettings } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/notification-preferences`],
+    queryKey: [`/api/mobile/notification-preferences`],
     queryFn: async () => {
-      const response = await mobileGet(
+      const response = await axiosInstance.get(
         `${BASE_URL}/api/mobile/notification-preferences`
       );
-      if (!response.ok) {
+      if (!response.data) {
         // Return default settings if not found
         return null;
       }
-      return response.json();
+      return response.data;
     },
   });
 
@@ -182,16 +184,16 @@ export default function NotificationSettings({
   // Save notification settings
   const saveMutation = useMutation({
     mutationFn: async (values: NotificationSettingsValues) => {
-      const response = await mobilePatch(
+      const response = await axiosInstance.patch(
         `${BASE_URL}/api/mobile/notification-preferences`,
         values
       );
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error("Failed to save notification settings");
       }
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       toast({
@@ -201,7 +203,7 @@ export default function NotificationSettings({
         variant: "default",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/notification-preferences`],
+        queryKey: [`/api/mobile/notification-preferences`],
       });
       onSave?.();
     },

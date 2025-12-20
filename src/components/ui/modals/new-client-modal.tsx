@@ -3,9 +3,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 const clientSchema = z.object({
   name: z.string().min(1, "Nome / Azienda è richiesto"),
@@ -59,10 +59,10 @@ export function NewClientModal() {
 
   const onSubmit = async (data: ClientFormData) => {
     try {
-      await apiRequest("POST", `${BASE_URL}/api/clients`, data);
+      await axiosInstance.post(`${BASE_URL}/api/clients`, data);
 
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/clients`] });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/stats`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/clients`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/stats`] });
 
       toast({
         title: "Cliente aggiunto",

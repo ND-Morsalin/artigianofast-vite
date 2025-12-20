@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { queryClient, apiRequest } from "../lib/queryClient";
+import { queryClient } from "../lib/queryClient";
 import { useToast } from "../hooks/use-toast";
 import { Button } from "../components/ui/button";
 import {
@@ -50,6 +50,7 @@ import {
 } from "../components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { BASE_URL } from "../constant";
+import { axiosInstance } from "../lib/axios";
 
 // Definiamo lo schema di validazione del form
 const formSchema = z.object({
@@ -100,8 +101,8 @@ export default function SubscriptionPlansPage() {
 
   // Query per ottenere i piani di abbonamento
   const { data: plans = [], isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/subscription-plans`],
-    queryFn: () => apiRequest(`${BASE_URL}/api/subscription-plans`),
+    queryKey: [`/api/subscription-plans`],
+    queryFn: () => axiosInstance.get(`${BASE_URL}/api/subscription-plans`),
   });
 
   // Definiamo il form con React Hook Form
@@ -123,13 +124,13 @@ export default function SubscriptionPlansPage() {
   // Mutation per creare un nuovo piano
   const createMutation = useMutation({
     mutationFn: (data: FormValues) =>
-      apiRequest(`${BASE_URL}/api/subscription-plans`, {
+      axiosInstance.get(`${BASE_URL}/api/subscription-plans`, {
         method: "POST",
         data,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       toast({
         title: "Piano creato",
@@ -151,13 +152,13 @@ export default function SubscriptionPlansPage() {
   // Mutation per aggiornare un piano esistente
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: FormValues }) =>
-      apiRequest(`${BASE_URL}/api/subscription-plans/${id}`, {
+      axiosInstance.get(`${BASE_URL}/api/subscription-plans/${id}`, {
         method: "PUT",
         data,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       toast({
         title: "Piano aggiornato",
@@ -180,12 +181,12 @@ export default function SubscriptionPlansPage() {
   // Mutation per eliminare un piano
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest(`${BASE_URL}/api/subscription-plans/${id}`, {
+      axiosInstance.get(`${BASE_URL}/api/subscription-plans/${id}`, {
         method: "DELETE",
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       toast({
         title: "Piano eliminato",

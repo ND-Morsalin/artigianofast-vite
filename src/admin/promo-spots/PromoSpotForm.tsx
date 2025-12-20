@@ -33,12 +33,12 @@ import {
 
 import { useToast } from "../../hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { Loader2, PlusCircle, X, Upload } from "lucide-react";
 import { Switch } from "../../components/ui/switch";
 import { format } from "date-fns";
 import { Checkbox } from "../../components/ui/checkbox";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 type SpotFormValues = {
   id?: number;
@@ -213,12 +213,11 @@ export default function PromoSpotForm({ spot, onCancel }: PromoSpotFormProps) {
       };
 
       console.log("Invio spot:", processedData);
-      const res = await apiRequest(
-        "POST",
+      const res = await axiosInstance.post(
         `${BASE_URL}/api/admin/promotional-spots`,
         processedData
       );
-      return res.json();
+      return res.data;
     },
     onSuccess: () => {
       toast({
@@ -226,7 +225,7 @@ export default function PromoSpotForm({ spot, onCancel }: PromoSpotFormProps) {
         description: "Lo spot promozionale è stato creato con successo.",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/promotional-spots`],
+        queryKey: [`/api/admin/promotional-spots`],
       });
       onCancel(); // Chiudi il form e torna alla lista
     },
@@ -282,12 +281,11 @@ export default function PromoSpotForm({ spot, onCancel }: PromoSpotFormProps) {
       };
 
       console.log("Aggiornamento spot:", processedData);
-      const res = await apiRequest(
-        "PATCH",
+      const res = await axiosInstance.patch(
         `${BASE_URL}/api/admin/promotional-spots/${id}`,
         processedData
       );
-      return res.json();
+      return res.data;
     },
     onSuccess: () => {
       toast({
@@ -295,7 +293,7 @@ export default function PromoSpotForm({ spot, onCancel }: PromoSpotFormProps) {
         description: "Lo spot promozionale è stato aggiornato con successo.",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/promotional-spots`],
+        queryKey: [`/api/admin/promotional-spots`],
       });
       onCancel(); // Chiudi il form e torna alla lista
     },

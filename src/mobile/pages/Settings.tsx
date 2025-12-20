@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect } from "react";
@@ -57,8 +58,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import { mobileGet } from "../utils/mobileApi";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface UserSettings {
   isDarkMode: boolean;
@@ -105,15 +106,10 @@ export default function Settings() {
 
   // Check settings.view permission using plan configuration
   const { data: planConfig, isLoading: isPlanConfigLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/plan-configuration`],
+    queryKey: [`/api/mobile/plan-configuration`],
     queryFn: async () => {
-      const response = await mobileGet(
-        `${BASE_URL}/api/mobile/plan-configuration`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch plan configuration");
-      }
-      return response.json();
+      const response = await axiosInstance(`/api/mobile/plan-configuration`);
+      return response.data;
     },
     enabled: !!profile, // Only fetch if user is logged in
     retry: false,
@@ -129,18 +125,12 @@ export default function Settings() {
   // Fetch abbonamento utente
   const { data: subscription, isLoading: isSubscriptionLoading } =
     useQuery<UserSubscription>({
-      queryKey: [`${BASE_URL}/api/subscription`],
+      queryKey: [`/api/subscription`],
       queryFn: async () => {
         try {
-          const response = await fetch(`${BASE_URL}/api/subscription`);
-          if (!response.ok) {
-            if (response.status === 401 || response.status === 404) {
-              // Utente non autenticato o nessun abbonamento, restituiamo null
-              return null;
-            }
-            throw new Error("Errore nel recuperare l'abbonamento");
-          }
-          return response.json();
+          const response = await axiosInstance.get(`/api/subscription`);
+
+          return response.data;
         } catch (error) {
           console.log(error);
           console.error("Errore nel recuperare l'abbonamento:", error);
@@ -206,16 +196,9 @@ export default function Settings() {
   // Mutation per il logout
   const logout = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Errore durante il logout");
-      }
-      return response.json();
+      const response = await axiosInstance.post(`${BASE_URL}/api/logout`, {});
+
+      return response.data;
     },
     onSuccess: () => {
       // Invalida tutte le query per pulire la cache

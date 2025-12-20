@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { useTranslation } from "react-i18next";
 
 import { ArrowLeft, Download, RefreshCcw } from "lucide-react";
@@ -43,6 +42,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Colori per i grafici
 const COLORS = [
@@ -117,10 +117,11 @@ export default function StatisticsPage() {
       selectedClientType,
     ],
     queryFn: () =>
-      apiRequest({
-        method: "GET",
-        url: `${BASE_URL}/api/admin/stats/advanced?period=${activePeriod}&sector=${selectedSector}&plan=${selectedPlan}&clientType=${selectedClientType}`,
-      }).then((res) => res.json()),
+      axiosInstance
+        .get(
+          `${BASE_URL}/api/admin/stats/advanced?period=${activePeriod}&sector=${selectedSector}&plan=${selectedPlan}&clientType=${selectedClientType}`
+        )
+        .then((res) => res.data),
     placeholderData: {
       subscriptionsStats: {
         total: 0,

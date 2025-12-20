@@ -39,10 +39,9 @@ import {
   Landmark,
   Globe,
 } from "lucide-react";
-import { mobileApiCall } from "../mobile/utils/mobileApi";
 import StripePaymentForm from "../components/StripePaymentForm";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../constant";
+import { axiosInstance } from "../lib/axios";
 
 // Schema di validazione per i dati di pagamento
 const paymentSchema = z.object({
@@ -131,18 +130,14 @@ export default function CheckoutPage() {
 
       try {
         setLoading(true);
-        const response = await mobileApiCall(
-          "GET",
-          `${BASE_URL}/api/mobile/subscription-plans/${planId}`
+        const response = await axiosInstance.get(
+          `/api/mobile/subscription-plans/${planId}`
         );
-        if (response.ok) {
-          const data = await response.json();
+        if (response.data) {
+          const data = await response.data;
           setPlanDetails(data);
         } else {
-          console.error(
-            "Errore nel caricamento del piano:",
-            await response.text()
-          );
+          console.error("Errore nel caricamento del piano:", response.data);
           toast({
             title: "Errore",
             description: "Impossibile caricare i dettagli del piano",
@@ -202,20 +197,16 @@ export default function CheckoutPage() {
         "Creating subscription with payment intent:",
         paymentIntent.id
       );
-      const response = await mobileApiCall(
-        "POST",
-        `${BASE_URL}/api/mobile/subscriptions`,
-        {
-          planId,
-          billingFrequency: billingType,
-          paymentMethod: "credit_card",
-          paymentIntentId: paymentIntent.id,
-        }
-      );
+      const response = await axiosInstance.post(`/api/mobile/subscriptions`, {
+        planId,
+        billingFrequency: billingType,
+        paymentMethod: "credit_card",
+        paymentIntentId: paymentIntent.id,
+      });
 
-      console.log("Subscription response:", response.status, response.ok);
+      console.log("Subscription response:", response.status, response.data);
 
-      if (response.ok) {
+      if (response.data) {
         console.log(
           "Subscription created successfully, redirecting to dashboard"
         );
@@ -230,7 +221,7 @@ export default function CheckoutPage() {
           setLocation("/admin/artisan-dashboard");
         }, 1500);
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data;
         console.error("Subscription creation failed:", errorData);
         throw new Error(
           errorData.error || "Errore durante l'elaborazione del pagamento"
@@ -319,18 +310,14 @@ export default function CheckoutPage() {
       }
 
       // Invia la richiesta di abbonamento all'API (solo per bank_transfer e free plans)
-      const response = await mobileApiCall(
-        "POST",
-        `${BASE_URL}/api/mobile/subscriptions`,
-        {
-          planId,
-          billingFrequency: billingType,
-          paymentMethod: isFreePlan ? null : data.paymentMethod,
-          paymentInfo: isFreePlan ? null : data,
-        }
-      );
+      const response = await axiosInstance.post(`/api/mobile/subscriptions`, {
+        planId,
+        billingFrequency: billingType,
+        paymentMethod: isFreePlan ? null : data.paymentMethod,
+        paymentInfo: isFreePlan ? null : data,
+      });
 
-      if (response.ok) {
+      if (response.data) {
         // Gestione diversa in base al tipo di piano
         if (isFreePlan) {
           toast({
@@ -355,7 +342,7 @@ export default function CheckoutPage() {
 
         setLocation("/admin/artisan-dashboard");
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data;
         throw new Error(
           errorData.error || "Errore durante l'elaborazione del pagamento"
         );

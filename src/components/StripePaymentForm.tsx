@@ -9,7 +9,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { Button } from "./ui/button";
 import { CreditCard, Loader2 } from "lucide-react";
-import { BASE_URL } from "../constant";
+import { axiosInstance } from "../lib/axios";
 
 // Initialize Stripe
 const stripePromise = loadStripe(
@@ -100,23 +100,18 @@ function PaymentForm({
 
       // Create payment intent on server
       console.log("Creating payment intent on server...");
-      const response = await fetch(
-        `${BASE_URL}/api/stripe/create-payment-intent`,
+
+      const response = await axiosInstance.post(
+        `/api/stripe/create-payment-intent`,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: Math.round(amount * 100), // Convert to cents
-            currency,
-            paymentMethodId: paymentMethod.id,
-          }),
+          amount: Math.round(amount * 100), // Convert to cents
+          currency,
+          paymentMethodId: paymentMethod.id,
         }
       );
 
       console.log("Payment intent response status:", response.status);
-      const { clientSecret, error: serverError } = await response.json();
+      const { clientSecret, error: serverError } = await response.data;
       console.log("Payment intent response:", { clientSecret, serverError });
 
       if (serverError) {
@@ -149,9 +144,9 @@ function PaymentForm({
         console.log("Payment not succeeded, status:", paymentIntent.status);
         onError("Pagamento non completato");
       }
-     } catch (error) {
-      console.log(error)
-      console.log(error)
+    } catch (error) {
+      console.log(error);
+      console.log(error);
       onError("Errore durante il pagamento");
     } finally {
       setIsProcessing(false);

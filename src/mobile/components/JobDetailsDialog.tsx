@@ -23,8 +23,7 @@ import {
 } from "lucide-react";
 import { useToast } from "../../hooks/use-toast";
 import ActivityTracker from "./ActivityTracker";
-import { mobileApiCall } from "../utils/mobileApi";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface JobDetailsDialogProps {
   isOpen: boolean;
@@ -43,15 +42,12 @@ export function JobDetailsDialog({
 
   // Query per ottenere i dettagli del lavoro selezionato
   const { data: job = {}, isLoading: isJobLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/jobs`, jobId],
+    queryKey: [`/api/mobile/jobs`, jobId],
     queryFn: async () => {
       if (!jobId) return {};
-      const response = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/mobile/jobs/${jobId}`
-      );
-      if (!response.ok) throw new Error("Errore nel recuperare il lavoro");
-      return response.json();
+      const response = await axiosInstance.get(`/api/mobile/jobs/${jobId}`);
+      if (!response.data) throw new Error("Errore nel recuperare il lavoro");
+      return response.data;
     },
     enabled: !!jobId && isOpen,
   });
@@ -59,25 +55,23 @@ export function JobDetailsDialog({
   // Mutation per annullare un lavoro
   const cancelJobMutation = useMutation({
     mutationFn: async () => {
-      const response = await mobileApiCall(
-        "PATCH",
-        `${BASE_URL}/api/mobile//jobs/${jobId}`,
-        { status: "cancelled" }
-      );
+      const response = await axiosInstance.patch(`/api/mobile//jobs/${jobId}`, {
+        status: "cancelled",
+      });
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error("Errore durante l'annullamento del lavoro");
       }
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       // Aggiorna la cache delle query
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+        queryKey: [`/api/mobile/all-jobs`],
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/jobs`, jobId],
+        queryKey: [`/api/mobile/jobs`, jobId],
       });
 
       // Mostra notifica di successo
@@ -105,15 +99,14 @@ export function JobDetailsDialog({
 
   // Query per ottenere i dettagli del cliente
   const { data: client = {}, isLoading: isClientLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/clients`, job.clientId],
+    queryKey: [`/api/mobile/clients`, job.clientId],
     queryFn: async () => {
       if (!job.clientId) return {};
-      const response = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/mobile/clients/${job.clientId}`
+      const response = await axiosInstance.get(
+        `/api/mobile/clients/${job.clientId}`
       );
-      if (!response.ok) throw new Error("Errore nel recuperare il cliente");
-      return response.json();
+      if (!response.data) throw new Error("Errore nel recuperare il cliente");
+      return response.data;
     },
     enabled: !!job.clientId && isOpen,
   });

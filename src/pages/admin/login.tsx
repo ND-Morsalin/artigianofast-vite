@@ -25,6 +25,7 @@ import {
 } from "../../components/ui/form";
 import { Lock, User } from "lucide-react";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Schema di validazione
 const loginSchema = z.object({
@@ -53,19 +54,13 @@ export default function AdminLoginPage() {
 
     try {
       // Try mobile login first (for artisan users)
-      const mobileResponse = await fetch(`${BASE_URL}/api/mobile/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const mobileResponse = await axiosInstance.post(`${BASE_URL}/api/mobile/login`,{
           email: data.username,
           password: data.password,
-        }),
-      });
+        });
 
-      if (mobileResponse.ok) {
-        const mobileResult = await mobileResponse.json();
+      if (mobileResponse.data) {
+        const mobileResult = await mobileResponse.data;
 
 
         // Store mobile session ID in localStorage
@@ -95,20 +90,10 @@ export default function AdminLoginPage() {
       }
 
       // If mobile login fails, try admin login
-      const response = await fetch(`${BASE_URL}/api/admin/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await axiosInstance.post(`${BASE_URL}/api/admin/login`, data);
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Errore durante il login");
-      }
-
+      const result = await response.data;
+ 
       // Check user role and redirect accordingly
       const userRole = result.user?.role;
 

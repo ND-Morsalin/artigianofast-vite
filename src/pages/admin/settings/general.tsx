@@ -41,7 +41,7 @@ import {
   TabsTrigger,
 } from "../../../components/ui/tabs";
 import { LanguageSelector } from "../../../components/ui/language-selector";
-import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Schema per la validazione del form
 const generalSettingsSchema = z.object({
@@ -120,14 +120,14 @@ export default function GeneralSettingsPage() {
 
   // Query per ottenere le impostazioni generali
   const { data: settings, isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/admin/settings/general`],
+    queryKey: [`/api/admin/settings/general`],
     queryFn: async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/admin/settings/general`);
-        if (!response.ok) {
+        const response = await axiosInstance.get(`/api/admin/settings/general`);
+        if (!response.data) {
           throw new Error("Failed to fetch settings");
         }
-        const data = await response.json();
+        const data = await response.data;
         return data || defaultSettings;
       } catch (error) {
         console.log(error);
@@ -136,7 +136,7 @@ export default function GeneralSettingsPage() {
       }
     },
   });
-console.log(isLoading); 
+  console.log(isLoading);
   // Aggiorniamo i valori del form quando arrivano i dati
   useEffect(() => {
     if (settings) {
@@ -147,24 +147,21 @@ console.log(isLoading);
   // Mutation per aggiornare le impostazioni
   const updateMutation = useMutation({
     mutationFn: async (data: FormValues) => {
-      const response = await fetch(`${BASE_URL}/api/admin/settings/general`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await axiosInstance.put(
+        `/api/admin/settings/general`,
+        data
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response.data) {
+        const errorData = await response.data;
         throw new Error(errorData.message || "Failed to save settings");
       }
 
-      return await response.json();
+      return await response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/settings/general`],
+        queryKey: [`/api/admin/settings/general`],
       });
       toast({
         title: t("admin.general.settingsSaved"),

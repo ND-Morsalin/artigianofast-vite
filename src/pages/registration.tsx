@@ -26,9 +26,8 @@ import {
 import { useToast } from "../hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { Globe, Check } from "lucide-react";
-import { mobileApiCall } from "../mobile/utils/mobileApi";
 import { useQuery } from "@tanstack/react-query";
-import { BASE_URL } from "../constant";
+import { axiosInstance } from "../lib/axios";
 
 // Schema di validazione con zod
 const signupSchema = z
@@ -69,11 +68,11 @@ export default function RegistrationPage() {
 
   // Fetch subscription plans
   const { data: subscriptionPlans, isLoading: plansLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/subscription-plans`],
+    queryKey: [`/api/mobile/subscription-plans`],
     queryFn: () =>
-      mobileApiCall("GET", `${BASE_URL}/api/mobile/subscription-plans`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`/api/mobile/subscription-plans`)
+        .then((res) => res.data),
     enabled: true,
   });
 
@@ -183,19 +182,15 @@ export default function RegistrationPage() {
         return;
       }
 
-      const response = await mobileApiCall(
-        "POST",
-        `${BASE_URL}/api/mobile/register`,
-        {
-          email: data.email,
-          password: data.password,
-          fullName: data.fullName,
-          username: data.email.split("@")[0],
-        }
-      );
+      const response = await axiosInstance.post(`/api/mobile/register`, {
+        email: data.email,
+        password: data.password,
+        fullName: data.fullName,
+        username: data.email.split("@")[0],
+      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response.data) {
+        const errorData = await response.data;
         throw new Error(errorData.error || "Errore durante la registrazione");
       }
 
@@ -236,10 +231,9 @@ export default function RegistrationPage() {
   const onSubmit = async (data: SignupFormValues) => {
     // Rimuoviamo confirmPassword dai dati da inviare
     const { confirmPassword, ...signupData } = data;
-    console.log(confirmPassword)
+    console.log(confirmPassword);
     await handleSignup(signupData);
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50/30">

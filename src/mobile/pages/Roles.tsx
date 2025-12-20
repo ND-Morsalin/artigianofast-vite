@@ -8,9 +8,8 @@ import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import MobileLayout from "../components/MobileLayout";
 import FeatureGate from "../components/FeatureGate";
-// import { usePlanFeatures } from "../hooks/usePlanFeatures";
-import { mobileGet, mobileDelete } from "../utils/mobileApi";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Definisci l'interfaccia per il ruolo
 interface Role {
@@ -30,14 +29,16 @@ export default function RolesSettings() {
 
   // Carica i ruoli
   const { data: roles = [], isLoading: isRolesLoading } = useQuery<Role[]>({
-    queryKey: [`${BASE_URL}/api/mobile/roles`],
+    queryKey: [`/api/mobile/roles`],
     queryFn: async () => {
       try {
-        const response = await mobileGet(`${BASE_URL}/api/mobile/roles`);
-        if (!response.ok) {
+        const response = await axiosInstance.get(
+          `${BASE_URL}/api/mobile/roles`
+        );
+        if (!response.data) {
           throw new Error("Errore nel recuperare i ruoli");
         }
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore:", error);
@@ -57,13 +58,15 @@ export default function RolesSettings() {
   // Mutation per eliminare un ruolo
   const deleteRole = useMutation({
     mutationFn: async (id: number) => {
-      const response = await mobileDelete(`${BASE_URL}/api/mobile/roles/${id}`);
+      const response = await axiosInstance.delete(
+        `${BASE_URL}/api/mobile/roles/${id}`
+      );
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error("Errore durante l'eliminazione del ruolo");
       }
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       toast({
@@ -71,7 +74,7 @@ export default function RolesSettings() {
         description: "Il ruolo è stato eliminato con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/roles`],
+        queryKey: [`/api/mobile/roles`],
       });
     },
     onError: (error: Error) => {

@@ -36,7 +36,7 @@ export default function WebPagesPage() {
         throw new Error("Si è verificato un errore durante l'eliminazione della pagina");
       }
       
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/web-pages"] });
@@ -68,7 +68,7 @@ export default function WebPagesPage() {
         throw new Error("Si è verificato un errore durante la pubblicazione della pagina");
       }
       
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/web-pages"] });
@@ -100,7 +100,7 @@ export default function WebPagesPage() {
         throw new Error("Si è verificato un errore durante l'impostazione della homepage");
       }
       
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/web-pages"] });

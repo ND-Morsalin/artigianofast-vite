@@ -66,6 +66,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Schema per la validazione del form degli admin
 const adminSchema = z.object({
@@ -95,13 +96,13 @@ export default function UsersPage() {
   // Function to refresh all data
   const refreshData = () => {
     queryClient.invalidateQueries({
-      queryKey: [`${BASE_URL}/api/user-subscriptions`],
+      queryKey: [`/api/user-subscriptions`],
     });
     queryClient.invalidateQueries({
-      queryKey: [`${BASE_URL}/api/subscription-plans`],
+      queryKey: [`/api/subscription-plans`],
     });
     queryClient.invalidateQueries({
-      queryKey: [`${BASE_URL}/api/administrators`],
+      queryKey: [`/api/administrators`],
     });
     toast({
       title: "Data Refreshed",
@@ -112,49 +113,55 @@ export default function UsersPage() {
 
   // Query per ottenere gli amministratori e gli utenti
   const { data: administrators = [], isLoading: isLoadingAdmins } = useQuery({
-    queryKey: [`${BASE_URL}/api/administrators`],
+    queryKey: [`/api/administrators`],
     queryFn: async () => {
-      const response = await apiRequest(`${BASE_URL}/api/administrators`);
-      return await response.json();
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/administrators`
+      );
+      return await response.data;
     },
   });
 
   // Query per ottenere i clienti
   const { data: clients = [], isLoading: isLoadingClients } = useQuery({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
     queryFn: async () => {
-      const response = await apiRequest(`${BASE_URL}/api/clients`);
-      return await response.json();
+      const response = await axiosInstance.get(`${BASE_URL}/api/clients`);
+      return await response.data;
     },
   });
 
   // Query per ottenere le sottoscrizioni utente
   const { data: subscriptions = [], isLoading: isLoadingSubscriptions } =
     useQuery({
-      queryKey: [`${BASE_URL}/api/user-subscriptions`],
+      queryKey: [`/api/user-subscriptions`],
       queryFn: async () => {
-        const response = await apiRequest(`${BASE_URL}/api/user-subscriptions`);
-        return await response.json();
+        const response = await axiosInstance.get(
+          `${BASE_URL}/api/user-subscriptions`
+        );
+        return await response.data;
       },
       staleTime: 0, // Always fetch fresh data
     });
 
   // Query per ottenere i piani di abbonamento
   const { data: plans = [], isLoading: isLoadingPlans } = useQuery({
-    queryKey: [`${BASE_URL}/api/subscription-plans`],
+    queryKey: [`/api/subscription-plans`],
     queryFn: async () => {
-      const response = await apiRequest(`${BASE_URL}/api/subscription-plans`);
-      return await response.json();
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/subscription-plans`
+      );
+      return await response.data;
     },
   });
 
   // Query per ottenere i ruoli
   const { data: roles = [], isLoading: isLoadingRoles } = useQuery({
-    queryKey: [`${BASE_URL}/api/roles`],
+    queryKey: [`/api/roles`],
     queryFn: async () => {
       try {
-        const response = await apiRequest(`${BASE_URL}/api/roles`);
-        return await response.json();
+        const response = await axiosInstance.get(`${BASE_URL}/api/roles`);
+        return await response.data;
       } catch (error) {
         console.log(error);
         console.error("Error fetching roles:", error);
@@ -190,10 +197,13 @@ export default function UsersPage() {
   // Mutation per creare un nuovo amministratore
   const createMutation = useMutation({
     mutationFn: (data: AdminFormValues) =>
-      apiRequest(`${BASE_URL}/api/administrators`, { method: "POST", data }),
+      axiosInstance.get(`${BASE_URL}/api/administrators`, {
+        method: "POST",
+        data,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/administrators`],
+        queryKey: [`/api/administrators`],
       });
       toast({
         title: "Amministratore creato",
@@ -215,13 +225,13 @@ export default function UsersPage() {
   // Mutation per aggiornare un amministratore esistente
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: AdminFormValues }) =>
-      apiRequest(`${BASE_URL}/api/administrators/${id}`, {
+      axiosInstance.get(`${BASE_URL}/api/administrators/${id}`, {
         method: "PUT",
         data,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/administrators`],
+        queryKey: [`/api/administrators`],
       });
       toast({
         title: "Amministratore aggiornato",
@@ -244,10 +254,12 @@ export default function UsersPage() {
   // Mutation per eliminare un amministratore
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest(`${BASE_URL}/api/administrators/${id}`, { method: "DELETE" }),
+      axiosInstance.get(`${BASE_URL}/api/administrators/${id}`, {
+        method: "DELETE",
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/administrators`],
+        queryKey: [`/api/administrators`],
       });
       toast({
         title: "Amministratore eliminato",
@@ -292,7 +304,7 @@ export default function UsersPage() {
         );
       } else {
         // Se non ha sottoscrizioni, crea una nuova
-        return apiRequest("POST", `${BASE_URL}/api/user-subscriptions`, {
+        return axiosInstance.post(`${BASE_URL}/api/user-subscriptions`, {
           userId,
           planId: parseInt(data.planId),
           billingFrequency: data.billingFrequency,
@@ -304,10 +316,10 @@ export default function UsersPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/user-subscriptions`],
+        queryKey: [`/api/user-subscriptions`],
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/administrators`],
+        queryKey: [`/api/administrators`],
       });
       toast({
         title: "Piano aggiornato",

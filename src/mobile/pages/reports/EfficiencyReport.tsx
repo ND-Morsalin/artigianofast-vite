@@ -33,7 +33,6 @@ import ReportFilters, {
 } from "../../components/reports/ReportFilters";
 import DashboardMetricCard from "../../components/reports/DashboardMetricCard";
 import MobileLayout from "../../components/MobileLayout";
-import { mobileApiCall } from "../../utils/mobileApi";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -53,7 +52,7 @@ import {
 import { Progress } from "../../../components/ui/progress";
 import { Button } from "../../../components/ui/button";
 import { useLocation } from "wouter";
-import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 export default function EfficiencyReport() {
   const [, setLocation] = useLocation();
@@ -66,15 +65,12 @@ export default function EfficiencyReport() {
 
   // Carica i dati dal server utilizzando i filtri
   const { data = {}, isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/reports/efficiency`, filters],
+    queryKey: [`/api/reports/efficiency`, filters],
     queryFn: async () => {
-      const response = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/reports/efficiency`
-      );
-      if (!response.ok)
+      const response = await axiosInstance.get(`/api/reports/efficiency`);
+      if (!response.data)
         throw new Error("Errore nel recuperare i dati di efficienza");
-      return response.json();
+      return response.data;
     },
     refetchOnWindowFocus: false,
     placeholderData: {},
@@ -194,7 +190,7 @@ export default function EfficiencyReport() {
     "#FF6666",
   ];
 
-  console.log(COLORS)
+  console.log(COLORS);
 
   return (
     <MobileLayout title="Efficienza Lavori">

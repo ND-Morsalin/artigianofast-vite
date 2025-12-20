@@ -59,7 +59,7 @@ export default function EditWebPage() {
   
   // Carica i dati della pagina corrente
   const { data: page, isLoading, error } = useQuery({
-    queryKey: [`${BASE_URL}/api/admin/web-pages/${pageId}`],
+    queryKey: [`/api/admin/web-pages/${pageId}`],
     enabled: !!pageId,
     onSuccess: (data: WebPage) => {
       // Imposta i valori predefiniti del form con i dati caricati
@@ -88,15 +88,15 @@ export default function EditWebPage() {
       });
       
       if (!response.ok) {
-        const error = await response.json();
+        const error = await response.data;
         throw new Error(error.message || "Si è verificato un errore durante l'aggiornamento della pagina");
       }
       
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/web-pages"] });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/admin/web-pages/${pageId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/admin/web-pages/${pageId}`] });
       toast({
         title: "Pagina aggiornata",
         description: "La pagina è stata aggiornata con successo",
@@ -125,7 +125,7 @@ export default function EditWebPage() {
         throw new Error("Si è verificato un errore durante l'eliminazione della pagina");
       }
       
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/web-pages"] });

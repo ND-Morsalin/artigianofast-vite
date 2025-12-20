@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { useToast } from "../../hooks/use-toast";
 
 import {
@@ -35,6 +34,7 @@ import {
   CardTitle,
 } from "./card";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface Job {
   id: number;
@@ -90,7 +90,7 @@ export function JobCompletion({ job, onCompleted }: JobCompletionProps) {
   // Mutation per completare il lavoro
   const completeJob = useMutation({
     mutationFn: (values: JobCompletionFormValues) => {
-      return apiRequest("POST", `${BASE_URL}/api/jobs/${job.id}/complete`, {
+      return axiosInstance.post(`${BASE_URL}/api/jobs/${job.id}/complete`, {
         ...values,
         photos,
       });
@@ -100,8 +100,8 @@ export function JobCompletion({ job, onCompleted }: JobCompletionProps) {
         title: "Lavoro completato",
         description: "Il lavoro è stato registrato come completato.",
       });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobs`] });
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/stats`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/jobs`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/stats`] });
       setIsOpen(false);
       if (onCompleted) onCompleted();
     },

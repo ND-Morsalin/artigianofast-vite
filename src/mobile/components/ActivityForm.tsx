@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { useParams, useLocation } from "wouter";
 import { useForm, type Resolver } from "react-hook-form";
@@ -21,6 +22,7 @@ import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Interface for JobType
 interface JobType {
@@ -68,13 +70,10 @@ export default function ActivityForm() {
 
   // Fetch job types
   const { isLoading: isLoadingJobTypes, data: jobTypesData } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/jobtypes`],
+    queryKey: [`/api/mobile/jobtypes`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/mobile/jobtypes`);
-      if (!response.ok) {
-        throw new Error("Errore nel recuperare i tipi di lavoro");
-      }
-      return response.json();
+      const res = await axiosInstance.get(`/api/mobile/jobtypes`);
+      return res.data;
     },
   });
 
@@ -87,16 +86,14 @@ export default function ActivityForm() {
 
   // Fetch activity data if in edit mode
   const { isLoading: isLoadingActivity, data: activityData } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/activities/${activityId}`],
+    queryKey: [`/api/mobile/activities/${activityId}`],
     queryFn: async () => {
       if (!activityId) return undefined;
-      const response = await fetch(
-        `${BASE_URL}/api/mobile/activities/${activityId}`
+      const response = await axiosInstance.get(
+        `/api/mobile/activities/${activityId}`
       );
-      if (!response.ok) {
-        throw new Error("Errore nel recuperare i dati dell'attività");
-      }
-      return response.json();
+
+      return response.data;
     },
     enabled: isEditMode,
   });
@@ -182,13 +179,10 @@ export default function ActivityForm() {
           JSON.stringify(dataToSend, null, 2)
         );
 
-        const response = await fetch(`${BASE_URL}/api/mobile/activities`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(dataToSend),
-        });
+        const response = await axiosInstance.post(
+          `/api/mobile/activities`,
+          dataToSend
+        );
 
         console.log(
           "Risposta del server:",
@@ -196,20 +190,19 @@ export default function ActivityForm() {
           response.statusText
         );
 
-        if (!response.ok) {
+        if (!response.data) {
           let errorMessage = "Errore durante la creazione dell'attività";
           try {
-            const errorData = await response.json();
+            const errorData = await response.data();
             errorMessage = errorData.error || errorMessage;
           } catch (e) {
             console.log(e);
-            const errorText = await response.text();
-            errorMessage += `: ${errorText}`;
+            errorMessage += (e as any).message;
           }
           throw new Error(errorMessage);
         }
 
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore nella chiamata API:", error);
@@ -223,7 +216,7 @@ export default function ActivityForm() {
         description: "La nuova attività è stata creata con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/activities`],
+        queryKey: [`/api/mobile/activities`],
       });
       setLocation("/mobile/settings/activities");
     },
@@ -273,15 +266,9 @@ export default function ActivityForm() {
           JSON.stringify(dataToSend, null, 2)
         );
 
-        const response = await fetch(
+        const response = await axiosInstance.put(
           `${BASE_URL}/api/mobile/activities/${activityId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToSend),
-          }
+          dataToSend
         );
 
         console.log(
@@ -290,20 +277,7 @@ export default function ActivityForm() {
           response.statusText
         );
 
-        if (!response.ok) {
-          let errorMessage = "Errore durante l'aggiornamento dell'attività";
-          try {
-            const errorData = await response.json();
-            errorMessage = errorData.error || errorMessage;
-          } catch (e) {
-            console.log(e); 
-            const errorText = await response.text();
-            errorMessage += `: ${errorText}`;
-          }
-          throw new Error(errorMessage);
-        }
-
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore nella chiamata API di aggiornamento:", error);
@@ -317,7 +291,7 @@ export default function ActivityForm() {
         description: "L'attività è stata aggiornata con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/activities`],
+        queryKey: [`/api/mobile/activities`],
       });
       setLocation("/mobile/settings/activities");
     },

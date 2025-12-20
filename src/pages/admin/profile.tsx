@@ -14,12 +14,12 @@ import { Label } from "../../components/ui/label";
 import { ArrowLeft, User, Save } from "lucide-react";
 import { useToast } from "../../hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Form validation schema
 const profileSchema = z.object({
@@ -60,30 +60,28 @@ export default function ProfilePage() {
 
   // Get current user data
   const { data: currentUser, isLoading: userLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/user`],
+    queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/user`).then((res) =>
-        res.json()
-      ),
+      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
 
   // Fetch user subscription and plan features (same as dashboard)
   const { data: userSubscription } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/user-subscription`],
+    queryKey: [`/api/mobile/user-subscription`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/user-subscription`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/user-subscription`)
+        .then((res) => res.data),
     enabled: true,
   });
 
   const { data: subscriptionPlans } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/subscription-plans`],
+    queryKey: [`/api/mobile/subscription-plans`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/subscription-plans`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/subscription-plans`)
+        .then((res) => res.data),
     enabled: true,
   });
 
@@ -125,12 +123,12 @@ export default function ProfilePage() {
   // Update profile mutation
   const updateProfileMutation = useMutation({
     mutationFn: (data: ProfileFormData) =>
-      apiRequest("PUT", `${BASE_URL}/api/mobile/user`, data).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .put(`${BASE_URL}/api/mobile/user`, data)
+        .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/user`],
+        queryKey: [`/api/mobile/user`],
       });
       toast({
         title: t("profile.updated"),

@@ -25,7 +25,6 @@ import {
 } from "../../components/ui/dialog";
 import { useToast } from "../../hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import {
   Plus,
   Search,
@@ -43,6 +42,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Types for Collaborators
 type Collaborator = {
@@ -523,11 +523,11 @@ export default function CollaboratorsPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/collaborators`],
+    queryKey: [`/api/mobile/collaborators`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/collaborators`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/collaborators`)
+        .then((res) => res.data),
     enabled: true,
     retry: false, // Don't retry on permission errors
   });
@@ -560,12 +560,12 @@ export default function CollaboratorsPage() {
   // Create collaborator mutation - use mobile API for permission checks
   const createCollaboratorMutation = useMutation({
     mutationFn: (data: CollaboratorFormData) =>
-      apiRequest("POST", `${BASE_URL}/api/mobile/collaborators`, data).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .post(`${BASE_URL}/api/mobile/collaborators`, data)
+        .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/collaborators`],
+        queryKey: [`/api/mobile/collaborators`],
       });
       toast({
         title: t("collaborators.messages.created"),
@@ -587,14 +587,12 @@ export default function CollaboratorsPage() {
   // Update collaborator mutation - use mobile API for permission checks
   const updateCollaboratorMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: CollaboratorFormData }) =>
-      apiRequest(
-        "PUT",
-        `${BASE_URL}/api/mobile/collaborators/${id}`,
-        data
-      ).then((res) => res.json()),
+      axiosInstance
+        .put(`${BASE_URL}/api/mobile/collaborators/${id}`, data)
+        .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/collaborators`],
+        queryKey: [`/api/mobile/collaborators`],
       });
       toast({
         title: t("collaborators.messages.updated"),
@@ -616,12 +614,12 @@ export default function CollaboratorsPage() {
   // Delete collaborator mutation - use mobile API for permission checks
   const deleteCollaboratorMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest("DELETE", `${BASE_URL}/api/mobile/collaborators/${id}`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .delete(`${BASE_URL}/api/mobile/collaborators/${id}`)
+        .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/collaborators`],
+        queryKey: [`/api/mobile/collaborators`],
       });
       toast({
         title: t("collaborators.messages.deleted"),

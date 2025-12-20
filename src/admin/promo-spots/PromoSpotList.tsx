@@ -19,10 +19,10 @@ import {
 import { Badge } from "../../components/ui/badge";
 import { useToast } from "../../hooks/use-toast";
 import { Pencil, Trash2, Plus, Eye, EyeOff } from "lucide-react";
-import { apiRequest } from "../../lib/queryClient";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 // Local type for promotional spots (replace with shared type import if available)
 type PromoStatus = "active" | "inactive";
 
@@ -55,21 +55,19 @@ export default function PromoSpotList({ onEdit }: PromoSpotListProps) {
     isLoading,
     error,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/admin/promotional-spots`],
+    queryKey: [`/api/admin/promotional-spots`],
     queryFn: async () => {
-      const res = await fetch(`${BASE_URL}/api/admin/promotional-spots`);
-      if (!res.ok) {
-        throw new Error(t("admin.settings.loadingPromotionalSpots"));
-      }
-      return res.json() as Promise<PromotionalSpot[]>;
+      const res = await axiosInstance.get<PromotionalSpot[]>(
+        "/api/admin/promotional-spots"
+      );
+      return res.data;
     },
   });
 
   // Mutation per eliminare uno spot
   const deleteSpotMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest(
-        "DELETE",
+      await axiosInstance.delete(
         `${BASE_URL}/api/admin/promotional-spots/${id}`
       );
     },
@@ -79,7 +77,7 @@ export default function PromoSpotList({ onEdit }: PromoSpotListProps) {
         description: t("admin.settings.promotionalSpotDeletedDescription"),
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/promotional-spots`],
+        queryKey: [`/api/admin/promotional-spots`],
       });
     },
     onError: (error) => {
@@ -103,8 +101,7 @@ export default function PromoSpotList({ onEdit }: PromoSpotListProps) {
       id: number;
       status: "active" | "inactive";
     }) => {
-      await apiRequest(
-        "PATCH",
+      await axiosInstance.patch(
         `${BASE_URL}/api/admin/promotional-spots/${id}`,
         {
           status,
@@ -117,7 +114,7 @@ export default function PromoSpotList({ onEdit }: PromoSpotListProps) {
         description: t("admin.settings.statusUpdatedDescription"),
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/promotional-spots`],
+        queryKey: [`/api/admin/promotional-spots`],
       });
     },
     onError: (error) => {

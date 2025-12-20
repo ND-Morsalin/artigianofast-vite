@@ -8,6 +8,7 @@ import { it } from "date-fns/locale";
 import { JobCompletion } from "../../components/ui/job-completion";
 import { JobActivityRegistration } from "../../components/ui/job-activity-registration";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface Job {
   id: number;
@@ -49,36 +50,29 @@ export function Jobs({ isRegistrationMode = false }: JobsProps) {
   const { toast } = useToast();
 
   const { data: jobs = [], isLoading: jobsLoading } = useQuery<Job[]>({
-    queryKey: [`${BASE_URL}/api/jobs`],
+    queryKey: [`/api/jobs`],
   });
 
   const { data: clients = [], isLoading: clientsLoading } = useQuery<Client[]>({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
   });
 
   const { data: jobTypes = [], isLoading: jobTypesLoading } = useQuery<
     JobType[]
   >({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
   });
 
   // Query per ottenere le attività
   const { data: activities = [], isLoading: activitiesLoading } = useQuery<
     any[]
   >({
-    queryKey: [`${BASE_URL}/api/activities`],
+    queryKey: [`/api/activities`],
     enabled: !!jobTypes.length,
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/activities`, {
-        method: "GET",
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error(
-          `Errore nel recupero delle attività: ${response.statusText}`
-        );
-      }
-      return await response.json();
+      const response = await axiosInstance.get(`${BASE_URL}/api/activities`);
+
+      return await response.data;
     },
   });
 
@@ -119,7 +113,7 @@ export function Jobs({ isRegistrationMode = false }: JobsProps) {
   //   try {
   //     const response = await fetch(`${BASE_URL}/api/jobs/${jobId}/activities`);
   //     if (!response.ok) throw new Error("Errore nel recupero delle attività");
-  //     return await response.json();
+  //     return await response.data;
   //   } catch (error) {
   //     console.log(error);
   //     console.error("Errore nel recupero delle attività:", error);
@@ -406,7 +400,7 @@ export function Jobs({ isRegistrationMode = false }: JobsProps) {
                     }}
                     onCompleted={() => {
                       queryClient.invalidateQueries({
-                        queryKey: [`${BASE_URL}/api/jobs`],
+                        queryKey: [`/api/jobs`],
                       });
                       queryClient.invalidateQueries({
                         queryKey: ["/api/stats"],
@@ -424,7 +418,7 @@ export function Jobs({ isRegistrationMode = false }: JobsProps) {
                           }}
                           onCompleted={() => {
                             queryClient.invalidateQueries({
-                              queryKey: [`${BASE_URL}/api/jobs`],
+                              queryKey: [`/api/jobs`],
                             });
                             queryClient.invalidateQueries({
                               queryKey: ["/api/stats"],

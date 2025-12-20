@@ -24,6 +24,7 @@ import MobileLayout from "../components/MobileLayout";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Switch } from "../../components/ui/switch";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Schema per il form
 const roleSchema = z.object({
@@ -173,14 +174,12 @@ export default function RoleForm() {
 
   // Carica i dati del ruolo se siamo in modalità modifica
   const { isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/roles/${roleId}`],
+    queryKey: [`/api/mobile/roles/${roleId}`],
     queryFn: async () => {
       if (!roleId) return undefined;
-      const response = await fetch(`${BASE_URL}/api/mobile/roles/${roleId}`);
-      if (!response.ok) {
-        throw new Error("Errore nel recuperare i dati del ruolo");
-      }
-      return response.json();
+      const response = await axiosInstance.get(`/api/mobile/roles/${roleId}`);
+       
+      return response.data;
     },
     enabled: isEditMode,
   });
@@ -190,13 +189,11 @@ export default function RoleForm() {
     const loadRoleData = async () => {
       if (isEditMode && roleId && !isDataLoaded) {
         try {
-          const response = await fetch(
-            `${BASE_URL}/api/mobile/roles/${roleId}`
+          const response = await axiosInstance.get(
+            `/api/mobile/roles/${roleId}`
           );
-          if (!response.ok) {
-            throw new Error("Errore nel recuperare i dati del ruolo");
-          }
-          const data = await response.json();
+           
+          const {data} =   response ;
 
           if (data) {
             // Assicuriamoci di parsare i permessi dal DB (string JSON -> object)
@@ -250,23 +247,14 @@ export default function RoleForm() {
           v === "true",
         ])
       );
-      const response = await fetch(`${BASE_URL}/api/mobile/roles`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const response = await axiosInstance.post(`${BASE_URL}/api/mobile/roles`,{
           ...values,
           permissions: normalizedPermissions,
-        }),
-      });
+        } );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Errore durante la creazione del ruolo: ${errorText}`);
-      }
+      
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       setIsSaving(false);
@@ -275,7 +263,7 @@ export default function RoleForm() {
         description: "Il ruolo è stato creato con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/roles`],
+        queryKey: [`/api/mobile/roles`],
       });
       setLocation("/mobile/settings/roles");
     },
@@ -299,25 +287,13 @@ export default function RoleForm() {
           v === "true",
         ])
       );
-      const response = await fetch(`${BASE_URL}/api/mobile/roles/${roleId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const response = await axiosInstance.patch(`/api/mobile/roles/${roleId}`, {
           ...values,
           permissions: normalizedPermissions,
-        }),
-      });
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Errore durante l'aggiornamento del ruolo: ${errorText}`
-        );
-      }
-
-      return response.json();
+      
+      return response.data;
     },
     onSuccess: () => {
       setIsSaving(false);
@@ -326,7 +302,7 @@ export default function RoleForm() {
         description: "Il ruolo è stato aggiornato con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/roles`],
+        queryKey: [`/api/mobile/roles`],
       });
       setLocation("/mobile/settings/roles");
     },

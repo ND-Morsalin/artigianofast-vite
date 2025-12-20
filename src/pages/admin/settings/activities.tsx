@@ -51,6 +51,7 @@ import {
 } from "../../../components/ui/multi-select";
 import { LanguageSelector } from "../../../components/ui/language-selector";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Schema per la validazione del form
 const activitySchema = z.object({
@@ -92,31 +93,34 @@ export default function AdminActivitiesPage() {
 
   // Query per ottenere le attività
   const { data: activities = [], isLoading: isLoadingActivities } = useQuery({
-    queryKey: [`${BASE_URL}/api/activities`],
+    queryKey: [`/api/activities`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/activities`)
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/activities`)
+        .then((res) => res.data)
         .catch(() => []),
   });
 
   // Query per ottenere i tipi di lavoro
   const { data: jobTypes = [], isLoading: isLoadingJobTypes } = useQuery({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/jobtypes`)
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/jobtypes`)
+        .then((res) => res.data)
         .catch(() => []),
   });
-console.log(isLoadingJobTypes)
+  console.log(isLoadingJobTypes);
   // Query per ottenere i settori
   const { data: sectors = [], isLoading: isLoadingSectors } = useQuery({
-    queryKey: [`${BASE_URL}/api/sectors`],
+    queryKey: [`/api/sectors`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/sectors`)
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/sectors`)
+        .then((res) => res.data)
         .catch(() => []),
   });
-console.log(isLoadingSectors)
+  console.log(isLoadingSectors);
   // Prepara le opzioni per il multi-select dei tipi di lavoro
   useEffect(() => {
     console.log("Job types data received:", jobTypes);
@@ -180,11 +184,11 @@ console.log(isLoadingSectors)
         defaultRate: data.defaultRate?.toString() || null,
         defaultCost: data.defaultCost?.toString() || null,
       };
-      return apiRequest("POST", `${BASE_URL}/api/activities`, formattedData);
+      return axiosInstance.post( `${BASE_URL}/api/activities`, formattedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/activities`],
+        queryKey: [`/api/activities`],
       });
       toast({
         title: t("activities.activityCreated"),
@@ -225,7 +229,7 @@ console.log(isLoadingSectors)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/activities`],
+        queryKey: [`/api/activities`],
       });
       toast({
         title: t("activities.activityUpdated"),
@@ -251,7 +255,7 @@ console.log(isLoadingSectors)
       apiRequest("DELETE", `${BASE_URL}/api/activities/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/activities`],
+        queryKey: [`/api/activities`],
       });
       toast({
         title: t("activities.activityDeleted"),

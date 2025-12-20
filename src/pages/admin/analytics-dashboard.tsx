@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import AdvancedCharts from "../../components/analytics/AdvancedCharts";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface AnalyticsData {
   planUsage: {
@@ -120,11 +120,9 @@ const AnalyticsDashboard: React.FC = () => {
   } = useQuery<AnalyticsData>({
     queryKey: ["analytics"],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/analytics`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch analytics data");
-      }
-      return response.json();
+      const response = await axiosInstance.get(`/api/analytics`);
+
+      return response.data;
     },
     refetchInterval: 300000, // Refresh every 5 minutes
   });
@@ -649,15 +647,13 @@ const AnalyticsDashboard: React.FC = () => {
               yearlyRevenue: plan.yearlyRevenue,
               userCount: plan.userCount,
             }))}
-            userGrowthData={userBehavior.monthlyUserGrowth.map(
-              (month) => ({
-                name: month.month,
-                value: month.totalUsers,
-                totalUsers: month.totalUsers,
-                activeUsers: month.activeUsers,
-                newUsers: month.newUsers,
-              })
-            )}
+            userGrowthData={userBehavior.monthlyUserGrowth.map((month) => ({
+              name: month.month,
+              value: month.totalUsers,
+              totalUsers: month.totalUsers,
+              activeUsers: month.activeUsers,
+              newUsers: month.newUsers,
+            }))}
             featureUsageData={featureAnalytics.monthlyFeatureUsage.map(
               (month) => ({
                 name: month.month,

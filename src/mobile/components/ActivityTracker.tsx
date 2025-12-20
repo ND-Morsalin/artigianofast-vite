@@ -6,6 +6,7 @@ import { Textarea } from "../../components/ui/textarea";
 import { useToast } from "../../hooks/use-toast";
 import PhotoCapture from "./PhotoCapture";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface Activity {
   id: number;
@@ -49,22 +50,23 @@ export default function ActivityTracker({
 
   // Fetch activities
   const { data: activities = [] } = useQuery<Activity[]>({
-    queryKey: [`${BASE_URL}/api/mobile/activities`],
+    queryKey: [`/api/mobile/activities`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/mobile/activities`);
-      if (!response.ok) throw new Error("Errore nel recuperare le attività");
-      return response.json();
+      const response = await axiosInstance.get(`/api/mobile/activities`);
+
+      return response.data;
     },
   });
 
   // Fetch job activities
   const { data: jobActivities = [] } = useQuery<JobActivity[]>({
-    queryKey: [`${BASE_URL}/api/mobile/jobs/${jobId}/activities`],
+    queryKey: [`/api/mobile/jobs/${jobId}/activities`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/mobile/jobs/${jobId}/activities`);
-      if (!response.ok)
-        throw new Error("Errore nel recuperare le attività del lavoro");
-      return response.json();
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/mobile/jobs/${jobId}/activities`
+      );
+
+      return response.data;
     },
   });
 
@@ -75,18 +77,16 @@ export default function ActivityTracker({
       notes: string;
       estimatedDuration: string;
     }) => {
-      const response = await fetch(`${BASE_URL}/api/mobile/jobs/${jobId}/activities`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok)
-        throw new Error("Errore nell'assegnazione dell'attività");
-      return response.json();
+      const response = await axiosInstance.post(
+        `${BASE_URL}/api/mobile/jobs/${jobId}/activities`,
+        data
+      );
+
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/jobs/${jobId}/activities`],
+        queryKey: [`/api/mobile/jobs/${jobId}/activities`],
       });
       toast({
         title: "Attività assegnata",
@@ -103,24 +103,19 @@ export default function ActivityTracker({
       notes: string;
       photos: string[];
     }) => {
-      const response = await fetch(
-        `${BASE_URL}/api/mobile/job-activities/${data.jobActivityId}/complete`,
+      const response = await axiosInstance.post(
+        `/api/mobile/job-activities/${data.jobActivityId}/complete`,
         {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            actualDuration: data.actualDuration,
-            notes: data.notes,
-          }),
+          actualDuration: data.actualDuration,
+          notes: data.notes,
         }
       );
-      if (!response.ok)
-        throw new Error("Errore nel completamento dell'attività");
-      return response.json();
+
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/jobs/${jobId}/activities`],
+        queryKey: [`/api/mobile/jobs/${jobId}/activities`],
       });
       setIsTracking(false);
       setStartTime(null);

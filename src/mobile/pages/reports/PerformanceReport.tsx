@@ -34,7 +34,6 @@ import ReportFilters, {
 } from "../../components/reports/ReportFilters";
 import DashboardMetricCard from "../../components/reports/DashboardMetricCard";
 import PerformanceGauge from "../../components/reports/PerformanceGauge";
-import { mobileApiCall } from "../../utils/mobileApi";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -51,7 +50,7 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { useState } from "react";
-import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 export default function PerformanceReport() {
   const [, setLocation] = useLocation();
@@ -63,15 +62,12 @@ export default function PerformanceReport() {
 
   // Carica i dati dal server utilizzando i filtri
   const { data = {}, isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/reports/performance`, filters],
+    queryKey: [`/api/reports/performance`, filters],
     queryFn: async () => {
-      const response = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/reports/performance`
-      );
-      if (!response.ok)
+      const response = await axiosInstance.get(`/api/reports/performance`);
+      if (!response.data)
         throw new Error("Errore nel recuperare i dati di performance");
-      return response.json();
+      return response.data;
     },
     refetchOnWindowFocus: false,
     placeholderData: (previousData) => previousData, // Mantiene i dati precedenti durante il caricamento (nuova sintassi)

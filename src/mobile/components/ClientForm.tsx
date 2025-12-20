@@ -8,7 +8,6 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToast } from "../../hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { usePermissions } from "../contexts/PermissionContext";
-import { mobileApiCall } from "../utils/mobileApi";
 
 import MobileLayout from "./MobileLayout";
 import {
@@ -31,7 +30,7 @@ import {
 } from "../../components/ui/select";
 import { Textarea } from "../../components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 const clientSchema = z.object({
   name: z.string().min(1, "Il nome è richiesto"),
@@ -73,14 +72,12 @@ export default function ClientForm() {
 
   // Fetch client data if in edit mode
   const { data: clientData, isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/clients/${clientId}`],
+    queryKey: [`/api/clients/${clientId}`],
     queryFn: async () => {
       if (!clientId) return undefined;
-      const response = await fetch(`${BASE_URL}/api/clients/${clientId}`);
-      if (!response.ok) {
-        throw new Error("Errore nel recuperare i dati del cliente");
-      }
-      return response.json();
+      const response = await axiosInstance.get(`/api/clients/${clientId}`);
+
+      return response.data;
     },
     enabled: isEditMode,
   });
@@ -96,20 +93,16 @@ export default function ClientForm() {
   const createClient = useMutation({
     mutationFn: async (values: ClientFormValues) => {
       setIsSaving(true);
-      const response = await mobileApiCall(
-        "POST",
-        `${BASE_URL}/api/mobile/clients`,
-        values
-      );
+      const response = await axiosInstance.post(`/api/mobile/clients`, values);
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response.data) {
+        const errorData = await response.data;
         throw new Error(
           errorData.error || "Errore durante la creazione del cliente"
         );
       }
 
-      return response.json();
+      return response.data;
     },
   });
 
@@ -122,7 +115,7 @@ export default function ClientForm() {
         description: "Il nuovo cliente è stato creato con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/all-clients`],
+        queryKey: [`/api/mobile/all-clients`],
       });
       setLocation("/mobile/settings/clients");
     }
@@ -148,16 +141,15 @@ export default function ClientForm() {
       if (!clientId) throw new Error("ID cliente mancante");
       setIsSaving(true);
 
-      const response = await mobileApiCall(
-        "PUT",
-        `${BASE_URL}/api/mobile/clients/${clientId}`,
+      const response = await axiosInstance.put(
+        `/api/mobile/clients/${clientId}`,
         values
       );
 
-      if (!response.ok) {
+      if (!response.data) {
         // Try to parse JSON, but guard HTML/empty responses
         try {
-          const errorData = await response.json();
+          const errorData = await response.data;
           throw new Error(
             errorData.error || "Errore durante l'aggiornamento del cliente"
           );
@@ -167,7 +159,7 @@ export default function ClientForm() {
       }
 
       try {
-        return await response.json();
+        return await response.data;
       } catch {
         return true as any;
       }
@@ -183,7 +175,7 @@ export default function ClientForm() {
         description: "Il cliente è stato aggiornato con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/all-clients`],
+        queryKey: [`/api/mobile/all-clients`],
       });
       setLocation("/mobile/settings/clients");
     }

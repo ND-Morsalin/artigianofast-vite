@@ -13,7 +13,7 @@ import { Tabs, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { Button } from "../../../components/ui/button";
 import { Check } from "lucide-react";
 import { Skeleton } from "../../../components/ui/skeleton";
-import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Interfacce
 interface SubscriptionPlan {
@@ -76,11 +76,11 @@ export function SubscriptionPlansGrid({
     isLoading,
     error,
   } = useQuery<SubscriptionPlan[]>({
-    queryKey: [`${BASE_URL}/api/subscription-plans`],
+    queryKey: [`/api/subscription-plans`],
     queryFn: async () => {
-      const res = await fetch(`${BASE_URL}/api/subscription-plans`);
-      if (!res.ok) throw new Error("Failed to load plans");
-      return res.json();
+      const res = await axiosInstance.get(`/api/subscription-plans`);
+     
+      return res.data;
     },
   });
 

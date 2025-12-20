@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "../../../lib/queryClient";
+import { queryClient } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type Resolver } from "react-hook-form";
@@ -69,6 +69,7 @@ import {
 import { Badge } from "../../../components/ui/badge";
 import { LanguageSelector } from "../../../components/ui/language-selector";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Schema for client plan override
 const clientPlanOverrideSchema = z.object({
@@ -87,7 +88,9 @@ const clientPlanOverrideSchema = z.object({
     notifications: z.boolean().optional(),
 
     // Page access control
-    page_access: z.record(z.string(), z.enum(["view", "edit", "none"])).optional(),
+    page_access: z
+      .record(z.string(), z.enum(["view", "edit", "none"]))
+      .optional(),
 
     // Visible fields configuration
     visible_fields: z.record(z.string(), z.array(z.string())).optional(),
@@ -284,26 +287,30 @@ export default function ClientPlanOverridesPage() {
 
   // Fetch data
   const { data: clients, isLoading: clientsLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
     queryFn: async () => {
-      const response = await apiRequest(`${BASE_URL}/api/clients`);
-      return await response.json();
+      const response = await axiosInstance.get(`${BASE_URL}/api/clients`);
+      return await response.data;
     },
   });
 
   const { data: plans, isLoading: plansLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/subscription-plans`],
+    queryKey: [`/api/subscription-plans`],
     queryFn: async () => {
-      const response = await apiRequest(`${BASE_URL}/api/subscription-plans`);
-      return await response.json();
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/subscription-plans`
+      );
+      return await response.data;
     },
   });
 
   const { data: planConfigurations, isLoading: configsLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/plan-configurations`],
+    queryKey: [`/api/plan-configurations`],
     queryFn: async () => {
-      const response = await apiRequest(`${BASE_URL}/api/plan-configurations`);
-      return await response.json();
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/plan-configurations`
+      );
+      return await response.data;
     },
   });
 
@@ -340,14 +347,10 @@ export default function ClientPlanOverridesPage() {
   // Mutations
   const createMutation = useMutation({
     mutationFn: (data: ClientPlanOverrideFormValues) =>
-      apiRequest({
-        method: "POST",
-        url: `${BASE_URL}/api/plan-configurations`,
-        data,
-      }),
+      axiosInstance.post(`${BASE_URL}/api/plan-configurations`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/plan-configurations`],
+        queryKey: [`/api/plan-configurations`],
       });
       toast({
         title: t("admin.clientPlanOverrides.overrideCreatedTitle"),
@@ -373,15 +376,10 @@ export default function ClientPlanOverridesPage() {
     }: {
       id: number;
       data: Partial<ClientPlanOverrideFormValues>;
-    }) =>
-      apiRequest({
-        method: "PUT",
-        url: `${BASE_URL}/api/plan-configurations/${id}`,
-        data,
-      }),
+    }) => axiosInstance.put(`${BASE_URL}/api/plan-configurations/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/plan-configurations`],
+        queryKey: [`/api/plan-configurations`],
       });
       toast({
         title: t("override_updated_title"),
@@ -402,13 +400,10 @@ export default function ClientPlanOverridesPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest({
-        method: "DELETE",
-        url: `${BASE_URL}/api/plan-configurations/${id}`,
-      }),
+      axiosInstance.delete(`${BASE_URL}/api/plan-configurations/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/plan-configurations`],
+        queryKey: [`/api/plan-configurations`],
       });
       toast({
         title: t("override_deleted_title"),

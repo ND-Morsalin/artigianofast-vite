@@ -39,7 +39,7 @@ import {
 } from "../../../components/ui/select";
 import { Plus, Edit, Trash2, Download } from "lucide-react";
 import { useToast } from "../../../hooks/use-toast";
-import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 interface Invoice {
   id: number;
@@ -71,11 +71,11 @@ const AdminSettingsInvoicePage: React.FC = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
-  console.log({isEditDialogOpen,selectedInvoice,queryClient})
+  console.log({ isEditDialogOpen, selectedInvoice, queryClient });
 
   // Mock data for now - replace with actual API calls
   const { data: invoices = [], isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/invoices`],
+    queryKey: [`/api/invoices`],
     queryFn: async () => {
       // Mock data - replace with actual API call
       return [
@@ -140,10 +140,10 @@ const AdminSettingsInvoicePage: React.FC = () => {
   });
 
   const { data: clients = [] } = useQuery({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
     queryFn: async () => {
-      const response = await fetch(`${BASE_URL}/api/clients`);
-      return response.json();
+      const response = await axiosInstance.get(`/api/clients`);
+      return response.data;
     },
   });
 

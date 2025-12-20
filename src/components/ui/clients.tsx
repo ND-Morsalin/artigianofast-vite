@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "../../hooks/use-toast";
-import { BASE_URL } from "../../constant";
 
 interface Client {
   id: number;
@@ -21,7 +20,7 @@ export function Clients() {
   const { toast } = useToast();
 
   const { data: clients = [], isLoading } = useQuery<Client[]>({
-    queryKey: [`${BASE_URL}/api/clients`],
+    queryKey: [`/api/clients`],
   });
 
   const filteredClients = clients.filter((client) => {

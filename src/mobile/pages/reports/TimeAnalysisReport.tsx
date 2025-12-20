@@ -31,7 +31,6 @@ import ReportFilters, {
 } from "../../components/reports/ReportFilters";
 import DashboardMetricCard from "../../components/reports/DashboardMetricCard";
 import MobileLayout from "../../components/MobileLayout";
-import { mobileApiCall } from "../../utils/mobileApi";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -47,7 +46,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 export default function TimeAnalysisReport() {
   const [, setLocation] = useLocation();
@@ -60,15 +59,12 @@ export default function TimeAnalysisReport() {
 
   // Carica i dati dal server utilizzando i filtri
   const { data = {}, isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/reports/time`, filters],
+    queryKey: [`/api/reports/time`, filters],
     queryFn: async () => {
-      const response = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/reports/time`
-      );
-      if (!response.ok)
+      const response = await axiosInstance.get(`/api/reports/time`);
+      if (!response.data)
         throw new Error("Errore nel recuperare i dati di analisi temporale");
-      return response.json();
+      return response.data;
     },
     refetchOnWindowFocus: false,
     placeholderData: {}, // Usa questo invece di keepPreviousData

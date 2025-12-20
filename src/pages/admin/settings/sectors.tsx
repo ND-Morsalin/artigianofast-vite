@@ -47,6 +47,7 @@ import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "../../../components/ui/language-selector";
 import { Badge } from "../../../components/ui/badge";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Schema per la validazione del form
 const sectorSchema = z.object({
@@ -68,10 +69,11 @@ export default function SectorsPage() {
 
   // Query per ottenere i settori
   const { data: sectors = [], isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/sectors`],
+    queryKey: [`/api/sectors`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/sectors`)
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/sectors`)
+        .then((res) => res.data)
         .catch(() => []),
   });
 
@@ -90,9 +92,9 @@ export default function SectorsPage() {
   // Mutation per creare un nuovo settore
   const createMutation = useMutation({
     mutationFn: (data: SectorFormValues) =>
-      apiRequest("POST", `${BASE_URL}/api/sectors`, data),
+      axiosInstance.post( `${BASE_URL}/api/sectors`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/sectors`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/sectors`] });
       toast({
         title: t("sectors.sectorCreated"),
         description: t("sectors.sectorCreatedDescription"),
@@ -115,7 +117,7 @@ export default function SectorsPage() {
     mutationFn: ({ id, data }: { id: number; data: SectorFormValues }) =>
       apiRequest("PATCH", `${BASE_URL}/api/sectors/${id}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/sectors`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/sectors`] });
       toast({
         title: t("sectors.sectorUpdated"),
         description: t("sectors.sectorUpdatedDescription"),
@@ -139,7 +141,7 @@ export default function SectorsPage() {
     mutationFn: (id: number) =>
       apiRequest("DELETE", `${BASE_URL}/api/sectors/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/sectors`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/sectors`] });
       toast({
         title: t("sectors.sectorDeleted"),
         description: t("sectors.sectorDeletedDescription"),

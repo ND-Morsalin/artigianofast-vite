@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useLocation } from "wouter";
 import { useToast } from "../../../hooks/use-toast";
-import { apiRequest } from "../../../lib/queryClient";
 
 import { Button } from "../../../components/ui/button";
 import {
@@ -27,6 +26,7 @@ import {
 import { ArrowLeft, Save } from "lucide-react";
 import { Separator } from "../../../components/ui/separator";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Schema di validazione
 const formSchema = z.object({
@@ -63,14 +63,13 @@ export default function AdminCreatePage() {
     setIsSubmitting(true);
 
     try {
-      const res = await apiRequest(
-        "POST",
+      const res = await axiosInstance.post(
         `${BASE_URL}/api/administrators`,
         data
       );
 
-      if (!res.ok) {
-        const errorData = await res.json();
+      if (!res.data) {
+        const errorData = await res.data;
         throw new Error(
           errorData.message || "Errore durante la creazione dell'amministratore"
         );

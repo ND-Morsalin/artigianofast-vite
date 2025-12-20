@@ -13,8 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import { mobileApiCall } from "../utils/mobileApi";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 export default function Registration() {
   const { t } = useTranslation();
@@ -40,20 +39,17 @@ export default function Registration() {
 
   // Query per ottenere i lavori
   const { data: jobs, isLoading } = useQuery<Job[]>({
-    queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+    queryKey: [`/api/mobile/all-jobs`],
     queryFn: async () => {
-      const response = await mobileApiCall(
-        "GET",
-        `${BASE_URL}/api/mobile/all-jobs`
-      );
-      if (!response.ok) throw new Error("Errore nel recuperare i lavori");
-      return response.json();
+      const response = await axiosInstance.get(`/api/mobile/all-jobs`);
+      if (!response.data) throw new Error("Errore nel recuperare i lavori");
+      return response.data;
     },
   });
 
   // Query per ottenere i tipi di lavoro
   const { data: jobTypes } = useQuery<JobType[]>({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
   });
 
   // Filtriamo i lavori

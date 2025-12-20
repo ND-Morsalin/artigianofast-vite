@@ -7,8 +7,8 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import MobileLayout from "../components/MobileLayout";
-import { mobileGet, mobileDelete } from "../utils/mobileApi";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Definisci l'interfaccia per l'attività
 interface Activity {
@@ -36,14 +36,16 @@ export default function ActivitiesSettings() {
   const { data: activities = [], isLoading: isActivitiesLoading } = useQuery<
     Activity[]
   >({
-    queryKey: [`${BASE_URL}/api/mobile/activities`],
+    queryKey: [`/api/mobile/activities`],
     queryFn: async () => {
       try {
-        const response = await mobileGet(`${BASE_URL}/api/mobile/activities`);
-        if (!response.ok) {
+        const response = await axiosInstance.get(
+          `${BASE_URL}/api/mobile/activities`
+        );
+        if (!response.data) {
           throw new Error("Errore nel recuperare le attività");
         }
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore:", error);
@@ -54,14 +56,16 @@ export default function ActivitiesSettings() {
 
   // Carica i tipi di lavoro per associarli alle attività
   const { data: jobTypes = [] } = useQuery<JobType[]>({
-    queryKey: [`${BASE_URL}/api/mobile/jobtypes`],
+    queryKey: [`/api/mobile/jobtypes`],
     queryFn: async () => {
       try {
-        const response = await mobileGet(`${BASE_URL}/api/mobile/jobtypes`);
-        if (!response.ok) {
+        const response = await axiosInstance.get(
+          `${BASE_URL}/api/mobile/jobtypes`
+        );
+        if (!response.data) {
           throw new Error("Errore nel recuperare i tipi di lavoro");
         }
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore:", error);
@@ -81,15 +85,15 @@ export default function ActivitiesSettings() {
   // Mutation per eliminare un'attività
   const deleteActivity = useMutation({
     mutationFn: async (id: number) => {
-      const response = await mobileDelete(
+      const response = await axiosInstance.delete(
         `${BASE_URL}/api/mobile/activities/${id}`
       );
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error("Errore durante l'eliminazione dell'attività");
       }
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       toast({
@@ -97,7 +101,7 @@ export default function ActivitiesSettings() {
         description: "L'attività è stata eliminata con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/activities`],
+        queryKey: [`/api/mobile/activities`],
       });
     },
     onError: (error: Error) => {

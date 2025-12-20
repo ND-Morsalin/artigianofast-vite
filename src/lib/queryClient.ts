@@ -80,7 +80,7 @@ export async function apiRequest(
     headers: {
       ...(mobileSessionId && { "x-mobile-session-id": mobileSessionId }),
       // Altri header possono essere aggiunti qui se necessario
-      ...(adminAccessToken && { "x-admin_access_token": adminAccessToken}),
+      ...(adminAccessToken && { "x-admin_access_token": adminAccessToken }),
     },
     credentials: "include",
   };

@@ -30,8 +30,8 @@ import {
 import { SiPaypal } from "react-icons/si";
 import { DesktopNavbar } from "./components/DesktopNavbar";
 import { CompanyProfileForm } from "./components/CompanyProfileForm";
-import { apiRequest } from "../../lib/queryClient";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Interfacce
 interface Plan {
@@ -92,15 +92,15 @@ export default function CheckoutPage() {
     isLoading,
     error,
   } = useQuery<Plan>({
-    queryKey: [`${BASE_URL}/api/subscription-plans/${planId}`],
+    queryKey: [`/api/subscription-plans/${planId}`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/subscription-plans/${planId}`).then(
-        (res) => {
-          if (!res.ok)
+      axiosInstance
+        .get(`${BASE_URL}/api/subscription-plans/${planId}`)
+        .then((res) => {
+          if (!res.data)
             throw new Error(t("errors.planNotFound", "Piano non trovato"));
-          return res.json();
-        }
-      ),
+          return res.data;
+        }),
     enabled: !!planId,
   });
 
@@ -293,15 +293,14 @@ export default function CheckoutPage() {
       };
 
       // Chiamata API reale per la registrazione e sottoscrizione
-      const response = await apiRequest(
-        "POST",
+      const response = await axiosInstance.post(
         `${BASE_URL}/api/checkout/subscribe`,
         subscriptionData
       );
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log(result)
+      if (response.data) {
+        const result = await response.data;
+        console.log(result);
 
         // Clear temp user data
         sessionStorage.removeItem("tempUser");
@@ -320,7 +319,7 @@ export default function CheckoutPage() {
         // Redirect to artisan dashboard
         setLocation("/admin/artisan-dashboard");
       } else {
-        const errorData = await response.json();
+        const errorData = await response.data;
         throw new Error(errorData.error || "Errore durante la registrazione");
       }
     } catch (error) {

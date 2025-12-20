@@ -10,7 +10,7 @@ import {
 import { Button } from "../../components/ui/button";
 import { LogOut, Loader2 } from "lucide-react";
 import { useToast } from "../../hooks/use-toast";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 export default function AdminLogout() {
   const [, setLocation] = useLocation();
@@ -20,12 +20,9 @@ export default function AdminLogout() {
     const performLogout = async () => {
       try {
         // Call logout API
-        const response = await fetch(`${BASE_URL}/api/admin/logout`, {
-          method: "POST",
-          credentials: "include",
-        });
+        const response = await axiosInstance.post(`/api/admin/logout`, {});
 
-        if (response.ok) {
+        if (response.data) {
           toast({
             title: "Logout effettuato",
             description: "Sessione terminata con successo",

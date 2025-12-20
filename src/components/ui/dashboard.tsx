@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { BASE_URL } from "../../constant";
 
 interface DashboardStats {
   activeJobs: number;
@@ -32,7 +31,7 @@ interface DashboardData {
 // Questo componente è obsoleto e verrà sostituito dalla versione mobile
 export function Dashboard() {
   const { data, isLoading, error } = useQuery<DashboardData>({
-    queryKey: [`${BASE_URL}/api/stats`],
+    queryKey: [`/api/stats`],
   });
 
   if (isLoading) {

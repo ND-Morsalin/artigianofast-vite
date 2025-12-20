@@ -21,9 +21,9 @@ import {
 } from "lucide-react";
 // import { useToast } from "../../hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { useTranslation } from "react-i18next";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 export default function ReportsPage() {
   const [, setLocation] = useLocation();
@@ -32,31 +32,29 @@ export default function ReportsPage() {
 
   // Check if user has reports permissions
   const { data: currentUser } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/user`],
+    queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/user`).then((res) =>
-        res.json()
-      ),
+      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
 
   console.log({ currentUser });
   // Fetch user subscription and plan features (same as dashboard)
   const { data: userSubscription } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/user-subscription`],
+    queryKey: [`/api/mobile/user-subscription`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/user-subscription`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/user-subscription`)
+        .then((res) => res.data),
     enabled: true,
   });
 
   const { data: subscriptionPlans } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/subscription-plans`],
+    queryKey: [`/api/mobile/subscription-plans`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/subscription-plans`).then(
-        (res) => res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/subscription-plans`)
+        .then((res) => res.data),
     enabled: true,
   });
 
@@ -83,11 +81,11 @@ export default function ReportsPage() {
     isLoading: clientsLoading,
     error: clientsError,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/clients`],
+    queryKey: [`/api/mobile/clients`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/clients`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/clients`)
+        .then((res) => res.data),
     enabled: hasReportsPermission,
     retry: false,
   });
@@ -97,11 +95,11 @@ export default function ReportsPage() {
     isLoading: jobsLoading,
     error: jobsError,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/all-jobs`],
+    queryKey: [`/api/mobile/all-jobs`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/all-jobs`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/all-jobs`)
+        .then((res) => res.data),
     enabled: hasReportsPermission,
     retry: false,
   });
@@ -111,11 +109,11 @@ export default function ReportsPage() {
     isLoading: invoicesLoading,
     error: invoicesError,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/invoices`],
+    queryKey: [`/api/mobile/invoices`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/mobile/invoices`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/mobile/invoices`)
+        .then((res) => res.data),
     enabled: hasReportsPermission,
     retry: false,
   });

@@ -13,7 +13,6 @@ import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import { useToast } from "../../../hooks/use-toast";
-import { apiRequest } from "../../../lib/queryClient";
 import {
   Form,
   FormControl,
@@ -26,6 +25,7 @@ import {
 import { MultiSelect } from "../../../components/ui/multi-select";
 import { LanguageSelector } from "../../../components/ui/language-selector";
 import { BASE_URL } from "../../../constant";
+import { axiosInstance } from "../../../lib/axios";
 
 // Schema di validazione per il profilo aziendale
 const companyProfileSchema = z.object({
@@ -60,20 +60,21 @@ export default function CompanyProfilePage() {
 
   // Query per ottenere i settori disponibili
   const { data: sectors } = useQuery({
-    queryKey: [`${BASE_URL}/api/sectors`],
+    queryKey: [`/api/sectors`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/sectors`)
-        .then((res) => res.json())
+      axiosInstance
+        .get(`${BASE_URL}/api/sectors`)
+        .then((res) => res.data)
         .catch(() => []),
   });
 
   // Query per ottenere il profilo aziendale attuale
   const { data: company, isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/company`],
+    queryKey: [`/api/company`],
     queryFn: async () => {
       try {
-        const res = await apiRequest("GET", `${BASE_URL}/api/company`);
-        return await res.json();
+        const res = await axiosInstance.get(`${BASE_URL}/api/company`);
+        return await res.data;
       } catch (error) {
         console.log(error);
         console.error("Errore nel recupero del profilo aziendale:", error);
@@ -149,11 +150,13 @@ export default function CompanyProfilePage() {
         ...data,
         sectorIds: JSON.stringify(data.sectorIds),
       };
-      return await apiRequest(
-        method,
-        `${BASE_URL}/api/company`,
-        formattedData
-      ).then((res) => res.json());
+      return method === "POST"
+        ? await axiosInstance
+            .post(`${BASE_URL}/api/company`, formattedData)
+            .then((res) => res.data)
+        : await axiosInstance
+            .put(`${BASE_URL}/api/company`, formattedData)
+            .then((res) => res.data);
     },
     onSuccess: () => {
       setLoading(false);
@@ -215,7 +218,7 @@ export default function CompanyProfilePage() {
           ) : (
             <Form {...form}>
               <form
-                onSubmit={()=> form.handleSubmit(onSubmit)()}
+                onSubmit={() => form.handleSubmit(onSubmit)()}
                 className="space-y-6"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

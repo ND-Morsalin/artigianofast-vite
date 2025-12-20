@@ -42,6 +42,7 @@ import {
 import { FileEdit, Trash2, Plus, Globe, Eye } from "lucide-react";
 import type { WebPage } from "../../../../types";
 import { BASE_URL } from "../../../../constant";
+import { axiosInstance } from "../../../../lib/axios";
 
 export default function WebPagesPage() {
   const [activeTab, setActiveTab] = useState<string>("desktop");
@@ -51,30 +52,19 @@ export default function WebPagesPage() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: [`${BASE_URL}/api/admin/web-pages`],
+    queryKey: [`/api/admin/web-pages`],
     select: (data: WebPage[]) => data,
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`${BASE_URL}/api/admin/web-pages/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          "Si è verificato un errore durante l'eliminazione della pagina"
-        );
-      }
-
-      return response.json();
+      const response = await axiosInstance.delete(`${BASE_URL}/api/admin/web-pages/${id}`);
+ 
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/web-pages`],
+        queryKey: [`/api/admin/web-pages`],
       });
       toast({
         title: "Pagina eliminata",
@@ -93,25 +83,15 @@ export default function WebPagesPage() {
 
   const publishMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const response = await fetch(`${BASE_URL}/api/admin/web-pages/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status }),
-      });
+      const response = await axiosInstance.patch(`${BASE_URL}/api/admin/web-pages/${id}`, { status });
 
-      if (!response.ok) {
-        throw new Error(
-          "Si è verificato un errore durante la pubblicazione della pagina"
-        );
-      }
+       
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/web-pages`],
+        queryKey: [`/api/admin/web-pages`],
       });
       toast({
         title: "Pagina aggiornata",
@@ -136,25 +116,15 @@ export default function WebPagesPage() {
       id: number;
       isHomepage: boolean;
     }) => {
-      const response = await fetch(`${BASE_URL}/api/admin/web-pages/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ isHomepage }),
-      });
+      const response = await axiosInstance.patch(`/api/admin/web-pages/${id}`, { isHomepage });
 
-      if (!response.ok) {
-        throw new Error(
-          "Si è verificato un errore durante l'impostazione della homepage"
-        );
-      }
+     
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/admin/web-pages`],
+        queryKey: [`/api/admin/web-pages`],
       });
       toast({
         title: "Homepage impostata",

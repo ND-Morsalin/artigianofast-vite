@@ -7,15 +7,13 @@ import {
   useEffect,
 } from "react";
 import { queryClient } from "../../lib/queryClient";
-import { mobileApiCall } from "../utils/mobileApi";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Use the centralized mobile API utility
-const apiCall = mobileApiCall;
 
 // Tipo utente mobile
 export interface MobileUser {
- 
   id: number;
   username: string;
   fullName: string;
@@ -24,7 +22,7 @@ export interface MobileUser {
   roleId: number | null;
   type?: "client" | "collaborator";
   language?: string;
-  avatarUrl?:string;
+  avatarUrl?: string;
 }
 
 export interface MobileAuthContextType {
@@ -65,10 +63,10 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
     const loadUser = async () => {
       try {
         setIsLoading(true);
-        const res = await apiCall("GET", `${BASE_URL}/api/mobile/user`);
+        const res = await axiosInstance.get(`${BASE_URL}/api/mobile/user`);
 
-        if (res.ok) {
-          const userData = await res.json();
+        if (res.data) {
+          const userData = await res.data;
           setUser(userData);
         } else {
           setUser(null);
@@ -91,7 +89,7 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await apiCall("POST", `${BASE_URL}/api/mobile/login`, {
+      const res = await axiosInstance.post(`${BASE_URL}/api/mobile/login`, {
         email,
         password,
       });
@@ -102,14 +100,14 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
         Object.fromEntries(res.headers.entries())
       );
 
-      if (!res.ok) {
+      if (!res.data) {
         console.error("❌ Login failed with status:", res.status);
-        const errorData = await res.json();
+        const errorData = await res.data;
         console.error("❌ Error data:", errorData);
         throw new Error(errorData.error || "Errore durante il login");
       }
 
-      const userData = await res.json();
+      const userData = await res.data;
       console.log("✅ Login successful, user data:", userData);
       console.log(
         "🔑 Mobile session ID from response:",
@@ -144,7 +142,7 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await apiCall("POST", `${BASE_URL}/api/mobile/register`, {
+      const res = await axiosInstance.post(`${BASE_URL}/api/mobile/register`, {
         email,
         password,
         fullName,
@@ -153,14 +151,14 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
 
       console.log("📡 Registration response status:", res.status);
 
-      if (!res.ok) {
+      if (!res.data) {
         console.error("❌ Registration failed with status:", res.status);
-        const errorData = await res.json();
+        const errorData = await res.data;
         console.error("❌ Error data:", errorData);
         throw new Error(errorData.error || "Errore durante la registrazione");
       }
 
-      const userData = await res.json();
+      const userData = await res.data;
       console.log("✅ Registration successful, user data:", userData);
       console.log(
         "🔑 Mobile session ID from response:",
@@ -192,10 +190,10 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await apiCall("POST", `${BASE_URL}/api/mobile/logout`);
+      const res = await axiosInstance.post(`${BASE_URL}/api/mobile/logout`);
 
-      if (!res.ok) {
-        const errorData = await res.json();
+      if (!res.data) {
+        const errorData = await res.data;
         throw new Error(errorData.error || "Errore durante il logout");
       }
 
@@ -217,20 +215,20 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await apiCall("POST",`${BASE_URL}/api/mobile/activate`, {
+      const res = await axiosInstance.post(`${BASE_URL}/api/mobile/activate`, {
         activationCode: code,
         password,
         fullName,
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
+      if (!res.data) {
+        const errorData = await res.data;
         throw new Error(
           errorData.error || "Errore durante l'attivazione dell'account"
         );
       }
 
-      const userData = await res.json();
+      const userData = await res.data;
       setUser(userData);
       return userData;
     } catch (err) {
@@ -251,16 +249,19 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await apiCall("PUT", `${BASE_URL}/api/mobile/user`, userData);
+      const res = await axiosInstance.put(
+        `${BASE_URL}/api/mobile/user`,
+        userData
+      );
 
-      if (!res.ok) {
-        const errorData = await res.json();
+      if (!res.data) {
+        const errorData = await res.data;
         throw new Error(
           errorData.error || "Errore durante l'aggiornamento dei dati"
         );
       }
 
-      const updatedUser = await res.json();
+      const updatedUser = await res.data;
       setUser(updatedUser);
       return updatedUser;
     } catch (err) {
@@ -284,13 +285,16 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await apiCall("POST", `${BASE_URL}/api/mobile/change-password`, {
-        currentPassword,
-        newPassword,
-      });
+      const res = await axiosInstance.post(
+        `${BASE_URL}/api/mobile/change-password`,
+        {
+          currentPassword,
+          newPassword,
+        }
+      );
 
-      if (!res.ok) {
-        const errorData = await res.json();
+      if (!res.data) {
+        const errorData = await res.data;
         throw new Error(errorData.error || "Errore durante il cambio password");
       }
     } catch (err) {

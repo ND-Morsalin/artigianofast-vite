@@ -55,6 +55,7 @@ import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { SubscriptionPlan } from "../../types";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Schema per la validazione del form
 const formSchema = z.object({
@@ -86,10 +87,10 @@ export default function AdminSubscriptionPlansPage() {
 
   // Query per ottenere i piani di abbonamento
   const { data: plans = [], isLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/subscription-plans`],
+    queryKey: [`/api/subscription-plans`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/subscription-plans`).then((res) =>
-        res.json()
+      axiosInstance.get( `${BASE_URL}/api/subscription-plans`).then(
+        (res) => res.data
       ),
     retry: 3, // retry a few times in case of network issues
     retryDelay: 1000, // 1 second between retries
@@ -114,14 +115,14 @@ export default function AdminSubscriptionPlansPage() {
   // Mutation per creare un nuovo piano
   const createMutation = useMutation({
     mutationFn: (data: FormValues) =>
-      apiRequest("POST", `${BASE_URL}/api/subscription-plans`, data),
+      axiosInstance.post( `${BASE_URL}/api/subscription-plans`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       // Ricarica i dati dei piani
       queryClient.refetchQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       toast({
         title: "Piano creato",
@@ -147,8 +148,8 @@ export default function AdminSubscriptionPlansPage() {
         `Invio richiesta PUT a /api/subscription-plans/${id} con dati:`,
         data
       );
-      const response = await apiRequest(
-        "PUT",
+      const response = await axiosInstance.put(
+        
         `${BASE_URL}/api/subscription-plans/${id}`,
         data
       );
@@ -158,11 +159,11 @@ export default function AdminSubscriptionPlansPage() {
     onSuccess: () => {
       console.log("Successo nella mutation di aggiornamento!");
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       // Ricarica i dati dei piani
       queryClient.refetchQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       toast({
         title: "Piano aggiornato",
@@ -189,11 +190,11 @@ export default function AdminSubscriptionPlansPage() {
       apiRequest("DELETE", `${BASE_URL}/api/subscription-plans/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       // Ricarica i dati dei piani
       queryClient.refetchQueries({
-        queryKey: [`${BASE_URL}/api/subscription-plans`],
+        queryKey: [`/api/subscription-plans`],
       });
       toast({
         title: "Piano eliminato",

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery } from "@tanstack/react-query";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 type PlanConfig = {
   planId: number | null;
@@ -12,15 +12,10 @@ type PlanConfig = {
 
 export function usePlanFeatures() {
   const { data, isLoading, isError } = useQuery<PlanConfig>({
-    queryKey: [`${BASE_URL}/api/mobile/plan-configuration`],
+    queryKey: [`/api/mobile/plan-configuration`],
     queryFn: async () => {
-      const res = await fetch(`${BASE_URL}/api/mobile/plan-configuration`, {
-        headers: {
-          "x-mobile-session-id": localStorage.getItem("mobileSessionId") || "",
-        },
-      });
-      if (!res.ok) throw new Error("Failed to load plan configuration");
-      return res.json();
+      const res = await axiosInstance.get(`/api/mobile/plan-configuration`);
+      return res.data;
     },
     staleTime: 60_000,
   });

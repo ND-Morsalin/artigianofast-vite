@@ -19,9 +19,9 @@ import {
 } from "../components/ui/tabs";
 import { Badge } from "../components/ui/badge";
 import { Check } from "lucide-react";
-import { apiRequest } from "../lib/queryClient";
 import { Workflow } from "lucide-react";
 import { BASE_URL } from "../constant";
+import { axiosInstance } from "../lib/axios";
 
 type Plan = {
   id: number;
@@ -47,11 +47,11 @@ export default function PlansPage() {
 
   // Query per ottenere i piani
   const { data: plans = [], isLoading } = useQuery<Plan[]>({
-    queryKey: [`${BASE_URL}/api/subscription-plans`],
+    queryKey: [`/api/subscription-plans`],
     queryFn: () =>
-      apiRequest("GET", `${BASE_URL}/api/subscription-plans`).then((res) =>
-        res.json()
-      ),
+      axiosInstance
+        .get(`${BASE_URL}/api/subscription-plans`)
+        .then((res) => res.data),
   });
 
   const handlePlanSelect = (planId: number) => {
@@ -108,8 +108,7 @@ export default function PlansPage() {
           endDate.setDate(endDate.getDate() + 365);
         }
 
-        const response = await apiRequest(
-          "POST",
+        const response = await axiosInstance.post(
           `${BASE_URL}/api/user-subscriptions`,
           {
             userId: userData.id,
@@ -121,7 +120,7 @@ export default function PlansPage() {
           }
         );
 
-        if (response.ok) {
+        if (response.data) {
           // Clear temp user data
           sessionStorage.removeItem("tempUser");
 
@@ -136,7 +135,7 @@ export default function PlansPage() {
             setLocation("/admin/artisan-dashboard");
           }, 1500);
         } else {
-          const errorData = await response.json();
+          const errorData = await response.data;
           throw new Error(
             errorData.message ||
               errorData.error ||

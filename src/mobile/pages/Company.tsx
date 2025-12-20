@@ -17,9 +17,9 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/ui/form";
-import { mobileGet, mobilePatch } from "../utils/mobileApi";
 import MobileLayout from "../components/MobileLayout";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 const companySchema = z.object({
   companyName: z.string().min(1, { message: "Nome azienda obbligatorio" }),
@@ -49,11 +49,13 @@ export default function CompanySettings() {
 
   // Carica i dati aziendali
   const { data: company, isLoading: isCompanyLoading } = useQuery({
-    queryKey: [`${BASE_URL}/api/mobile/company`],
+    queryKey: [`/api/mobile/company`],
     queryFn: async () => {
       try {
-        const response = await mobileGet(`${BASE_URL}/api/mobile/company`);
-        if (!response.ok) {
+        const response = await axiosInstance.get(
+          `${BASE_URL}/api/mobile/company`
+        );
+        if (!response.data) {
           if (response.status === 401) {
             // Utente non autenticato, ma non facciamo il redirect
             // Restituiamo null invece di lanciare un errore
@@ -61,7 +63,7 @@ export default function CompanySettings() {
           }
           throw new Error("Errore nel recuperare i dati aziendali");
         }
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore:", error);
@@ -112,26 +114,29 @@ export default function CompanySettings() {
   // Mutation per salvare i dati aziendali
   const updateCompany = useMutation({
     mutationFn: async (data: CompanyFormValues) => {
-      const response = await mobilePatch(`${BASE_URL}/api/mobile/company`, {
-        name: data.companyName,
-        ownerName: data.ownerName,
-        vatNumber: data.vatNumber,
-        address: data.address,
-        city: data.city,
-        zipCode: data.zipCode,
-        province: data.province,
-        country: data.country,
-        email: data.email,
-        phone: data.phone,
-        website: data.website,
-        logo: data.logo,
-      });
+      const response = await axiosInstance.patch(
+        `${BASE_URL}/api/mobile/company`,
+        {
+          name: data.companyName,
+          ownerName: data.ownerName,
+          vatNumber: data.vatNumber,
+          address: data.address,
+          city: data.city,
+          zipCode: data.zipCode,
+          province: data.province,
+          country: data.country,
+          email: data.email,
+          phone: data.phone,
+          website: data.website,
+          logo: data.logo,
+        }
+      );
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error("Errore durante il salvataggio dei dati aziendali");
       }
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       toast({
@@ -139,7 +144,7 @@ export default function CompanySettings() {
         description: "I dati aziendali sono stati aggiornati correttamente",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/company`],
+        queryKey: [`/api/mobile/company`],
       });
     },
     onError: (error) => {

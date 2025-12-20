@@ -7,8 +7,8 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import MobileLayout from "../components/MobileLayout";
-import { mobileGet, mobileDelete } from "../utils/mobileApi";
 import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 // Definisci l'interfaccia per il tipo di lavoro
 interface JobType {
@@ -30,14 +30,16 @@ export default function JobTypesSettings() {
   const { data: jobTypes = [], isLoading: isJobTypesLoading } = useQuery<
     JobType[]
   >({
-    queryKey: [`${BASE_URL}/api/mobile/jobtypes`],
+    queryKey: [`/api/mobile/jobtypes`],
     queryFn: async () => {
       try {
-        const response = await mobileGet(`${BASE_URL}/api/mobile/jobtypes`);
-        if (!response.ok) {
+        const response = await axiosInstance.get(
+          `${BASE_URL}/api/mobile/jobtypes`
+        );
+        if (!response.data) {
           throw new Error("Errore nel recuperare i tipi di lavoro");
         }
-        return response.json();
+        return response.data;
       } catch (error) {
         console.log(error);
         console.error("Errore:", error);
@@ -57,15 +59,15 @@ export default function JobTypesSettings() {
   // Mutation per eliminare un tipo di lavoro
   const deleteJobType = useMutation({
     mutationFn: async (id: number) => {
-      const response = await mobileDelete(
+      const response = await axiosInstance.delete(
         `${BASE_URL}/api/mobile/jobtypes/${id}`
       );
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error("Errore durante l'eliminazione del tipo di lavoro");
       }
 
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       toast({
@@ -73,7 +75,7 @@ export default function JobTypesSettings() {
         description: "Il tipo di lavoro è stato eliminato con successo",
       });
       queryClient.invalidateQueries({
-        queryKey: [`${BASE_URL}/api/mobile/jobtypes`],
+        queryKey: [`/api/mobile/jobtypes`],
       });
     },
     onError: (error: Error) => {
