@@ -18,7 +18,6 @@ import {
   FormMessage,
 } from "../../components/ui/form";
 import MobileLayout from "../components/MobileLayout";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 const companySchema = z.object({
@@ -53,7 +52,7 @@ export default function CompanySettings() {
     queryFn: async () => {
       try {
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/mobile/company`
+          `/api/mobile/company`
         );
         if (!response.data) {
           if (response.status === 401) {
@@ -115,7 +114,7 @@ export default function CompanySettings() {
   const updateCompany = useMutation({
     mutationFn: async (data: CompanyFormValues) => {
       const response = await axiosInstance.patch(
-        `${BASE_URL}/api/mobile/company`,
+        `/api/mobile/company`,
         {
           name: data.companyName,
           ownerName: data.ownerName,

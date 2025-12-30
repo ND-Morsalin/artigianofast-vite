@@ -54,7 +54,6 @@ import {
   TableRow,
 } from "../../../components/ui/table";
 import { LanguageSelector } from "../../../components/ui/language-selector";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Definizione delle funzionalità disponibili nel sistema
@@ -156,7 +155,7 @@ export default function AdminSettingsPlansPage() {
     queryKey: [`/api/subscription-plans`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/subscription-plans`
+        `/api/subscription-plans`
       );
       return await response.data;
     },
@@ -182,7 +181,7 @@ export default function AdminSettingsPlansPage() {
   // Mutation per creare un nuovo piano
   const createMutation = useMutation({
     mutationFn: (data: FormValues) =>
-      axiosInstance.post(`${BASE_URL}/api/subscription-plans`, data),
+      axiosInstance.post(`/api/subscription-plans`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/subscription-plans`],
@@ -211,7 +210,7 @@ export default function AdminSettingsPlansPage() {
   // Mutation per aggiornare un piano esistente
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: FormValues }) =>
-      axiosInstance.put(`${BASE_URL}/api/subscription-plans/${id}`, data),
+      axiosInstance.put(`/api/subscription-plans/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/subscription-plans`],
@@ -241,7 +240,7 @@ export default function AdminSettingsPlansPage() {
   // Mutation per eliminare un piano
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      axiosInstance.delete(`${BASE_URL}/api/subscription-plans/${id}`),
+      axiosInstance.delete(`/api/subscription-plans/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/subscription-plans`],

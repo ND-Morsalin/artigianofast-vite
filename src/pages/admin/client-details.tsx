@@ -62,7 +62,6 @@ import {
 import { Badge } from "../../components/ui/badge";
 import { Separator } from "../../components/ui/separator";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Schema per il form di modifica del piano personalizzato
@@ -91,7 +90,7 @@ export default function ClientDetailsPage() {
   const { data: client, isLoading: isClientLoading } = useQuery({
     queryKey: [`/api/clients/${clientId}`],
     queryFn: async () => {
-      const response = await axiosInstance.get(`${BASE_URL}/api/clients/${clientId}`);
+      const response = await axiosInstance.get(`/api/clients/${clientId}`);
       return await response.data;
     },
     enabled: !!clientId,
@@ -104,7 +103,7 @@ export default function ClientDetailsPage() {
       queryFn: async () => {
         try {
           const response = await axiosInstance.get(
-            `${BASE_URL}/api/clients/${clientId}/subscription`
+            `/api/clients/${clientId}/subscription`
           );
           return await response.data;
         } catch (error) {
@@ -120,7 +119,7 @@ export default function ClientDetailsPage() {
   const { data: plans = [], isLoading: arePlansLoading } = useQuery({
     queryKey: [`/api/subscription-plans`],
     queryFn: async () => {
-      const response = await axiosInstance.get(`${BASE_URL}/api/subscription-plans`);
+      const response = await axiosInstance.get(`/api/subscription-plans`);
       return await response.data;
     },
   });
@@ -165,7 +164,7 @@ export default function ClientDetailsPage() {
     mutationFn: (data: PlanCustomizationFormValues) =>
       apiRequest(
         "PUT",
-        `${BASE_URL}/api/clients/${clientId}/subscription`,
+        `/api/clients/${clientId}/subscription`,
         data
       ),
     onSuccess: () => {

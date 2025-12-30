@@ -50,7 +50,6 @@ import {
   type OptionType,
 } from "../../../components/ui/multi-select";
 import { LanguageSelector } from "../../../components/ui/language-selector";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Schema per la validazione del form
@@ -96,7 +95,7 @@ export default function AdminActivitiesPage() {
     queryKey: [`/api/activities`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/activities`)
+        .get(`/api/activities`)
         .then((res) => res.data)
         .catch(() => []),
   });
@@ -106,7 +105,7 @@ export default function AdminActivitiesPage() {
     queryKey: [`/api/jobtypes`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/jobtypes`)
+        .get(`/api/jobtypes`)
         .then((res) => res.data)
         .catch(() => []),
   });
@@ -116,7 +115,7 @@ export default function AdminActivitiesPage() {
     queryKey: [`/api/sectors`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/sectors`)
+        .get(`/api/sectors`)
         .then((res) => res.data)
         .catch(() => []),
   });
@@ -184,7 +183,7 @@ export default function AdminActivitiesPage() {
         defaultRate: data.defaultRate?.toString() || null,
         defaultCost: data.defaultCost?.toString() || null,
       };
-      return axiosInstance.post( `${BASE_URL}/api/activities`, formattedData);
+      return axiosInstance.post( `/api/activities`, formattedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -223,7 +222,7 @@ export default function AdminActivitiesPage() {
       };
       return apiRequest(
         "PUT",
-        `${BASE_URL}/api/activities/${id}`,
+        `/api/activities/${id}`,
         formattedData
       );
     },
@@ -252,7 +251,7 @@ export default function AdminActivitiesPage() {
   // Mutation per eliminare un'attività
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest("DELETE", `${BASE_URL}/api/activities/${id}`),
+      apiRequest("DELETE", `/api/activities/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/activities`],

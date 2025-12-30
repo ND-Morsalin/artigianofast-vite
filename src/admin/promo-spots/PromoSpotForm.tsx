@@ -37,7 +37,6 @@ import { Loader2, PlusCircle, X, Upload } from "lucide-react";
 import { Switch } from "../../components/ui/switch";
 import { format } from "date-fns";
 import { Checkbox } from "../../components/ui/checkbox";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 type SpotFormValues = {
@@ -214,7 +213,7 @@ export default function PromoSpotForm({ spot, onCancel }: PromoSpotFormProps) {
 
       console.log("Invio spot:", processedData);
       const res = await axiosInstance.post(
-        `${BASE_URL}/api/admin/promotional-spots`,
+        `/api/admin/promotional-spots`,
         processedData
       );
       return res.data;
@@ -282,7 +281,7 @@ export default function PromoSpotForm({ spot, onCancel }: PromoSpotFormProps) {
 
       console.log("Aggiornamento spot:", processedData);
       const res = await axiosInstance.patch(
-        `${BASE_URL}/api/admin/promotional-spots/${id}`,
+        `/api/admin/promotional-spots/${id}`,
         processedData
       );
       return res.data;

@@ -43,7 +43,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { LanguageSelector } from "../../../components/ui/language-selector";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Colori per i grafici
@@ -113,7 +112,7 @@ export default function StatisticsPage() {
     refetch,
   } = useQuery({
     queryKey: [
-      `${BASE_URL}/api/admin/stats/advanced`,
+      `/api/admin/stats/advanced`,
       activePeriod,
       selectedSector,
       selectedPlan,
@@ -122,7 +121,7 @@ export default function StatisticsPage() {
     queryFn: () =>
       axiosInstance
         .get(
-          `${BASE_URL}/api/admin/stats/advanced?period=${activePeriod}&sector=${selectedSector}&plan=${selectedPlan}&clientType=${selectedClientType}`
+          `/api/admin/stats/advanced?period=${activePeriod}&sector=${selectedSector}&plan=${selectedPlan}&clientType=${selectedClientType}`
         )
         .then((res) => res.data),
     placeholderData: {

@@ -55,7 +55,6 @@ import { useLocation } from "wouter";
 import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
 import type { OptionType } from "../../../components/ui/multi-select";
 import { LanguageSelector } from "../../../components/ui/language-selector";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Permission categories - will be populated with translations
@@ -232,7 +231,7 @@ export default function AdminRolesPage() {
     queryKey: [`/api/roles`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/roles`)
+        .get(`/api/roles`)
         .then((res) => res.data)
         .catch(() => []),
   });
@@ -242,7 +241,7 @@ export default function AdminRolesPage() {
     queryKey: [`/api/sectors`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/sectors`)
+        .get(`/api/sectors`)
         .then((res) => res.data)
         .catch(() => []),
   });
@@ -297,7 +296,7 @@ export default function AdminRolesPage() {
             ? parseInt(data.sectorId)
             : null,
       };
-      return axiosInstance.post( `${BASE_URL}/api/roles`, formattedData);
+      return axiosInstance.post( `/api/roles`, formattedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/roles`] });
@@ -321,7 +320,7 @@ export default function AdminRolesPage() {
   // Mutation per aggiornare un ruolo esistente
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: RoleFormValues }) =>
-      apiRequest("PUT", `${BASE_URL}/api/roles/${id}`, data),
+      apiRequest("PUT", `/api/roles/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/roles`] });
       toast({
@@ -345,7 +344,7 @@ export default function AdminRolesPage() {
   // Mutation per eliminare un ruolo
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest("DELETE", `${BASE_URL}/api/roles/${id}`),
+      apiRequest("DELETE", `/api/roles/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/roles`] });
       toast({

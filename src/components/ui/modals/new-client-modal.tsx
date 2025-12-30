@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../../hooks/use-toast";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 const clientSchema = z.object({
@@ -59,7 +58,7 @@ export function NewClientModal() {
 
   const onSubmit = async (data: ClientFormData) => {
     try {
-      await axiosInstance.post(`${BASE_URL}/api/clients`, data);
+      await axiosInstance.post(`/api/clients`, data);
 
       queryClient.invalidateQueries({ queryKey: [`/api/clients`] });
       queryClient.invalidateQueries({ queryKey: [`/api/stats`] });

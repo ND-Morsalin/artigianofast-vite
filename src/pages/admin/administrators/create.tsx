@@ -25,7 +25,6 @@ import {
 } from "../../../components/ui/card";
 import { ArrowLeft, Save } from "lucide-react";
 import { Separator } from "../../../components/ui/separator";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Schema di validazione
@@ -64,7 +63,7 @@ export default function AdminCreatePage() {
 
     try {
       const res = await axiosInstance.post(
-        `${BASE_URL}/api/administrators`,
+        `/api/administrators`,
         data
       );
 

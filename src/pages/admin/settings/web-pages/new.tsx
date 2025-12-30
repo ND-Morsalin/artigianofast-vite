@@ -37,7 +37,6 @@ import {
 } from "../../../../components/ui/select";
 import { toast } from "../../../../hooks/use-toast";
 import { ArrowLeft, Save } from "lucide-react";
-import { BASE_URL } from "../../../../constant";
 import { axiosInstance } from "../../../../lib/axios";
 
 // Estendi lo schema di inserimento con validazioni aggiuntive
@@ -93,7 +92,7 @@ export default function NewWebPage() {
   // Effettua la chiamata API per creare la pagina
   const createMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      const response = await axiosInstance.post(`${BASE_URL}/api/admin/web-pages`,data );
+      const response = await axiosInstance.post(`/api/admin/web-pages`, data);
       return response.data;
     },
     onSuccess: () => {

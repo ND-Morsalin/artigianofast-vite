@@ -24,7 +24,6 @@ import {
   FormMessage,
 } from "../../components/ui/form";
 import { Lock, User } from "lucide-react";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Schema di validazione
@@ -55,7 +54,7 @@ export default function AdminLoginPage() {
   try {
     // Try mobile login first (for artisan users)
     try {
-      const mobileResponse = await axiosInstance.post(`${BASE_URL}/api/mobile/login`, {
+      const mobileResponse = await axiosInstance.post(`/api/mobile/login`, {
         email: data.username,
         password: data.password,
       });

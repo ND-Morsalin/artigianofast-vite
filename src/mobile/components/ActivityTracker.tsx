@@ -5,7 +5,6 @@ import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
 import { useToast } from "../../hooks/use-toast";
 import PhotoCapture from "./PhotoCapture";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 interface Activity {
@@ -63,7 +62,7 @@ export default function ActivityTracker({
     queryKey: [`/api/mobile/jobs/${jobId}/activities`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/mobile/jobs/${jobId}/activities`
+        `/api/mobile/jobs/${jobId}/activities`
       );
 
       return response.data;
@@ -78,7 +77,7 @@ export default function ActivityTracker({
       estimatedDuration: string;
     }) => {
       const response = await axiosInstance.post(
-        `${BASE_URL}/api/mobile/jobs/${jobId}/activities`,
+        `/api/mobile/jobs/${jobId}/activities`,
         data
       );
 

@@ -6,7 +6,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "../../../hooks/use-toast";
 import { QuickClientModal } from "./quick-client-modal";
 import { QuickJobTypeModal } from "./quick-jobtype-modal";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 interface Client {
@@ -52,11 +51,9 @@ export function NewJobModal() {
   });
 
   const { data: jobTypes = [] } = useQuery<JobType[]>({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
     queryFn: async () => {
-      const response = await axiosInstance.get(
-        `${BASE_URL}/api/jobtypes`
-      );
+      const response = await axiosInstance.get(`/api/jobtypes`);
       return response.data;
     },
     enabled: isOpen,
@@ -178,7 +175,7 @@ export function NewJobModal() {
         photos: photos, // Aggiungi i file all'oggetto job
       };
 
-      await axiosInstance.post(`${BASE_URL}/api/jobs`, jobData);
+      await axiosInstance.post(`/api/jobs`, jobData);
 
       queryClient.invalidateQueries({ queryKey: [`/api/jobs`] });
 

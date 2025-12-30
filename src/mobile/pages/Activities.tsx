@@ -7,7 +7,6 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import MobileLayout from "../components/MobileLayout";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Definisci l'interfaccia per l'attività
@@ -40,7 +39,7 @@ export default function ActivitiesSettings() {
     queryFn: async () => {
       try {
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/mobile/activities`
+          `/api/mobile/activities`
         );
         if (!response.data) {
           throw new Error("Errore nel recuperare le attività");
@@ -60,7 +59,7 @@ export default function ActivitiesSettings() {
     queryFn: async () => {
       try {
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/mobile/jobtypes`
+          `/api/mobile/jobtypes`
         );
         if (!response.data) {
           throw new Error("Errore nel recuperare i tipi di lavoro");
@@ -86,7 +85,7 @@ export default function ActivitiesSettings() {
   const deleteActivity = useMutation({
     mutationFn: async (id: number) => {
       const response = await axiosInstance.delete(
-        `${BASE_URL}/api/mobile/activities/${id}`
+        `/api/mobile/activities/${id}`
       );
 
       if (!response.data) {

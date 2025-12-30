@@ -9,7 +9,6 @@ import {
   useMemo,
 } from "react";
 import { useMobileAuth } from "./MobileAuthContext";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Permission types based on our collaborator schema
@@ -431,7 +430,7 @@ export const PermissionProvider = ({ children }: PermissionProviderProps) => {
 
         // Fetch user permissions from API
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/mobile/permissions`
+          `/api/mobile/permissions`
         );
 
         if (response.data) {

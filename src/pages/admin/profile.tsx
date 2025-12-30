@@ -18,7 +18,6 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Form validation schema
@@ -62,7 +61,7 @@ export default function ProfilePage() {
   const { data: currentUser, isLoading: userLoading } = useQuery({
     queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
+      axiosInstance.get(`/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
 
@@ -71,7 +70,7 @@ export default function ProfilePage() {
     queryKey: [`/api/mobile/user-subscription`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/user-subscription`)
+        .get(`/api/mobile/user-subscription`)
         .then((res) => res.data),
     enabled: true,
   });
@@ -80,7 +79,7 @@ export default function ProfilePage() {
     queryKey: [`/api/mobile/subscription-plans`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/subscription-plans`)
+        .get(`/api/mobile/subscription-plans`)
         .then((res) => res.data),
     enabled: true,
   });
@@ -124,7 +123,7 @@ export default function ProfilePage() {
   const updateProfileMutation = useMutation({
     mutationFn: (data: ProfileFormData) =>
       axiosInstance
-        .put(`${BASE_URL}/api/mobile/user`, data)
+        .put(`/api/mobile/user`, data)
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({

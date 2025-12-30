@@ -4,7 +4,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { X } from "lucide-react";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 /**
@@ -30,11 +29,11 @@ export default function PromoSpotWrapper() {
         let response;
         try {
           console.log("Tentativo endpoint dedicato /api/spots...");
-          response = await axiosInstance.get(`${BASE_URL}/api/spots`);
+          response = await axiosInstance.get(`/api/spots`);
         } catch (apiError) {
           console.log("Fallback all'endpoint originale:", apiError);
           response = await axiosInstance.get(
-            `${BASE_URL}/api/mobile/promotional-spots`
+            `/api/mobile/promotional-spots`
           );
         }
 

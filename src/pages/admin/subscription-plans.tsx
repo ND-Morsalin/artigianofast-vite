@@ -54,7 +54,6 @@ import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
 import type { SubscriptionPlan } from "../../types";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Schema per la validazione del form
@@ -89,7 +88,7 @@ export default function AdminSubscriptionPlansPage() {
   const { data: plans = [], isLoading } = useQuery({
     queryKey: [`/api/subscription-plans`],
     queryFn: () =>
-      axiosInstance.get( `${BASE_URL}/api/subscription-plans`).then(
+      axiosInstance.get( `/api/subscription-plans`).then(
         (res) => res.data
       ),
     retry: 3, // retry a few times in case of network issues
@@ -115,7 +114,7 @@ export default function AdminSubscriptionPlansPage() {
   // Mutation per creare un nuovo piano
   const createMutation = useMutation({
     mutationFn: (data: FormValues) =>
-      axiosInstance.post( `${BASE_URL}/api/subscription-plans`, data),
+      axiosInstance.post( `/api/subscription-plans`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/subscription-plans`],
@@ -150,7 +149,7 @@ export default function AdminSubscriptionPlansPage() {
       );
       const response = await axiosInstance.put(
         
-        `${BASE_URL}/api/subscription-plans/${id}`,
+        `/api/subscription-plans/${id}`,
         data
       );
       console.log("Risposta ricevuta:", response);
@@ -187,7 +186,7 @@ export default function AdminSubscriptionPlansPage() {
   // Mutation per eliminare un piano
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest("DELETE", `${BASE_URL}/api/subscription-plans/${id}`),
+      apiRequest("DELETE", `/api/subscription-plans/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/subscription-plans`],

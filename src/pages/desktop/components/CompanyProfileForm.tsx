@@ -27,7 +27,6 @@ import {
   FormLabel,
   FormMessage,
 } from "../../../components/ui/form";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Schema di validazione per i dati aziendali - will be created dynamically with translations
@@ -158,7 +157,7 @@ export function CompanyProfileForm({
     queryKey: [`/api/sectors`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/sectors`)
+        .get(`/api/sectors`)
         .then((res) => res.data)
         .catch(() => []),
   });

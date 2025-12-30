@@ -19,7 +19,6 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 const jobTypeSchema = z.object({
@@ -103,7 +102,7 @@ export default function JobTypeForm() {
       setIsSaving(true);
 
       const response = await axiosInstance.put(
-        `${BASE_URL}/api/jobtypes/${jobTypeId}`,
+        `/api/jobtypes/${jobTypeId}`,
         values
       );
 

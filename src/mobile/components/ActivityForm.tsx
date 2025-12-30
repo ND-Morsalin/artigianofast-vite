@@ -21,7 +21,6 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Interface for JobType
@@ -267,7 +266,7 @@ export default function ActivityForm() {
         );
 
         const response = await axiosInstance.put(
-          `${BASE_URL}/api/mobile/activities/${activityId}`,
+          `/api/mobile/activities/${activityId}`,
           dataToSend
         );
 

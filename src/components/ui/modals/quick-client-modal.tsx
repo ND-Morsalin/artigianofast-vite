@@ -26,7 +26,6 @@ import {
   SelectValue,
 } from "../select";
 import { Textarea } from "../textarea";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 const clientSchema = z.object({
@@ -74,7 +73,7 @@ export function QuickClientModal({
   const createClient = useMutation({
     mutationFn: (values: ClientFormValues) => {
       setIsSaving(true);
-      return axiosInstance.post(`${BASE_URL}/api/clients`, values);
+      return axiosInstance.post(`/api/clients`, values);
     },
     onSuccess: (data: any) => {
       setIsSaving(false);

@@ -56,7 +56,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Job type definition
@@ -149,7 +148,7 @@ export default function JobsPage() {
     queryKey: [`/api/mobile/all-jobs`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/all-jobs`)
+        .get(`/api/mobile/all-jobs`)
         .then((res) => res.data),
     enabled: true,
     retry: false, // Don't retry on permission errors
@@ -160,7 +159,7 @@ export default function JobsPage() {
     queryKey: [`/api/mobile/clients`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/clients`)
+        .get(`/api/mobile/clients`)
         .then((res) => res.data),
     enabled: true,
     retry: false, // Don't retry on permission errors
@@ -170,7 +169,7 @@ export default function JobsPage() {
   const createJobMutation = useMutation({
     mutationFn: (data: JobFormData) =>
       axiosInstance
-        .post(`${BASE_URL}/api/mobile/jobs`, data)
+        .post(`/api/mobile/jobs`, data)
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -197,7 +196,7 @@ export default function JobsPage() {
   const updateJobMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: JobFormData }) =>
       axiosInstance
-        .put(`${BASE_URL}/api/mobile/jobs/${id}`, data)
+        .put(`/api/mobile/jobs/${id}`, data)
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -224,7 +223,7 @@ export default function JobsPage() {
   const deleteJobMutation = useMutation({
     mutationFn: (id: number) =>
       axiosInstance
-        .delete(`${BASE_URL}/api/mobile/jobs/${id}`)
+        .delete(`/api/mobile/jobs/${id}`)
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({

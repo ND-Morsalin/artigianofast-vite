@@ -18,7 +18,6 @@ import {
 } from "../../components/ui/tabs";
 import { ArrowRight, Check } from "lucide-react";
 import MobileLayout from "../components/MobileLayout";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Use the centralized mobile API utility
@@ -53,7 +52,7 @@ export default function MobileSubscriptionPlans() {
       try {
         setLoading(true);
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/mobile/subscription-plans`
+          `/api/mobile/subscription-plans`
         );
         if (response.data) {
           const data = await response.data;
@@ -144,7 +143,7 @@ export default function MobileSubscriptionPlans() {
           "Piano gratuito selezionato, attivazione diretta senza pagamento"
         );
         const response = await axiosInstance.post(
-          `${BASE_URL}/api/mobile/subscriptions`,
+          `/api/mobile/subscriptions`,
           {
             planId: selectedPlan,
             billingFrequency: billingType,

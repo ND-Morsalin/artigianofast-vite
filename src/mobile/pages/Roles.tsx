@@ -8,7 +8,6 @@ import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import MobileLayout from "../components/MobileLayout";
 import FeatureGate from "../components/FeatureGate";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Definisci l'interfaccia per il ruolo
@@ -33,7 +32,7 @@ export default function RolesSettings() {
     queryFn: async () => {
       try {
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/mobile/roles`
+          `/api/mobile/roles`
         );
         if (!response.data) {
           throw new Error("Errore nel recuperare i ruoli");
@@ -59,7 +58,7 @@ export default function RolesSettings() {
   const deleteRole = useMutation({
     mutationFn: async (id: number) => {
       const response = await axiosInstance.delete(
-        `${BASE_URL}/api/mobile/roles/${id}`
+        `/api/mobile/roles/${id}`
       );
 
       if (!response.data) {

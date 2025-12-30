@@ -51,7 +51,6 @@ import {
 import { format, differenceInDays, addMonths, addYears } from "date-fns";
 import { it } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../../../constant";
 import { axiosInstance } from "../../../../lib/axios";
 
 interface ClientPlanPageProps {
@@ -72,7 +71,7 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
     queryKey: [`/api/clients/${clientId}`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/clients/${clientId}`)
+        .get(`/api/clients/${clientId}`)
         .then((res) => res.data),
     enabled: !!clientId,
   });
@@ -82,7 +81,7 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
     queryKey: [`/api/users/${clientId}/subscription`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/users/${clientId}/subscription`)
+        .get(`/api/users/${clientId}/subscription`)
         .then((res) => res.data),
     enabled: !!clientId,
   });
@@ -92,7 +91,7 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
     queryKey: [`/api/subscription-plans`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/subscription-plans`)
+        .get(`/api/subscription-plans`)
         .then((res) => res.data),
   });
 
@@ -101,7 +100,7 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
     queryKey: [`/api/plan-configurations?userId=${clientId}`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/plan-configurations?userId=${clientId}`)
+        .get(`/api/plan-configurations?userId=${clientId}`)
         .then((res) => res.data)
         .catch(() => null),
     enabled: !!clientId,
@@ -188,13 +187,13 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
       // Se esiste già la sottoscrizione, aggiornala
       if (subscription?.id) {
         return axiosInstance
-          .put(`${BASE_URL}/api/user-subscriptions/${subscription.id}`, data)
+          .put(`/api/user-subscriptions/${subscription.id}`, data)
           .then((res) => res.data);
       }
       // Altrimenti crea una nuova sottoscrizione
       else {
         return axiosInstance
-          .post(`${BASE_URL}/api/user-subscriptions`, data)
+          .post(`/api/user-subscriptions`, data)
           .then((res) => res.data);
       }
     },
@@ -311,12 +310,12 @@ export default function ClientPlanPage(props: ClientPlanPageProps) {
       if (planConfig?.id) {
         // Aggiorna una configurazione esistente
         return axiosInstance
-          .put(`${BASE_URL}/api/plan-configurations/${planConfig.id}`, data)
+          .put(`/api/plan-configurations/${planConfig.id}`, data)
           .then((res) => res.data);
       } else {
         // Crea una nuova configurazione
         return axiosInstance
-          .post(`${BASE_URL}/api/plan-configurations`, data)
+          .post(`/api/plan-configurations`, data)
           .then((res) => res.data);
       }
     },

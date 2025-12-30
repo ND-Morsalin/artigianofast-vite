@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "../../lib/queryClient";
 import { useToast } from "../../hooks/use-toast";
 
 import {
@@ -34,7 +33,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
-import { BASE_URL } from "../../constant";
+import { axiosInstance } from "../../lib/axios";
 
 interface JobActivity {
   id: number;
@@ -92,17 +91,15 @@ export function ActivityCompletion({
 
   // Mutation per completare l'attività
   const completeActivity = useMutation({
-    mutationFn: (values: ActivityCompletionFormValues) => {
-      return apiRequest(
-        `${BASE_URL}/api/jobactivities/${jobActivity.id}/complete`,
-        {
-          method: "POST",
-          body: JSON.stringify({
+    mutationFn: async (values: ActivityCompletionFormValues) => {
+      const response = await axiosInstance.post(
+        `/api/jobactivities/${jobActivity.id}/complete`,
+        { 
             ...values,
             photos,
-          }),
         }
       );
+      return response.data;
     },
     onSuccess: () => {
       toast({

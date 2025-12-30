@@ -51,7 +51,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Client type definition
@@ -108,10 +107,10 @@ export default function ClientsPage() {
   const { data: currentUser } = useQuery({
     queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
+      axiosInstance.get(`/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
-  
+
   console.log("Current User:", currentUser);
   // Check if user has client creation permission - use correct feature names
   const hasClientPermission =
@@ -148,7 +147,7 @@ export default function ClientsPage() {
     queryKey: [`/api/mobile/clients`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/clients`)
+        .get(`/api/mobile/clients`)
         .then((res) => res.data),
     enabled: true,
     retry: false, // Don't retry on permission errors
@@ -158,7 +157,7 @@ export default function ClientsPage() {
   const createClientMutation = useMutation({
     mutationFn: (data: ClientFormData) =>
       axiosInstance
-        .post(`${BASE_URL}/api/mobile/clients`, data)
+        .post(`/api/mobile/clients`, data)
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -185,7 +184,7 @@ export default function ClientsPage() {
   const updateClientMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: ClientFormData }) =>
       axiosInstance
-        .put(`${BASE_URL}/api/mobile/clients/${id}`, data)
+        .put(`/api/mobile/clients/${id}`, data)
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -212,7 +211,7 @@ export default function ClientsPage() {
   const deleteClientMutation = useMutation({
     mutationFn: (id: number) =>
       axiosInstance
-        .delete(`${BASE_URL}/api/mobile/clients/${id}`)
+        .delete(`/api/mobile/clients/${id}`)
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({

@@ -26,7 +26,6 @@ import { Badge } from "../../components/ui/badge";
 import { LanguageSelector } from "../../components/ui/language-selector";
 import { useTranslation } from "react-i18next";
 import { useArtisanPermissions } from "../../hooks/useArtisanPermissions";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 export default function ArtisanDashboard() {
@@ -81,7 +80,7 @@ export default function ArtisanDashboard() {
     queryKey: [`/api/mobile/user-subscription`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/user-subscription`)
+        .get(`/api/mobile/user-subscription`)
         .then((res) => res.data),
     enabled: true,
   });
@@ -90,7 +89,7 @@ export default function ArtisanDashboard() {
     queryKey: [`/api/mobile/subscription-plans`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/subscription-plans`)
+        .get(`/api/mobile/subscription-plans`)
         .then((res) => res.data),
     enabled: true,
   });
@@ -117,7 +116,7 @@ export default function ArtisanDashboard() {
   const { data: currentUser } = useQuery({
     queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
+      axiosInstance.get(`/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
   console.log("Current User:", currentUser);
@@ -136,7 +135,7 @@ export default function ArtisanDashboard() {
     queryKey: [`/api/mobile/clients`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/clients`)
+        .get(`/api/mobile/clients`)
         .then((res) => res.data),
     enabled: canViewClients && !permissionsLoading,
     retry: false,
@@ -150,7 +149,7 @@ export default function ArtisanDashboard() {
     queryKey: [`/api/mobile/all-jobs`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/all-jobs`)
+        .get(`/api/mobile/all-jobs`)
         .then((res) => res.data),
     enabled: canViewJobs && !permissionsLoading,
     retry: false,
@@ -164,7 +163,7 @@ export default function ArtisanDashboard() {
     queryKey: [`/api/mobile/collaborators`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/collaborators`)
+        .get(`/api/mobile/collaborators`)
         .then((res) => res.data),
     enabled: canManageCollaborators && !permissionsLoading,
     retry: false,
@@ -178,7 +177,7 @@ export default function ArtisanDashboard() {
     queryKey: [`/api/mobile/invoices`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/invoices`)
+        .get(`/api/mobile/invoices`)
         .then((res) => res.data),
     enabled: canManageInvoices && !permissionsLoading,
     retry: false,

@@ -50,7 +50,6 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { Label } from "../../components/ui/label";
 import { cn } from "../../lib/utils";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
-import { BASE_URL } from "../../constant";
 import { useLocation } from "wouter";
 import { axiosInstance } from "../../lib/axios";
 
@@ -129,7 +128,7 @@ export default function Jobs(props: any) {
     queryKey: [`/api/mobile/all-jobs`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/mobile/all-jobs`
+        `/api/mobile/all-jobs`
       );
       if (!response.data) throw new Error("Errore nel recuperare i lavori");
       return response.data;
@@ -295,7 +294,7 @@ export default function Jobs(props: any) {
   // const handleNewJobSubmit = async (formData: FormData) => {
   //   try {
   //     const response = await axiosInstance.post( 
-  //       `${BASE_URL}/api/mobile/jobs`,
+  //       `/api/mobile/jobs`,
   //       formData
   //     );
 

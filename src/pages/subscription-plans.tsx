@@ -49,7 +49,6 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { BASE_URL } from "../constant";
 import { axiosInstance } from "../lib/axios";
 
 // Definiamo lo schema di validazione del form
@@ -102,7 +101,7 @@ export default function SubscriptionPlansPage() {
   // Query per ottenere i piani di abbonamento
   const { data: plans = [], isLoading } = useQuery({
     queryKey: [`/api/subscription-plans`],
-    queryFn: () => axiosInstance.get(`${BASE_URL}/api/subscription-plans`),
+    queryFn: () => axiosInstance.get(`/api/subscription-plans`),
   });
 
   // Definiamo il form con React Hook Form
@@ -124,7 +123,7 @@ export default function SubscriptionPlansPage() {
   // Mutation per creare un nuovo piano
   const createMutation = useMutation({
     mutationFn: (data: FormValues) =>
-      axiosInstance.get(`${BASE_URL}/api/subscription-plans`, {
+      axiosInstance.get(`/api/subscription-plans`, {
         method: "POST",
         data,
       }),
@@ -152,7 +151,7 @@ export default function SubscriptionPlansPage() {
   // Mutation per aggiornare un piano esistente
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: FormValues }) =>
-      axiosInstance.get(`${BASE_URL}/api/subscription-plans/${id}`, {
+      axiosInstance.get(`/api/subscription-plans/${id}`, {
         method: "PUT",
         data,
       }),
@@ -181,7 +180,7 @@ export default function SubscriptionPlansPage() {
   // Mutation per eliminare un piano
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      axiosInstance.get(`${BASE_URL}/api/subscription-plans/${id}`, {
+      axiosInstance.get(`/api/subscription-plans/${id}`, {
         method: "DELETE",
       }),
     onSuccess: () => {

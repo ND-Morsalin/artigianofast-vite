@@ -25,7 +25,6 @@ import {
 import { useMobileAuth } from "../contexts/MobileAuthContext";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 interface MobileLayoutProps {
@@ -60,7 +59,7 @@ MobileLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance.post(`${BASE_URL}/api/logout`);
+      const response = await axiosInstance.post(`/api/logout`);
 
       if (response.data) {
         await logout(); // Aggiorna il contesto locale

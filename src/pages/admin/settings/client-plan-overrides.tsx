@@ -68,7 +68,6 @@ import {
 } from "../../../components/ui/select";
 import { Badge } from "../../../components/ui/badge";
 import { LanguageSelector } from "../../../components/ui/language-selector";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Schema for client plan override
@@ -289,7 +288,7 @@ export default function ClientPlanOverridesPage() {
   const { data: clients, isLoading: clientsLoading } = useQuery({
     queryKey: [`/api/clients`],
     queryFn: async () => {
-      const response = await axiosInstance.get(`${BASE_URL}/api/clients`);
+      const response = await axiosInstance.get(`/api/clients`);
       return await response.data;
     },
   });
@@ -298,7 +297,7 @@ export default function ClientPlanOverridesPage() {
     queryKey: [`/api/subscription-plans`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/subscription-plans`
+        `/api/subscription-plans`
       );
       return await response.data;
     },
@@ -308,7 +307,7 @@ export default function ClientPlanOverridesPage() {
     queryKey: [`/api/plan-configurations`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/plan-configurations`
+        `/api/plan-configurations`
       );
       return await response.data;
     },
@@ -347,7 +346,7 @@ export default function ClientPlanOverridesPage() {
   // Mutations
   const createMutation = useMutation({
     mutationFn: (data: ClientPlanOverrideFormValues) =>
-      axiosInstance.post(`${BASE_URL}/api/plan-configurations`, data),
+      axiosInstance.post(`/api/plan-configurations`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/plan-configurations`],
@@ -376,7 +375,7 @@ export default function ClientPlanOverridesPage() {
     }: {
       id: number;
       data: Partial<ClientPlanOverrideFormValues>;
-    }) => axiosInstance.put(`${BASE_URL}/api/plan-configurations/${id}`, data),
+    }) => axiosInstance.put(`/api/plan-configurations/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/plan-configurations`],
@@ -400,7 +399,7 @@ export default function ClientPlanOverridesPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      axiosInstance.delete(`${BASE_URL}/api/plan-configurations/${id}`),
+      axiosInstance.delete(`/api/plan-configurations/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/plan-configurations`],

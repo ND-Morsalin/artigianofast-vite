@@ -35,7 +35,6 @@ import {
 import { ArrowLeft, Save } from "lucide-react";
 import { Skeleton } from "../../../../components/ui/skeleton";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../../../constant";
 import { axiosInstance } from "../../../../lib/axios";
 
 // Schema di validazione per il modulo client
@@ -76,7 +75,7 @@ export default function ClientEditPage(props: ClientEditPageProps) {
     queryKey: [`/api/clients/${clientId}`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/clients/${clientId}`)
+        .get(`/api/clients/${clientId}`)
         .then((res) => res.data),
     enabled: !!clientId,
   });
@@ -114,7 +113,7 @@ export default function ClientEditPage(props: ClientEditPageProps) {
   const updateMutation = useMutation({
     mutationFn: (data: ClientFormValues) => {
       return axiosInstance
-        .put(`${BASE_URL}/api/clients/${clientId}`, data)
+        .put(`/api/clients/${clientId}`, data)
         .then((res) => res.data);
     },
     onSuccess: () => {

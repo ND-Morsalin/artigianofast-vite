@@ -46,7 +46,6 @@ import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "../../../components/ui/language-selector";
 import { Badge } from "../../../components/ui/badge";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Schema per la validazione del form
@@ -72,7 +71,7 @@ export default function SectorsPage() {
     queryKey: [`/api/sectors`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/sectors`)
+        .get(`/api/sectors`)
         .then((res) => res.data)
         .catch(() => []),
   });
@@ -92,7 +91,7 @@ export default function SectorsPage() {
   // Mutation per creare un nuovo settore
   const createMutation = useMutation({
     mutationFn: (data: SectorFormValues) =>
-      axiosInstance.post( `${BASE_URL}/api/sectors`, data),
+      axiosInstance.post( `/api/sectors`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sectors`] });
       toast({
@@ -115,7 +114,7 @@ export default function SectorsPage() {
   // Mutation per aggiornare un settore esistente
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: SectorFormValues }) =>
-      apiRequest("PATCH", `${BASE_URL}/api/sectors/${id}`, data),
+      apiRequest("PATCH", `/api/sectors/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sectors`] });
       toast({
@@ -139,7 +138,7 @@ export default function SectorsPage() {
   // Mutation per eliminare un settore
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiRequest("DELETE", `${BASE_URL}/api/sectors/${id}`),
+      apiRequest("DELETE", `/api/sectors/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sectors`] });
       toast({

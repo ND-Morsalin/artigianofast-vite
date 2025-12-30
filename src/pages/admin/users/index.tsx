@@ -65,7 +65,6 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Schema per la validazione del form degli admin
@@ -116,7 +115,7 @@ export default function UsersPage() {
     queryKey: [`/api/administrators`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/administrators`
+        `/api/administrators`
       );
       return await response.data;
     },
@@ -126,7 +125,7 @@ export default function UsersPage() {
   const { data: clients = [], isLoading: isLoadingClients } = useQuery({
     queryKey: [`/api/clients`],
     queryFn: async () => {
-      const response = await axiosInstance.get(`${BASE_URL}/api/clients`);
+      const response = await axiosInstance.get(`/api/clients`);
       return await response.data;
     },
   });
@@ -137,7 +136,7 @@ export default function UsersPage() {
       queryKey: [`/api/user-subscriptions`],
       queryFn: async () => {
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/user-subscriptions`
+          `/api/user-subscriptions`
         );
         return await response.data;
       },
@@ -149,7 +148,7 @@ export default function UsersPage() {
     queryKey: [`/api/subscription-plans`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/subscription-plans`
+        `/api/subscription-plans`
       );
       return await response.data;
     },
@@ -160,7 +159,7 @@ export default function UsersPage() {
     queryKey: [`/api/roles`],
     queryFn: async () => {
       try {
-        const response = await axiosInstance.get(`${BASE_URL}/api/roles`);
+        const response = await axiosInstance.get(`/api/roles`);
         return await response.data;
       } catch (error) {
         console.log(error);
@@ -197,7 +196,7 @@ export default function UsersPage() {
   // Mutation per creare un nuovo amministratore
   const createMutation = useMutation({
     mutationFn: (data: AdminFormValues) =>
-      axiosInstance.get(`${BASE_URL}/api/administrators`, {
+      axiosInstance.get(`/api/administrators`, {
         method: "POST",
         data,
       }),
@@ -225,7 +224,7 @@ export default function UsersPage() {
   // Mutation per aggiornare un amministratore esistente
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: AdminFormValues }) =>
-      axiosInstance.get(`${BASE_URL}/api/administrators/${id}`, {
+      axiosInstance.get(`/api/administrators/${id}`, {
         method: "PUT",
         data,
       }),
@@ -254,7 +253,7 @@ export default function UsersPage() {
   // Mutation per eliminare un amministratore
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      axiosInstance.get(`${BASE_URL}/api/administrators/${id}`, {
+      axiosInstance.get(`/api/administrators/${id}`, {
         method: "DELETE",
       }),
     onSuccess: () => {
@@ -295,7 +294,7 @@ export default function UsersPage() {
 
         return apiRequest(
           "PUT",
-          `${BASE_URL}/api/user-subscriptions/${latestSubscription.id}`,
+          `/api/user-subscriptions/${latestSubscription.id}`,
           {
             planId: parseInt(data.planId),
             billingFrequency: data.billingFrequency,
@@ -304,7 +303,7 @@ export default function UsersPage() {
         );
       } else {
         // Se non ha sottoscrizioni, crea una nuova
-        return axiosInstance.post(`${BASE_URL}/api/user-subscriptions`, {
+        const response = await axiosInstance.post(`/api/user-subscriptions`, {
           userId,
           planId: parseInt(data.planId),
           billingFrequency: data.billingFrequency,
@@ -312,6 +311,7 @@ export default function UsersPage() {
           startDate: new Date(),
           endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         });
+        return response.data;
       }
     },
     onSuccess: () => {

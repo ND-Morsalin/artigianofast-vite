@@ -35,7 +35,6 @@ import {
 } from "./select";
 import { QuickClientModal } from "./modals/quick-client-modal";
 import { QuickJobTypeModal } from "./modals/quick-jobtype-modal";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 const jobSchema = z.object({
@@ -87,10 +86,10 @@ export function CalendarJobModal({
 
   // Query per ottenere i tipi di lavoro personalizzati
   const { data: jobTypes = [] } = useQuery<any[]>({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/jobtypes`
+        `/api/jobtypes`
       );
       return response.data;
     },
@@ -126,7 +125,7 @@ export function CalendarJobModal({
   // Mutation per creare un nuovo lavoro
   const createJob = useMutation({
     mutationFn: (values: JobFormValues) => {
-      return axiosInstance.post(`${BASE_URL}/api/jobs`, values);
+      return axiosInstance.post(`/api/jobs`, values);
     },
     onSuccess: () => {
       toast({
@@ -184,7 +183,7 @@ export function CalendarJobModal({
     console.log(jobTypeId);
     // In questo caso non facciamo nulla con il tipo di lavoro aggiunto perché
     // stiamo usando i tipi predefiniti (repair, installation, etc.) per il form del job
-    queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
+    queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
     setShowJobTypeModal(false);
     toast({
       title: "Tipo di lavoro aggiunto",

@@ -43,7 +43,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/card";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 interface Job {
@@ -136,10 +135,10 @@ export function JobActivityRegistration({
 
   // Ottieni i tipi di lavoro
   const { data: jobTypes = [] } = useQuery<any[]>({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/jobtypes`
+        `/api/jobtypes`
       );
       return response.data;
     },
@@ -249,7 +248,7 @@ export function JobActivityRegistration({
     queryKey: [`/api/collaborators`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/collaborators`
+        `/api/collaborators`
       );
       return response.data;
     },
@@ -263,7 +262,7 @@ export function JobActivityRegistration({
     queryKey: [`/api/collaborators`, job.id, "activities"],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/jobs/${job.id}/activities`
+        `/api/jobs/${job.id}/activities`
       );
 
       return await response.data;
@@ -299,7 +298,7 @@ export function JobActivityRegistration({
   const registerActivity = useMutation({
     mutationFn: async (values: JobActivityRegistrationFormValues) => {
       const response = await axiosInstance.post(
-        `${BASE_URL}/api/jobs/${job.id}/activities`,
+        `/api/jobs/${job.id}/activities`,
         {
           ...values,
           photos,

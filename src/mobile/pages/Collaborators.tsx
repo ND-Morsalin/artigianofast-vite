@@ -10,7 +10,6 @@ import { Avatar, AvatarFallback } from "../../components/ui/avatar";
 import MobileLayout from "../components/MobileLayout";
 import FeatureGate from "../components/FeatureGate";
 import { usePlanFeatures } from "../hooks/usePlanFeatures";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Definisci l'interfaccia per il collaboratore
@@ -43,7 +42,7 @@ export default function CollaboratorsSettings() {
       queryFn: async () => {
         try {
           const response = await axiosInstance.get(
-            `${BASE_URL}/api/mobile/collaborators`
+            `/api/mobile/collaborators`
           );
           if (!response.data) {
             throw new Error("Errore nel recuperare i collaboratori");
@@ -63,7 +62,7 @@ export default function CollaboratorsSettings() {
     queryFn: async () => {
       try {
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/mobile/roles`
+          `/api/mobile/roles`
         );
         if (!response.data) {
           throw new Error("Errore nel recuperare i ruoli");
@@ -91,7 +90,7 @@ export default function CollaboratorsSettings() {
   const deleteCollaborator = useMutation({
     mutationFn: async (id: number) => {
       const response = await axiosInstance.delete(
-        `${BASE_URL}/api/mobile/collaborators/${id}`
+        `/api/mobile/collaborators/${id}`
       );
 
       if (!response.data) {

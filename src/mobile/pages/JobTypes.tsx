@@ -7,7 +7,6 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import MobileLayout from "../components/MobileLayout";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Definisci l'interfaccia per il tipo di lavoro
@@ -34,7 +33,7 @@ export default function JobTypesSettings() {
     queryFn: async () => {
       try {
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/mobile/jobtypes`
+          `/api/mobile/jobtypes`
         );
         if (!response.data) {
           throw new Error("Errore nel recuperare i tipi di lavoro");
@@ -60,7 +59,7 @@ export default function JobTypesSettings() {
   const deleteJobType = useMutation({
     mutationFn: async (id: number) => {
       const response = await axiosInstance.delete(
-        `${BASE_URL}/api/mobile/jobtypes/${id}`
+        `/api/mobile/jobtypes/${id}`
       );
 
       if (!response.data) {

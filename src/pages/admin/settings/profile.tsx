@@ -24,7 +24,6 @@ import {
 } from "../../../components/ui/form";
 import { MultiSelect } from "../../../components/ui/multi-select";
 import { LanguageSelector } from "../../../components/ui/language-selector";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Schema di validazione per il profilo aziendale
@@ -63,7 +62,7 @@ export default function CompanyProfilePage() {
     queryKey: [`/api/sectors`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/sectors`)
+        .get(`/api/sectors`)
         .then((res) => res.data)
         .catch(() => []),
   });
@@ -73,7 +72,7 @@ export default function CompanyProfilePage() {
     queryKey: [`/api/company`],
     queryFn: async () => {
       try {
-        const res = await axiosInstance.get(`${BASE_URL}/api/company`);
+        const res = await axiosInstance.get(`/api/company`);
         return await res.data;
       } catch (error) {
         console.log(error);
@@ -152,10 +151,10 @@ export default function CompanyProfilePage() {
       };
       return method === "POST"
         ? await axiosInstance
-            .post(`${BASE_URL}/api/company`, formattedData)
+            .post(`/api/company`, formattedData)
             .then((res) => res.data)
         : await axiosInstance
-            .put(`${BASE_URL}/api/company`, formattedData)
+            .put(`/api/company`, formattedData)
             .then((res) => res.data);
     },
     onSuccess: () => {

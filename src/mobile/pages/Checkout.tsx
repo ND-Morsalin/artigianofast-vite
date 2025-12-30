@@ -41,7 +41,6 @@ import {
 } from "lucide-react";
 import MobileLayout from "../components/MobileLayout";
 import StripePaymentForm from "../../components/StripePaymentForm";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Use the centralized mobile API utility
@@ -156,7 +155,7 @@ export default function MobileCheckout() {
       try {
         setLoading(true);
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/mobile/subscription-plans/${planId}`
+          `/api/mobile/subscription-plans/${planId}`
         );
         if (response.data) {
           const data = await response.data;
@@ -234,7 +233,7 @@ export default function MobileCheckout() {
         paymentIntent.id
       );
       const response = await axiosInstance.post(
-        `${BASE_URL}/api/mobile/subscriptions`,
+        `/api/mobile/subscriptions`,
         {
           planId,
           billingFrequency: billingType,
@@ -350,7 +349,7 @@ export default function MobileCheckout() {
 
       // Invia la richiesta di abbonamento all'API (solo per bank_transfer e free plans)
       const response = await axiosInstance.post(
-        `${BASE_URL}/api/mobile/subscriptions`,
+        `/api/mobile/subscriptions`,
         {
           planId,
           billingFrequency: billingType,

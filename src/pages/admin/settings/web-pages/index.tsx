@@ -41,7 +41,6 @@ import {
 
 import { FileEdit, Trash2, Plus, Globe, Eye } from "lucide-react";
 import type { WebPage } from "../../../../types";
-import { BASE_URL } from "../../../../constant";
 import { axiosInstance } from "../../../../lib/axios";
 
 export default function WebPagesPage() {
@@ -58,7 +57,7 @@ export default function WebPagesPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await axiosInstance.delete(`${BASE_URL}/api/admin/web-pages/${id}`);
+      const response = await axiosInstance.delete(`/api/admin/web-pages/${id}`);
  
       return response.data;
     },
@@ -83,7 +82,7 @@ export default function WebPagesPage() {
 
   const publishMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const response = await axiosInstance.patch(`${BASE_URL}/api/admin/web-pages/${id}`, { status });
+      const response = await axiosInstance.patch(`/api/admin/web-pages/${id}`, { status });
 
        
 

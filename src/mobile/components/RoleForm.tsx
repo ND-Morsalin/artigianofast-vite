@@ -23,7 +23,6 @@ import { Checkbox } from "../../components/ui/checkbox";
 import MobileLayout from "../components/MobileLayout";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Switch } from "../../components/ui/switch";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Schema per il form
@@ -178,7 +177,7 @@ export default function RoleForm() {
     queryFn: async () => {
       if (!roleId) return undefined;
       const response = await axiosInstance.get(`/api/mobile/roles/${roleId}`);
-       
+
       return response.data;
     },
     enabled: isEditMode,
@@ -192,8 +191,8 @@ export default function RoleForm() {
           const response = await axiosInstance.get(
             `/api/mobile/roles/${roleId}`
           );
-           
-          const {data} =   response ;
+
+          const { data } = response;
 
           if (data) {
             // Assicuriamoci di parsare i permessi dal DB (string JSON -> object)
@@ -247,12 +246,10 @@ export default function RoleForm() {
           v === "true",
         ])
       );
-      const response = await axiosInstance.post(`${BASE_URL}/api/mobile/roles`,{
-          ...values,
-          permissions: normalizedPermissions,
-        } );
-
-      
+      const response = await axiosInstance.post(`/api/mobile/roles`, {
+        ...values,
+        permissions: normalizedPermissions,
+      });
 
       return response.data;
     },
@@ -287,12 +284,14 @@ export default function RoleForm() {
           v === "true",
         ])
       );
-      const response = await axiosInstance.patch(`/api/mobile/roles/${roleId}`, {
+      const response = await axiosInstance.patch(
+        `/api/mobile/roles/${roleId}`,
+        {
           ...values,
           permissions: normalizedPermissions,
-        });
+        }
+      );
 
-      
       return response.data;
     },
     onSuccess: () => {

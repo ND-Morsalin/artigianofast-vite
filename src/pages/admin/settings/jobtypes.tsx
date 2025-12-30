@@ -53,7 +53,6 @@ import {
   type OptionType,
 } from "../../../components/ui/multi-select";
 import { LanguageSelector } from "../../../components/ui/language-selector";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 // Schema per la validazione del form
@@ -80,7 +79,7 @@ export default function AdminJobTypesPage() {
     queryKey: [`/api/jobtypes`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/jobtypes`)
+        .get(`/api/jobtypes`)
         .then((res) => res.data)
         .catch(() => []),
   });
@@ -90,7 +89,7 @@ export default function AdminJobTypesPage() {
     queryKey: [`/api/sectors`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/sectors`)
+        .get(`/api/sectors`)
         .then((res) => res.data)
         .catch(() => []),
   });
@@ -127,7 +126,7 @@ export default function AdminJobTypesPage() {
         ...data,
         sectorIds: JSON.stringify(data.sectorIds),
       };
-      return axiosInstance.post( `${BASE_URL}/api/jobtypes`, formattedData);
+      return axiosInstance.post( `/api/jobtypes`, formattedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
@@ -151,7 +150,7 @@ export default function AdminJobTypesPage() {
   // Mutation per aggiornare un tipo di lavoro esistente
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: JobTypeFormValues }) =>
-      apiRequest("PUT", `${BASE_URL}/api/jobtypes/${id}`, data),
+      apiRequest("PUT", `/api/jobtypes/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
       toast({
@@ -176,7 +175,7 @@ export default function AdminJobTypesPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => {
       console.log("🔍 Deleting job type with ID:", id);
-      return apiRequest("DELETE", `${BASE_URL}/api/jobtypes/${id}`);
+      return apiRequest("DELETE", `/api/jobtypes/${id}`);
     },
     onSuccess: () => {
       console.log("✅ Job type deleted successfully");

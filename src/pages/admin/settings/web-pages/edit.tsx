@@ -47,7 +47,6 @@ import {
   AlertDialogTrigger,
 } from "../../../../components/ui/alert-dialog";
 import { ArrowLeft, Save, Trash2, Eye } from "lucide-react";
-import { BASE_URL } from "../../../../constant";
 import { axiosInstance } from "../../../../lib/axios";
 
 // Schema per il form di modifica
@@ -197,7 +196,7 @@ export default function EditWebPage(props: { params: { id: string } }) {
         title: "Pagina eliminata",
         description: "La pagina è stata eliminata con successo",
       });
-      navigate(`${BASE_URL}/admin/settings/web-pages`);
+      navigate(`/admin/settings/web-pages`);
     },
     onError: () => {
       toast({

@@ -20,7 +20,6 @@ import {
 import { Badge } from "../components/ui/badge";
 import { Check } from "lucide-react";
 import { Workflow } from "lucide-react";
-import { BASE_URL } from "../constant";
 import { axiosInstance } from "../lib/axios";
 
 type Plan = {
@@ -50,7 +49,7 @@ export default function PlansPage() {
     queryKey: [`/api/subscription-plans`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/subscription-plans`)
+        .get(`/api/subscription-plans`)
         .then((res) => res.data),
   });
 
@@ -109,7 +108,7 @@ export default function PlansPage() {
         }
 
         const response = await axiosInstance.post(
-          `${BASE_URL}/api/user-subscriptions`,
+          `/api/user-subscriptions`,
           {
             userId: userData.id,
             planId: selectedPlan,

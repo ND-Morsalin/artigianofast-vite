@@ -13,7 +13,6 @@ import {
 import { ArrowLeft, Loader2, Check, CreditCard } from "lucide-react";
 import MobileLayout from "../components/MobileLayout";
 import StripePaymentForm from "../../components/StripePaymentForm";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 interface SubscriptionPlan {
@@ -118,7 +117,7 @@ export default function ChangePlan() {
         paymentIntent.id
       );
       const response = await axiosInstance.put(
-        `${BASE_URL}/api/mobile/subscriptions/${currentSubscription.id}`,
+        `/api/mobile/subscriptions/${currentSubscription.id}`,
         {
           planId: selectedPlan,
           billingFrequency: billingType,
@@ -182,7 +181,7 @@ export default function ChangePlan() {
       setProcessingPayment(true);
 
       const response = await axiosInstance.put(
-        `${BASE_URL}/api/mobile/subscriptions/${currentSubscription.id}`,
+        `/api/mobile/subscriptions/${currentSubscription.id}`,
         {
           planId: selectedPlan,
           billingFrequency: billingType,

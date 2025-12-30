@@ -41,7 +41,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Types for Collaborators
@@ -526,7 +525,7 @@ export default function CollaboratorsPage() {
     queryKey: [`/api/mobile/collaborators`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/collaborators`)
+        .get(`/api/mobile/collaborators`)
         .then((res) => res.data),
     enabled: true,
     retry: false, // Don't retry on permission errors
@@ -561,7 +560,7 @@ export default function CollaboratorsPage() {
   const createCollaboratorMutation = useMutation({
     mutationFn: (data: CollaboratorFormData) =>
       axiosInstance
-        .post(`${BASE_URL}/api/mobile/collaborators`, data)
+        .post(`/api/mobile/collaborators`, data)
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -588,7 +587,7 @@ export default function CollaboratorsPage() {
   const updateCollaboratorMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: CollaboratorFormData }) =>
       axiosInstance
-        .put(`${BASE_URL}/api/mobile/collaborators/${id}`, data)
+        .put(`/api/mobile/collaborators/${id}`, data)
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -615,7 +614,7 @@ export default function CollaboratorsPage() {
   const deleteCollaboratorMutation = useMutation({
     mutationFn: (id: number) =>
       axiosInstance
-        .delete(`${BASE_URL}/api/mobile/collaborators/${id}`)
+        .delete(`/api/mobile/collaborators/${id}`)
         .then((res) => res.data),
     onSuccess: () => {
       queryClient.invalidateQueries({

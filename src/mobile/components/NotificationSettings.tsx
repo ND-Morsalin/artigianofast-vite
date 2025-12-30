@@ -31,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Schema for notification settings
@@ -136,7 +135,7 @@ export default function NotificationSettings({
     queryKey: [`/api/mobile/activities`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/mobile/activities`
+        `/api/mobile/activities`
       );
       if (!response.data) {
         throw new Error("Failed to fetch activities");
@@ -150,7 +149,7 @@ export default function NotificationSettings({
     queryKey: [`/api/mobile/notification-preferences`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/mobile/notification-preferences`
+        `/api/mobile/notification-preferences`
       );
       if (!response.data) {
         // Return default settings if not found
@@ -185,7 +184,7 @@ export default function NotificationSettings({
   const saveMutation = useMutation({
     mutationFn: async (values: NotificationSettingsValues) => {
       const response = await axiosInstance.patch(
-        `${BASE_URL}/api/mobile/notification-preferences`,
+        `/api/mobile/notification-preferences`,
         values
       );
 

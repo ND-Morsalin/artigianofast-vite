@@ -7,7 +7,6 @@ import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { JobCompletion } from "../../components/ui/job-completion";
 import { JobActivityRegistration } from "../../components/ui/job-activity-registration";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 interface Job {
@@ -70,7 +69,7 @@ export function Jobs({ isRegistrationMode = false }: JobsProps) {
     queryKey: [`/api/activities`],
     enabled: !!jobTypes.length,
     queryFn: async () => {
-      const response = await axiosInstance.get(`${BASE_URL}/api/activities`);
+      const response = await axiosInstance.get(`/api/activities`);
 
       return await response.data;
     },

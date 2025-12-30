@@ -45,7 +45,6 @@ import {
 } from "../../components/ui/tabs";
 import { useToast } from "../../hooks/use-toast";
 import { Switch } from "../../components/ui/switch";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Schema per la validazione dei dati del profilo
@@ -170,7 +169,7 @@ export default function MobileProfile() {
   // Gestione del logout
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance.post(`${BASE_URL}/api/logout`);
+      const response = await axiosInstance.post(`/api/logout`);
 
       if (response.data) {
         await logout(); // Aggiorna il contesto locale

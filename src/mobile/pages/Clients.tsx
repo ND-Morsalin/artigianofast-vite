@@ -8,7 +8,6 @@ import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import MobileLayout from "../components/MobileLayout";
 import { usePlanFeatures } from "../hooks/usePlanFeatures";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Definire l'interfaccia per il cliente
@@ -65,7 +64,7 @@ export default function ClientsSettings() {
   const deleteClient = useMutation({
     mutationFn: async (id: number) => {
       const response = await axiosInstance.delete(
-        `${BASE_URL}/api/mobile/clients/${id}`
+        `/api/mobile/clients/${id}`
       );
 
       if (!response.data) {
@@ -93,7 +92,7 @@ export default function ClientsSettings() {
       });
       // Optimistic remove from local list to avoid any caching artifact
       queryClient.setQueryData<Client[]>(
-        [`${BASE_URL}/api/mobile/all-clients`],
+        [`/api/mobile/all-clients`],
         (old) =>
           (old || []).filter((c) => c.id !== (deleteClient.variables as number))
       );

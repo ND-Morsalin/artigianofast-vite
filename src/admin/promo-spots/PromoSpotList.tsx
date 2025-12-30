@@ -21,7 +21,6 @@ import { useToast } from "../../hooks/use-toast";
 import { Pencil, Trash2, Plus, Eye, EyeOff } from "lucide-react";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 // Local type for promotional spots (replace with shared type import if available)
 type PromoStatus = "active" | "inactive";
@@ -68,7 +67,7 @@ export default function PromoSpotList({ onEdit }: PromoSpotListProps) {
   const deleteSpotMutation = useMutation({
     mutationFn: async (id: number) => {
       await axiosInstance.delete(
-        `${BASE_URL}/api/admin/promotional-spots/${id}`
+        `/api/admin/promotional-spots/${id}`
       );
     },
     onSuccess: () => {
@@ -102,7 +101,7 @@ export default function PromoSpotList({ onEdit }: PromoSpotListProps) {
       status: "active" | "inactive";
     }) => {
       await axiosInstance.patch(
-        `${BASE_URL}/api/admin/promotional-spots/${id}`,
+        `/api/admin/promotional-spots/${id}`,
         {
           status,
         }

@@ -27,7 +27,6 @@ import {
 import { ArrowLeft, Save } from "lucide-react";
 import { Separator } from "../../../../components/ui/separator";
 import { Skeleton } from "../../../../components/ui/skeleton";
-import { BASE_URL } from "../../../../constant";
 import { axiosInstance } from "../../../../lib/axios";
 
 // Schema di validazione
@@ -64,7 +63,7 @@ export default function AdministratorPasswordPage(props: PasswordPageProps) {
     queryKey: [`/api/administrators/${userId}`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/administrators/${userId}`)
+        .get(`/api/administrators/${userId}`)
         .then((res) => res.data),
     enabled: !!userId,
   });
@@ -81,7 +80,7 @@ export default function AdministratorPasswordPage(props: PasswordPageProps) {
   const updatePasswordMutation = useMutation({
     mutationFn: async (data: { password: string }) => {
       const response = await axiosInstance.patch(
-        `${BASE_URL}/api/administrators/${userId}/password`,
+        `/api/administrators/${userId}/password`,
         data
       );
 

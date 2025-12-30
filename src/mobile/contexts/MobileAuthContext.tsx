@@ -7,7 +7,6 @@ import {
   useEffect,
 } from "react";
 import { queryClient } from "../../lib/queryClient";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Use the centralized mobile API utility
@@ -63,7 +62,7 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
     const loadUser = async () => {
       try {
         setIsLoading(true);
-        const res = await axiosInstance.get(`${BASE_URL}/api/mobile/user`);
+        const res = await axiosInstance.get(`/api/mobile/user`);
 
         if (res.data) {
           const userData = await res.data;
@@ -89,14 +88,14 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await axiosInstance.post(`${BASE_URL}/api/mobile/login`, {
+      const res = await axiosInstance.post(`/api/mobile/login`, {
         email,
         password,
       });
 
       console.log("📡 Login response status:", res.status);
       console.log(
-        "📡 Login response headers:",
+        "📡 Login response headers:"
         // Object.fromEntries(res.headers.entries())
       );
 
@@ -142,7 +141,7 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await axiosInstance.post(`${BASE_URL}/api/mobile/register`, {
+      const res = await axiosInstance.post(`/api/mobile/register`, {
         email,
         password,
         fullName,
@@ -190,7 +189,7 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await axiosInstance.post(`${BASE_URL}/api/mobile/logout`);
+      const res = await axiosInstance.post(`/api/mobile/logout`);
 
       if (!res.data) {
         const errorData = await res.data;
@@ -215,7 +214,7 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await axiosInstance.post(`${BASE_URL}/api/mobile/activate`, {
+      const res = await axiosInstance.post(`/api/mobile/activate`, {
         activationCode: code,
         password,
         fullName,
@@ -250,7 +249,7 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setError(null);
 
       const res = await axiosInstance.put(
-        `${BASE_URL}/api/mobile/user`,
+        `/api/mobile/user`,
         userData
       );
 
@@ -286,7 +285,7 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setError(null);
 
       const res = await axiosInstance.post(
-        `${BASE_URL}/api/mobile/change-password`,
+        `/api/mobile/change-password`,
         {
           currentPassword,
           newPassword,

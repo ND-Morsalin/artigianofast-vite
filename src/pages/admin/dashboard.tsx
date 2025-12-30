@@ -45,7 +45,6 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 // Tipo di dati per il client
 type Client = {
@@ -136,7 +135,7 @@ export default function AdminDashboard() {
     const checkUserRole = async () => {
       try {
         const response = await axiosInstance.get(
-          `${BASE_URL}/api/admin/session`
+          `/api/admin/session`
         );
         if (response.data) {
           const session = await response.data;
@@ -174,7 +173,7 @@ export default function AdminDashboard() {
   } = useQuery({
     queryKey: [`/api/admin/stats`],
     queryFn: () =>
-      axiosInstance.get(`${BASE_URL}/api/admin/stats`).then((res) => res.data),
+      axiosInstance.get(`/api/admin/stats`).then((res) => res.data),
     retry: 3, // retry a few times in case of network issues
     retryDelay: 1000, // 1 second between retries
   });
@@ -182,8 +181,7 @@ export default function AdminDashboard() {
   // Query per i clienti
   const { data: clients = [], isLoading: clientsLoading } = useQuery({
     queryKey: [`/api/clients`],
-    queryFn: () =>
-      axiosInstance.get(`${BASE_URL}/api/clients`).then((res) => res.data),
+    queryFn: () => axiosInstance.get(`/api/clients`).then((res) => res.data),
     enabled: activeTab === "clients",
   });
 
@@ -192,7 +190,7 @@ export default function AdminDashboard() {
     queryKey: [`/api/subscription-plans`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/subscription-plans`)
+        .get(`/api/subscription-plans`)
         .then((res) => res.data),
     enabled: true, // Always fetch plans since they're needed for administrators section
   });
@@ -203,7 +201,7 @@ export default function AdminDashboard() {
       queryKey: [`/api/user-subscriptions`],
       queryFn: () =>
         axiosInstance
-          .get(`${BASE_URL}/api/user-subscriptions`)
+          .get(`/api/user-subscriptions`)
           .then((res) => res.data),
       enabled: activeTab === "clients" || activeTab === "admins",
     });
@@ -211,8 +209,7 @@ export default function AdminDashboard() {
   // Query per i settori
   useQuery({
     queryKey: [`/api/sectors`],
-    queryFn: () =>
-      axiosInstance.get(`${BASE_URL}/api/sectors`).then((res) => res.data),
+    queryFn: () => axiosInstance.get(`/api/sectors`).then((res) => res.data),
     enabled: activeTab === "clients",
   });
 
@@ -221,7 +218,7 @@ export default function AdminDashboard() {
     queryKey: [`/api/administrators`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/administrators`)
+        .get(`/api/administrators`)
         .then((res) => res.data),
     enabled: activeTab === "admins",
   });

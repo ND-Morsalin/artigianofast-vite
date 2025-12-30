@@ -37,7 +37,6 @@ import { ArrowLeft, Save, Key } from "lucide-react";
 import { Skeleton } from "../../../../components/ui/skeleton";
 import { Switch } from "../../../../components/ui/switch";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../../../constant";
 import { axiosInstance } from "../../../../lib/axios";
 
 // Schema di validazione per il modulo amministratore
@@ -70,7 +69,7 @@ export default function AdminEditPage(props: AdminEditPageProps) {
     queryKey: [`/api/administrators/${adminId}`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/administrators/${adminId}`)
+        .get(`/api/administrators/${adminId}`)
         .then((res) => res.data),
     enabled: !!adminId,
   });
@@ -78,8 +77,7 @@ export default function AdminEditPage(props: AdminEditPageProps) {
   // Carica i ruoli disponibili
   const { data: roles = [], isLoading: rolesLoading } = useQuery({
     queryKey: [`/api/roles`],
-    queryFn: () =>
-      axiosInstance.get(`${BASE_URL}/api/roles`).then((res) => res.data),
+    queryFn: () => axiosInstance.get(`/api/roles`).then((res) => res.data),
   });
 
   // Configurazione del form
@@ -113,7 +111,7 @@ export default function AdminEditPage(props: AdminEditPageProps) {
   const updateMutation = useMutation({
     mutationFn: (data: AdminFormValues) => {
       return axiosInstance
-        .put(`${BASE_URL}/api/administrators/${adminId}`, data)
+        .put(`/api/administrators/${adminId}`, data)
         .then((res) => res.data);
     },
     onSuccess: () => {

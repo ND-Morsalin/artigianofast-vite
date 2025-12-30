@@ -11,7 +11,6 @@ import { Textarea } from "../../components/ui/textarea";
 import { Label } from "../../components/ui/label";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { ArrowLeft, Save } from "lucide-react";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 interface ClientFormData {
@@ -48,8 +47,8 @@ export default function ClientForm({
   const clientMutation = useMutation({
     mutationFn: async (data: ClientFormData) => {
       const url = isEditMode
-        ? `${BASE_URL}/api/mobile/clients/${clientId}`
-        : `${BASE_URL}/api/mobile/clients`;
+        ? `/api/mobile/clients/${clientId}`
+        : `/api/mobile/clients`;
 
       const method = isEditMode ? "PUT" : "POST";
 

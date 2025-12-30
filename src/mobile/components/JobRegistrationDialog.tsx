@@ -36,7 +36,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Schema per la validazione del form
@@ -250,7 +249,7 @@ export function JobRegistrationDialog({
         formData.append("photos", file);
       });
 
-      return axiosInstance.post(`${BASE_URL}/api/job-activities`, formData);
+      return axiosInstance.post(`/api/job-activities`, formData);
     },
     onSuccess: () => {
       console.log("🎉 Activity registered successfully!");

@@ -30,7 +30,6 @@ import {
 import { SiPaypal } from "react-icons/si";
 import { DesktopNavbar } from "./components/DesktopNavbar";
 import { CompanyProfileForm } from "./components/CompanyProfileForm";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 // Interfacce
@@ -95,7 +94,7 @@ export default function CheckoutPage() {
     queryKey: [`/api/subscription-plans/${planId}`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/subscription-plans/${planId}`)
+        .get(`/api/subscription-plans/${planId}`)
         .then((res) => {
           if (!res.data)
             throw new Error(t("errors.planNotFound", "Piano non trovato"));
@@ -294,7 +293,7 @@ export default function CheckoutPage() {
 
       // Chiamata API reale per la registrazione e sottoscrizione
       const response = await axiosInstance.post(
-        `${BASE_URL}/api/checkout/subscribe`,
+        `/api/checkout/subscribe`,
         subscriptionData
       );
 

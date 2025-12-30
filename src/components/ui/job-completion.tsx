@@ -33,7 +33,6 @@ import {
   CardHeader,
   CardTitle,
 } from "./card";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 interface Job {
@@ -90,7 +89,7 @@ export function JobCompletion({ job, onCompleted }: JobCompletionProps) {
   // Mutation per completare il lavoro
   const completeJob = useMutation({
     mutationFn: (values: JobCompletionFormValues) => {
-      return axiosInstance.post(`${BASE_URL}/api/jobs/${job.id}/complete`, {
+      return axiosInstance.post(`/api/jobs/${job.id}/complete`, {
         ...values,
         photos,
       });

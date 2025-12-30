@@ -18,7 +18,6 @@ import { useToast } from "../../hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "../../components/ui/language-selector";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 export default function UserSettingsPage() {
@@ -32,7 +31,7 @@ export default function UserSettingsPage() {
   const { data: currentUser } = useQuery({
     queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
+      axiosInstance.get(`/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
 
@@ -41,7 +40,7 @@ export default function UserSettingsPage() {
     queryKey: [`/api/mobile/user-subscription`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/user-subscription`)
+        .get(`/api/mobile/user-subscription`)
         .then((res) => res.data),
     enabled: true,
   });
@@ -50,7 +49,7 @@ export default function UserSettingsPage() {
     queryKey: [`/api/mobile/subscription-plans`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/subscription-plans`)
+        .get(`/api/mobile/subscription-plans`)
         .then((res) => res.data),
     enabled: true,
   });

@@ -20,7 +20,6 @@ import {
   FileText,
 } from "lucide-react";
 import { usePermissions } from "../contexts/PermissionContext";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 interface Client {
   id: number;
@@ -239,7 +238,7 @@ export function NewJobModal() {
     queryKey: [`/api/collaborators`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/collaborators`
+        `/api/collaborators`
       );
       return response.data;
     },
@@ -250,7 +249,7 @@ export function NewJobModal() {
     queryKey: [`/api/mobile/permissions/activity-management`],
     queryFn: async () => {
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/mobile/permissions/activity-management`
+        `/api/mobile/permissions/activity-management`
       );
       return response.data;
     },
@@ -334,7 +333,7 @@ export function NewJobModal() {
     queryFn: async () => {
       if (!selectedJobId) return null;
       const response = await axiosInstance.get(
-        `${BASE_URL}/api/jobs/${selectedJobId}`
+        `/api/jobs/${selectedJobId}`
       );
       return response.data;
     },
@@ -518,7 +517,7 @@ export function NewJobModal() {
       };
       if (editMode && selectedJobId) {
         await axiosInstance.patch(
-          `${BASE_URL}/api/mobile/jobs/${selectedJobId}`,
+          `/api/mobile/jobs/${selectedJobId}`,
           jobData
         );
         // Invalidate all job queries, including job range queries for calendar

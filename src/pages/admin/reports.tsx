@@ -22,7 +22,6 @@ import {
 // import { useToast } from "../../hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 export default function ReportsPage() {
@@ -34,7 +33,7 @@ export default function ReportsPage() {
   const { data: currentUser } = useQuery({
     queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
+      axiosInstance.get(`/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
 
@@ -44,7 +43,7 @@ export default function ReportsPage() {
     queryKey: [`/api/mobile/user-subscription`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/user-subscription`)
+        .get(`/api/mobile/user-subscription`)
         .then((res) => res.data),
     enabled: true,
   });
@@ -53,7 +52,7 @@ export default function ReportsPage() {
     queryKey: [`/api/mobile/subscription-plans`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/subscription-plans`)
+        .get(`/api/mobile/subscription-plans`)
         .then((res) => res.data),
     enabled: true,
   });
@@ -84,7 +83,7 @@ export default function ReportsPage() {
     queryKey: [`/api/mobile/clients`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/clients`)
+        .get(`/api/mobile/clients`)
         .then((res) => res.data),
     enabled: hasReportsPermission,
     retry: false,
@@ -98,7 +97,7 @@ export default function ReportsPage() {
     queryKey: [`/api/mobile/all-jobs`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/all-jobs`)
+        .get(`/api/mobile/all-jobs`)
         .then((res) => res.data),
     enabled: hasReportsPermission,
     retry: false,
@@ -112,7 +111,7 @@ export default function ReportsPage() {
     queryKey: [`/api/mobile/invoices`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/invoices`)
+        .get(`/api/mobile/invoices`)
         .then((res) => res.data),
     enabled: hasReportsPermission,
     retry: false,

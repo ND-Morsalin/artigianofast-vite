@@ -13,7 +13,6 @@ import { ArrowLeft, Calendar, Clock, MapPin, User, Plus } from "lucide-react";
 // import { useToast } from "../../hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 export default function CalendarPage() {
@@ -25,7 +24,7 @@ export default function CalendarPage() {
   const { data: currentUser } = useQuery({
     queryKey: [`/api/mobile/user`],
     queryFn: () =>
-      axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
+      axiosInstance.get(`/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
 
@@ -34,7 +33,7 @@ export default function CalendarPage() {
     queryKey: [`/api/mobile/user-subscription`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/user-subscription`)
+        .get(`/api/mobile/user-subscription`)
         .then((res) => res.data),
     enabled: true,
   });
@@ -43,7 +42,7 @@ export default function CalendarPage() {
     queryKey: [`/api/mobile/subscription-plans`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/subscription-plans`)
+        .get(`/api/mobile/subscription-plans`)
         .then((res) => res.data),
     enabled: true,
   });
@@ -74,7 +73,7 @@ export default function CalendarPage() {
     queryKey: [`/api/mobile/all-jobs`],
     queryFn: () =>
       axiosInstance
-        .get(`${BASE_URL}/api/mobile/all-jobs`)
+        .get(`/api/mobile/all-jobs`)
         .then((res) => res.data),
     enabled: hasCalendarPermission,
     retry: false,

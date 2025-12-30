@@ -18,7 +18,6 @@ import {
 import { Input } from "../input";
 import { Button } from "../button";
 import { Textarea } from "../textarea";
-import { BASE_URL } from "../../../constant";
 import { axiosInstance } from "../../../lib/axios";
 
 const jobTypeSchema = z.object({
@@ -54,7 +53,7 @@ export function QuickJobTypeModal({
   const createJobType = useMutation({
     mutationFn: (values: JobTypeFormValues) => {
       setIsSaving(true);
-      return axiosInstance.post(`${BASE_URL}/api/jobtypes`, values);
+      return axiosInstance.post(`/api/jobtypes`, values);
     },
     onSuccess: (data: any) => {
       setIsSaving(false);

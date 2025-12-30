@@ -58,7 +58,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
-import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
 
 interface UserSettings {
@@ -196,7 +195,7 @@ export default function Settings() {
   // Mutation per il logout
   const logout = useMutation({
     mutationFn: async () => {
-      const response = await axiosInstance.post(`${BASE_URL}/api/logout`, {});
+      const response = await axiosInstance.post(`/api/logout`, {});
 
       return response.data;
     },
