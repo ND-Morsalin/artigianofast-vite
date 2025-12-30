@@ -55,7 +55,7 @@ export function JobDetailsDialog({
   // Mutation per annullare un lavoro
   const cancelJobMutation = useMutation({
     mutationFn: async () => {
-      const response = await axiosInstance.patch(`/api/mobile//jobs/${jobId}`, {
+      const response = await axiosInstance.patch(`/api/mobile/jobs/${jobId}`, {
         status: "cancelled",
       });
 

@@ -1,5 +1,4 @@
 /* eslint-disable no-constant-binary-expression */
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -23,7 +22,6 @@ import {
 import { usePermissions } from "../contexts/PermissionContext";
 import { BASE_URL } from "../../constant";
 import { axiosInstance } from "../../lib/axios";
-
 interface Client {
   id: number;
   name: string;
@@ -32,13 +30,11 @@ interface Client {
   phone?: string;
   type?: string;
 }
-
 interface JobType {
   id: number;
   name: string;
   description: string | null;
 }
-
 interface Activity {
   id: number;
   name: string;
@@ -55,7 +51,6 @@ interface Activity {
   duration?: number;
   photos?: string[];
 }
-
 interface ActivityWithEditing extends Activity {
   isEditing?: boolean;
   notes?: string;
@@ -63,7 +58,6 @@ interface ActivityWithEditing extends Activity {
   jobTypes?: string[]; // Array di tipi di lavoro aggiuntivi
   collaborators?: number[]; // ID dei collaboratori assegnati a questa attività
 }
-
 interface Collaborator {
   id: number;
   name: string;
@@ -72,7 +66,6 @@ interface Collaborator {
   email?: string;
   phone?: string;
 }
-
 const getJobSchema = (t: any) =>
   z.object({
     title: z.string().min(1, t("mobile.jobs.modal.newJob.form.titleRequired")),
@@ -103,21 +96,19 @@ const getJobSchema = (t: any) =>
     priority: z.string().optional(),
     endDate: z.string().optional(),
   });
-
 // const activitySchema = z.object({ // Unused schema
-//   name: z.string().min(1, "Nome attività è richiesto"),
-//   jobTypeId: z.number().optional(),
-//   jobTypes: z.array(z.string()).optional(),
-//   description: z.string().optional(),
-//   hourlyRate: z.number().min(0, "Tariffa non può essere negativa").optional(),
-//   materialsCost: z.number().min(0, "Costo non può essere negativo").optional(),
-//   materialsDescription: z.string().optional(),
-//   duration: z.number().min(0.5, "Durata minima è 0.5 ore").optional(),
-//   date: z.string().optional(),
-//   startTime: z.string().optional(),
-//   collaborators: z.array(z.number()).optional(),
+// name: z.string().min(1, "Nome attività è richiesto"),
+// jobTypeId: z.number().optional(),
+// jobTypes: z.array(z.string()).optional(),
+// description: z.string().optional(),
+// hourlyRate: z.number().min(0, "Tariffa non può essere negativa").optional(),
+// materialsCost: z.number().min(0, "Costo non può essere negativo").optional(),
+// materialsDescription: z.string().optional(),
+// duration: z.number().min(0.5, "Durata minima è 0.5 ore").optional(),
+// date: z.string().optional(),
+// startTime: z.string().optional(),
+// collaborators: z.array(z.number()).optional(),
 // });
-
 const getClientSchema = (t: any) =>
   z.object({
     name: z.string().min(1, t("mobile.jobs.modal.newJob.form.nameLabel")),
@@ -129,7 +120,6 @@ const getClientSchema = (t: any) =>
     phone: z.string().optional(),
     type: z.string().optional(),
   });
-
 const getJobTypeSchema = (t: any) =>
   z.object({
     name: z
@@ -138,12 +128,16 @@ const getJobTypeSchema = (t: any) =>
     description: z.string().optional(),
     sectorIds: z.any().optional(),
   });
-
 type JobFormData = z.infer<ReturnType<typeof getJobSchema>>;
 // type ActivityFormData = z.infer<typeof activitySchema>; // Unused
 type ClientFormData = z.infer<ReturnType<typeof getClientSchema>>;
 type JobTypeFormData = z.infer<ReturnType<typeof getJobTypeSchema>>;
-
+type CollaboratorFormData = {
+  name: string;
+  role?: string;
+  email?: string;
+  phone?: string;
+};
 export function NewJobModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [photos, setPhotos] = useState<string[]>([]);
@@ -154,7 +148,6 @@ export function NewJobModal() {
   console.log(getClientSchema, getJobTypeSchema);
   // Get permissions for permission-based UI rendering
   const { hasPermission, isLoading: permissionsLoading } = usePermissions();
-
   // Permission checks
   const canCreateJobs = hasPermission("canCreateJobs");
   const canEditJobs = hasPermission("canEditJobs");
@@ -163,9 +156,8 @@ export function NewJobModal() {
   const canUploadJobPhotos = hasPermission("canUploadJobPhotos");
   const canAddJobNotes = hasPermission("canAddJobNotes");
   // const canViewClientSensitiveData = hasPermission(
-  //   "canViewClientSensitiveData"
+  // "canViewClientSensitiveData"
   // );
-
   // Job field visibility permissions
   const canViewJobTitle = hasPermission("canViewJobTitle");
   const canViewJobDescription = hasPermission("canViewJobDescription");
@@ -180,7 +172,6 @@ export function NewJobModal() {
   const canViewJobMaterials = hasPermission("canViewJobMaterials");
   // const canViewJobMaterialsCost = hasPermission("canViewJobMaterialsCost");
   // const canViewJobCost = hasPermission("canViewJobCost");
-
   const { data: clients = [] } = useQuery<Client[]>({
     queryKey: [`/api/mobile/all-clients`],
     queryFn: async () => {
@@ -190,7 +181,6 @@ export function NewJobModal() {
     },
     enabled: isOpen,
   });
-
   const { data: jobTypes = [] } = useQuery<JobType[]>({
     queryKey: [`/api/jobtypes`],
     queryFn: async () => {
@@ -200,10 +190,8 @@ export function NewJobModal() {
     },
     enabled: isOpen,
   });
-
   // Get schema with translations
   const jobSchema = getJobSchema(t);
-
   // Inizializziamo il form
   const {
     register,
@@ -232,9 +220,7 @@ export function NewJobModal() {
       endDate: "",
     },
   });
-
   // Note: selectedJobType is used in filteredActivities logic below
-
   // Query per ottenere tutte le attività disponibili
   const { data: allActivities = [] } = useQuery<Activity[]>({
     queryKey: [`/api/mobile/activities`],
@@ -248,9 +234,7 @@ export function NewJobModal() {
     staleTime: 0, // Disabilita la cache per ottenere sempre dati freschi
     refetchOnMount: true, // Aggiorna sempre i dati quando il componente viene montato
   });
-
   // Note: availableActivities logic moved to filteredActivities below
-
   const { data: availableCollaborators = [] } = useQuery<Collaborator[]>({
     queryKey: [`/api/collaborators`],
     queryFn: async () => {
@@ -261,7 +245,6 @@ export function NewJobModal() {
     },
     enabled: isOpen,
   });
-
   // Check activity management permissions
   const { data: activityPermissions } = useQuery({
     queryKey: [`/api/mobile/permissions/activity-management`],
@@ -269,12 +252,10 @@ export function NewJobModal() {
       const response = await axiosInstance.get(
         `${BASE_URL}/api/mobile/permissions/activity-management`
       );
-
       return response.data;
     },
     enabled: isOpen,
   });
-
   const [editMode, setEditMode] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
   const [isPriceTotal, setIsPriceTotal] = useState(false);
@@ -282,7 +263,6 @@ export function NewJobModal() {
   const [manageByActivities, setManageByActivities] = useState(false);
   const [activityManagementEnabled, setActivityManagementEnabled] =
     useState(false);
-
   const [activities, setActivities] = useState<ActivityWithEditing[]>([]);
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [showActivityDropdown, setShowActivityDropdown] = useState(false);
@@ -296,7 +276,6 @@ export function NewJobModal() {
   const [currentEditingActivity, setCurrentEditingActivity] = useState<
     number | null
   >(null);
-
   // Stati per il form di aggiunta attività
   const [activityName, setActivityName] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
@@ -308,41 +287,34 @@ export function NewJobModal() {
   const [activitySelectedJobTypes, setActivitySelectedJobTypes] = useState<
     string[]
   >([]);
-
   const [showAddClientModal, setShowAddClientModal] = useState(false);
   const [showAddJobTypeModal, setShowAddJobTypeModal] = useState(false);
-
+  const [showAddCollaboratorModal, setShowAddCollaboratorModal] = useState(false);
   const watchedType = watch("type");
   const watchedClientId = watch("clientId");
-
   // Ottieni informazioni del cliente selezionato
   const selectedClient = clients.find(
     (client) => client.id === watchedClientId
   );
-
   // Imposta automaticamente l'indirizzo del cliente quando viene selezionato
   useEffect(() => {
     if (selectedClient?.address && !editMode) {
       setValue("location", selectedClient.address);
     }
   }, [selectedClient, setValue, editMode]);
-
   // Versione semplificata del filtro attività
   const filteredActivities = useMemo(() => {
     // Se non c'è un tipo selezionato, restituisci tutte le attività
     if (!watchedType) {
       return allActivities;
     }
-
     // Converti watchedType in numero se possibile
     const jobTypeId = parseInt(watchedType);
-
     return allActivities.filter((activity) => {
       // Caso 1: L'attività non ha un tipo specifico (è generica)
       if (!activity.jobTypeId) {
         return true;
       }
-
       // Caso 2: Verifica la corrispondenza diretta con jobTypeId
       if (
         activity.jobTypeId === jobTypeId ||
@@ -350,16 +322,13 @@ export function NewJobModal() {
       ) {
         return true;
       }
-
       // Prova a cercare nei tipi secondari se presenti
       if (activity.jobTypesIds) {
         return true; // Semplifichiamo per ora includendo tutte le attività con tipi secondari
       }
-
       return false;
     });
   }, [watchedType, allActivities]);
-
   const { data: selectedJob } = useQuery({
     queryKey: [`/api/jobs`, selectedJobId],
     queryFn: async () => {
@@ -367,16 +336,13 @@ export function NewJobModal() {
       const response = await axiosInstance.get(
         `${BASE_URL}/api/jobs/${selectedJobId}`
       );
-
       return response.data;
     },
     enabled: !!selectedJobId && isOpen,
   });
-
   useEffect(() => {
     if (selectedJob) {
       const jobStartDate = new Date(selectedJob.startDate);
-
       setValue("title", selectedJob.title);
       setValue("clientId", selectedJob.clientId);
       setValue("type", selectedJob.type);
@@ -388,34 +354,27 @@ export function NewJobModal() {
       setValue("materialsCost", selectedJob.materialsCost || 0);
       setValue("materialsDescription", selectedJob.materialsDescription || "");
       setValue("notes", selectedJob.notes || "");
-
       if (selectedJob.photos && selectedJob.photos.length > 0) {
         setPhotos(selectedJob.photos);
       }
-
       if (selectedJob.activities && selectedJob.activities.length > 0) {
         setActivities(selectedJob.activities);
         setManageByActivities(true);
       }
-
-      if (selectedJob.collaborators && selectedJob.collaborators.length > 0) {
-        setCollaborators(selectedJob.collaborators);
-      }
-
+      // if (selectedJob.collaborators && selectedJob.collaborators.length > 0) {
+      //   setCollaborators(selectedJob.collaborators);
+      // }
       if (selectedJob.isActivityLevel !== undefined) {
         setIsActivityLevel(selectedJob.isActivityLevel);
       }
-
       if (selectedJob.isPriceTotal !== undefined) {
         setIsPriceTotal(selectedJob.isPriceTotal);
       }
-
       if (selectedJob.manageByActivities !== undefined) {
         setManageByActivities(selectedJob.manageByActivities);
       }
     }
   }, [selectedJob, setValue]);
-
   useEffect(() => {
     const handleOpenModal = (e: Event) => {
       const customEvent = e as CustomEvent;
@@ -442,11 +401,9 @@ export function NewJobModal() {
         }
       }
     };
-
     document.addEventListener("openModal", handleOpenModal);
     return () => document.removeEventListener("openModal", handleOpenModal);
   }, [reset]);
-
   const closeModal = () => {
     setIsOpen(false);
     reset();
@@ -459,11 +416,9 @@ export function NewJobModal() {
     setManageByActivities(false);
     setCurrentEditingActivity(null);
   };
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-
     const newMediaFiles = Array.from(files);
     const validFiles = newMediaFiles.filter((file) => {
       return (
@@ -478,7 +433,6 @@ export function NewJobModal() {
         file.name.endsWith(".coc")
       );
     });
-
     if (validFiles.length !== newMediaFiles.length) {
       toast({
         title: t("mobile.jobs.modal.newJob.form.attention"),
@@ -486,9 +440,7 @@ export function NewJobModal() {
         variant: "destructive",
       });
     }
-
     setMediaFiles((prev) => [...prev, ...validFiles]);
-
     validFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -499,12 +451,10 @@ export function NewJobModal() {
       reader.readAsDataURL(file);
     });
   };
-
   const removeFile = (index: number) => {
     setPhotos(photos.filter((_, i) => i !== index));
     setMediaFiles(mediaFiles.filter((_, i) => i !== index));
   };
-
   const onSubmit = async (data: JobFormData) => {
     console.log("🚀 FORM SUBMISSION STARTED", {
       canCreateJobs,
@@ -512,7 +462,6 @@ export function NewJobModal() {
       data: Object.keys(data),
       formData: data,
     });
-
     // Check permissions before allowing submission
     if (!canCreateJobs && !editMode) {
       toast({
@@ -522,7 +471,6 @@ export function NewJobModal() {
       });
       return;
     }
-
     if (editMode && !canEditJobs) {
       toast({
         title: t("mobile.jobs.modal.newJob.form.accessDenied"),
@@ -531,22 +479,18 @@ export function NewJobModal() {
       });
       return;
     }
-
     try {
       const startDate = new Date(`${data.date}T${data.startTime}`);
-
       // Calcola la data di fine in base alla durata specificata
       const durationInHours = data.duration;
       const endDate = new Date(startDate.getTime());
       endDate.setHours(endDate.getHours() + Math.floor(durationInHours));
       endDate.setMinutes(endDate.getMinutes() + (durationInHours % 1) * 60);
-
       // Aggiorna il calcolo della tariffa in base ai collaboratori
       let hourlyRate = data.hourlyRate;
       if (collaborators.length > 1 && !isPriceTotal && !manageByActivities) {
         hourlyRate = hourlyRate * collaborators.length;
       }
-
       const jobData = {
         title: data.title,
         clientId: data.clientId,
@@ -572,13 +516,11 @@ export function NewJobModal() {
         manageByActivities: manageByActivities,
         collaboratorCount: collaborators.length,
       };
-
       if (editMode && selectedJobId) {
         await axiosInstance.patch(
           `${BASE_URL}/api/mobile/jobs/${selectedJobId}`,
           jobData
         );
-
         // Invalidate all job queries, including job range queries for calendar
         queryClient.invalidateQueries({ queryKey: [`/api/jobs`] });
         queryClient.invalidateQueries({
@@ -587,19 +529,16 @@ export function NewJobModal() {
         queryClient.invalidateQueries({
           queryKey: [`/api/jobs/range`],
         });
-
         toast({
           title: t("mobile.jobs.modal.newJob.form.jobUpdated"),
           description: t("mobile.jobs.modal.newJob.form.jobUpdatedDescription"),
         });
       } else {
         const response = await axiosInstance.post(`/api/mobile/jobs`, jobData);
-
         if (!response.data) {
           const errorData = await response.data;
           throw new Error(errorData.error || "Failed to create job");
         }
-
         // Invalidate all job queries, including mobile job queries
         queryClient.invalidateQueries({
           queryKey: [`/api/mobile/all-jobs`],
@@ -608,12 +547,10 @@ export function NewJobModal() {
         queryClient.invalidateQueries({
           queryKey: [`/api/jobs/range`],
         });
-
         toast({
           title: t("mobile.jobs.modal.newJob.form.jobCreated"),
           description: t("mobile.jobs.modal.newJob.form.jobCreatedDescription"),
         });
-
         // Close modal immediately after success
         closeModal();
         setIsOpen(false);
@@ -630,27 +567,25 @@ export function NewJobModal() {
       });
     }
   };
-
   const handleAddNewClientClick = () => {
     setShowAddClientModal(true);
   };
-
   const handleAddCustomJobTypeClick = () => {
     setShowAddJobTypeModal(true);
   };
-
+  const handleAddNewCollaboratorClick = () => {
+    setShowAddCollaboratorModal(true);
+  };
   const handleActivityDropdownToggle = () => {
     setShowActivityDropdown(!showActivityDropdown);
     setShowCollaboratorDropdown(false);
     setShowActivityCollaboratorDropdown(null);
   };
-
   const handleCollaboratorDropdownToggle = () => {
     setShowCollaboratorDropdown(!showCollaboratorDropdown);
     setShowActivityDropdown(false);
     setShowActivityCollaboratorDropdown(null);
   };
-
   const handleActivityCollaboratorDropdownToggle = (activityId: number) => {
     if (showActivityCollaboratorDropdown === activityId) {
       setShowActivityCollaboratorDropdown(null);
@@ -660,7 +595,6 @@ export function NewJobModal() {
       setShowCollaboratorDropdown(false);
     }
   };
-
   const handleAddNewActivityClick = () => {
     setActivityName("");
     setActivityDescription("");
@@ -671,7 +605,6 @@ export function NewJobModal() {
     setShowAddActivityForm(true);
     setShowActivityDropdown(false);
   };
-
   const handleActivitySelect = (activity: Activity) => {
     if (
       activities.some((a) => a.id === activity.id && a.name === activity.name)
@@ -683,7 +616,6 @@ export function NewJobModal() {
       });
       return;
     }
-
     // Aggiungi l'attività con un campo isEditing impostato a true
     const newActivity: ActivityWithEditing = {
       ...activity,
@@ -694,34 +626,27 @@ export function NewJobModal() {
       isEditing: true,
       collaborators: [], // Array vuoto di collaboratori
     };
-
     setActivities([...activities, newActivity]);
     setShowActivityDropdown(false);
     setCurrentEditingActivity(newActivity.id);
-
     // Attiva la gestione per attività se è la prima attività aggiunta
     if (activities.length === 0) {
       setManageByActivities(true);
     }
   };
-
   const handleClientAdd = async (client: ClientFormData) => {
     try {
       const response = await axiosInstance.post(`/api/mobile/clients`, client);
       const newClient = await response.data;
-
       queryClient.invalidateQueries({
         queryKey: [`/api/mobile/all-clients`],
       });
-
       setValue("clientId", newClient.id);
       setValue("location", newClient.address || "");
-
       toast({
         title: "Cliente aggiunto",
         description: `Il cliente ${newClient.name} è stato aggiunto con successo`,
       });
-
       setShowAddClientModal(false);
     } catch (error) {
       console.log(error);
@@ -733,22 +658,17 @@ export function NewJobModal() {
       });
     }
   };
-
   const handleJobTypeAdd = async (jobType: JobTypeFormData) => {
     try {
       jobType.sectorIds= [1,2]; // Aggiungi un array vuoto di settori per compatibilità con il back-end
       const response = await axiosInstance.post(`/api/jobtypes`, jobType);
       const newJobType = await response.data;
-
       queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
-
       setValue("type", newJobType.id.toString());
-
       toast({
         title: "Tipo lavoro aggiunto",
         description: `Il tipo di lavoro ${newJobType.name} è stato aggiunto con successo`,
       });
-
       setShowAddJobTypeModal(false);
     } catch (error) {
       console.log(error);
@@ -761,7 +681,26 @@ export function NewJobModal() {
       });
     }
   };
-
+  const handleCollaboratorAdd = async (collaboratorData: CollaboratorFormData) => {
+    try {
+      const response = await axiosInstance.post(`/api/collaborators`, collaboratorData);
+      const newCollaborator = await response.data;
+      queryClient.invalidateQueries({ queryKey: [`/api/collaborators`] });
+      handleCollaboratorSelect(newCollaborator);
+      toast({
+        title: "Collaboratore aggiunto",
+        description: `Il collaboratore ${newCollaborator.name} è stato aggiunto con successo`,
+      });
+      setShowAddCollaboratorModal(false);
+    } catch (error) {
+      console.error("Error adding collaborator:", error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore nell'aggiunta del collaboratore",
+        variant: "destructive",
+      });
+    }
+  };
   const handleNewActivityAdd = () => {
     if (!activityName) {
       toast({
@@ -771,7 +710,6 @@ export function NewJobModal() {
       });
       return;
     }
-
     if (!activityJobTypeId) {
       toast({
         title: "Errore",
@@ -780,13 +718,11 @@ export function NewJobModal() {
       });
       return;
     }
-
     // Converti l'array di stringhe in stringa formato CSV per compatibilità con il back-end
     const jobTypesIds =
       activitySelectedJobTypes.length > 0
         ? activitySelectedJobTypes.join(",")
         : "";
-
     // Crea una nuova attività
     const activity: ActivityWithEditing = {
       id: Date.now(),
@@ -804,31 +740,34 @@ export function NewJobModal() {
       collaborators: [],
       isEditing: true,
     };
-
     setActivities([...activities, activity]);
     setShowAddActivityForm(false);
     setCurrentEditingActivity(activity.id);
-
     // Attiva la gestione per attività se è la prima attività aggiunta
     if (activities.length === 0) {
       setManageByActivities(true);
     }
   };
+  // const handleCollaboratorSelect = (collaborator: Collaborator) => {
+  //   // Verifica se il collaboratore è già stato selezionato
+  //   if (collaborators.some((c) => c.id === collaborator.id)) {
+  //     toast({
+  //       title: "Collaboratore già aggiunto",
+  //       description: "Questo collaboratore è già stato aggiunto al lavoro",
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
+  //   setCollaborators([...collaborators, collaborator]);
+  // };
 
   const handleCollaboratorSelect = (collaborator: Collaborator) => {
-    // Verifica se il collaboratore è già stato selezionato
-    if (collaborators.some((c) => c.id === collaborator.id)) {
-      toast({
-        title: "Collaboratore già aggiunto",
-        description: "Questo collaboratore è già stato aggiunto al lavoro",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  if (collaborators.some((c) => c.id === collaborator.id)) {
+    setCollaborators(collaborators.filter((c) => c.id !== collaborator.id));
+  } else {
     setCollaborators([...collaborators, collaborator]);
-  };
-
+  }
+};
   const handleActivityCollaboratorSelect = (
     activityId: number,
     collaboratorId: number
@@ -838,12 +777,10 @@ export function NewJobModal() {
       activities.map((activity) => {
         if (activity.id === activityId) {
           const activityCollaborators = activity.collaborators || [];
-
           // Se il collaboratore è già presente, non fare nulla
           if (activityCollaborators.includes(collaboratorId)) {
             return activity;
           }
-
           // Altrimenti aggiungi il collaboratore all'attività
           return {
             ...activity,
@@ -854,7 +791,6 @@ export function NewJobModal() {
       })
     );
   };
-
   const handleActivityCollaboratorRemove = (
     activityId: number,
     collaboratorId: number
@@ -874,26 +810,20 @@ export function NewJobModal() {
       })
     );
   };
-
   const handleActivityRemove = (id: number) => {
     setActivities(activities.filter((a) => a.id !== id));
-
     // Se rimuoviamo tutte le attività, disattiviamo la gestione per attività
     if (activities.length <= 1) {
       setManageByActivities(false);
     }
-
     if (currentEditingActivity === id) {
       setCurrentEditingActivity(null);
     }
   };
-
   const handleCollaboratorRemove = (id: number) => {
     setCollaborators(collaborators.filter((c) => c.id !== id));
   };
-
   // Note: handleJobTypeSelectToggle function removed as it's handled inline
-
   // Calcola il totale del lavoro in base alle attività o al prezzo totale
   const calculateTotals = () => {
     // Calcola totali per gestione per attività
@@ -903,7 +833,6 @@ export function NewJobModal() {
         (sum, act) => sum + (act.duration || 0),
         0
       );
-
       if (isActivityLevel) {
         // A livello attività, calcola separatamente prezzo e materiali
         const totalPrice = activities.reduce((sum, act) => {
@@ -915,12 +844,10 @@ export function NewJobModal() {
               (act.collaborators?.length || 0 || 1);
           return sum + activityPrice;
         }, 0);
-
         const totalMaterialsCost = activities.reduce(
           (sum, act) => sum + (act.materialsCost || 0),
           0
         );
-
         return {
           hours: totalHours,
           price: totalPrice,
@@ -931,11 +858,9 @@ export function NewJobModal() {
         // A livello lavoro, usa i campi del form
         const hourlyRate = watch("hourlyRate") || 0;
         const materialsCost = watch("materialsCost") || 0;
-
         const totalPrice = isPriceTotal
           ? hourlyRate
           : hourlyRate * totalHours * (collaborators.length || 1);
-
         return {
           hours: totalHours,
           price: totalPrice,
@@ -948,7 +873,6 @@ export function NewJobModal() {
       const hourlyRate = watch("hourlyRate") || 0;
       const materialsCost = watch("materialsCost") || 0;
       const duration = watch("duration") || 0;
-
       if (isPriceTotal) {
         return {
           hours: duration,
@@ -963,7 +887,6 @@ export function NewJobModal() {
             ? hourlyRate * collaborators.length
             : hourlyRate;
         const totalPrice = rateWithCollaborators * duration;
-
         return {
           hours: duration,
           price: totalPrice,
@@ -973,7 +896,6 @@ export function NewJobModal() {
       }
     }
   };
-
   useEffect(() => {
     const openModalOnNavigation = () => {
       const path = window.location.pathname;
@@ -981,22 +903,18 @@ export function NewJobModal() {
         setIsOpen(true);
       }
     };
-
     openModalOnNavigation();
     window.addEventListener("popstate", openModalOnNavigation);
-
     return () => {
       window.removeEventListener("popstate", openModalOnNavigation);
     };
   }, []);
-
   useEffect(() => {
     // Se selezioniamo "Gestisci per attività", abilita anche "Gestisci costi a livello attività"
     if (manageByActivities) {
       setIsActivityLevel(true);
     }
   }, [manageByActivities]);
-
   // Update activity management enabled state when permissions are loaded
   useEffect(() => {
     if (activityPermissions) {
@@ -1005,21 +923,17 @@ export function NewJobModal() {
       );
     }
   }, [activityPermissions]);
-
   // Fetch plan configuration to gate collaborator feature as well
   const { data: planConfig } = useQuery({
     queryKey: [`/api/mobile/plan-configuration`],
     queryFn: async () => {
       const res = await axiosInstance.get(`/api/mobile/plan-configuration`);
-
       return res.data;
     },
   });
   const collaboratorFeatureEnabled =
     planConfig?.features?.collaborator_management === true;
-
   if (!isOpen) return null;
-
   // Show loading state while permissions are being loaded
   if (permissionsLoading) {
     return (
@@ -1033,9 +947,7 @@ export function NewJobModal() {
       </div>
     );
   }
-
   const totals = calculateTotals();
-
   return (
     <>
       <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 overflow-y-auto pt-4 pb-20">
@@ -1086,7 +998,6 @@ export function NewJobModal() {
                     )}
                   </div>
                 )}
-
                 {(canViewJobClient || true) && (
                   <div>
                     <label className="block text-sm font-medium mb-1">
@@ -1126,7 +1037,6 @@ export function NewJobModal() {
                     )}
                   </div>
                 )}
-
                 {/* Job Location - Permission controlled */}
                 {canViewJobLocation && (
                   <div>
@@ -1151,7 +1061,6 @@ export function NewJobModal() {
                     )}
                   </div>
                 )}
-
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     {t("mobile.jobs.modal.newJob.form.type")}
@@ -1189,7 +1098,6 @@ export function NewJobModal() {
                     </p>
                   )}
                 </div>
-
                 {/* Switch per gestione per attività - visibile solo se abilitato dal piano */}
                 {activityManagementEnabled && (
                   <div className="flex items-center justify-between py-2 px-1 border-t border-b border-gray-200">
@@ -1211,7 +1119,6 @@ export function NewJobModal() {
                     </button>
                   </div>
                 )}
-
                 {manageByActivities && (
                   <div className="flex items-center justify-between py-2 px-1 border-t border-b border-gray-200">
                     <span className="text-sm font-medium">
@@ -1239,7 +1146,6 @@ export function NewJobModal() {
                     </div>
                   </div>
                 )}
-
                 {/* Sezione Attività con dropdown style come da immagine - visibile solo con gestione attività */}
                 {activityManagementEnabled && manageByActivities && (
                   <div>
@@ -1274,7 +1180,6 @@ export function NewJobModal() {
                             }`}
                           />
                         </button>
-
                         {showActivityDropdown && (
                           <div className="absolute top-full left-0 right-0 mt-1 border border-gray-200 rounded-lg bg-white shadow-lg z-20 max-h-60 overflow-y-auto">
                             {filteredActivities.length > 0 ? (
@@ -1340,7 +1245,6 @@ export function NewJobModal() {
                         <Plus size={20} />
                       </button>
                     </div>
-
                     {/* Area di modifica attività */}
                     {activities.length > 0 && (
                       <div className="mt-3 space-y-4">
@@ -1364,7 +1268,6 @@ export function NewJobModal() {
                                 </button>
                               </div>
                             </div>
-
                             {/* Form di modifica attività - sempre visibile */}
                             <div className="p-3 space-y-3">
                               <div className="grid grid-cols-2 gap-3">
@@ -1393,7 +1296,6 @@ export function NewJobModal() {
                                     }}
                                   />
                                 </div>
-
                                 <div>
                                   <label className="block text-sm font-medium mb-1">
                                     Ora inizio
@@ -1420,7 +1322,6 @@ export function NewJobModal() {
                                   />
                                 </div>
                               </div>
-
                               <div>
                                 <label className="block text-sm font-medium mb-1">
                                   Durata (ore)
@@ -1446,7 +1347,6 @@ export function NewJobModal() {
                                   }}
                                 />
                               </div>
-
                               {/* Mostra i campi costo solo se gestisco a livello attività - Permission controlled */}
                               {isActivityLevel && canViewJobFinancials && (
                                 <>
@@ -1477,7 +1377,6 @@ export function NewJobModal() {
                                       }}
                                     />
                                   </div>
-
                                   <div>
                                     <label className="block text-sm font-medium mb-1">
                                       Costo materiali (€)
@@ -1507,7 +1406,6 @@ export function NewJobModal() {
                                   </div>
                                 </>
                               )}
-
                               {/* Collaboratori per questa specifica attività */}
                               {activityManagementEnabled &&
                                 manageByActivities && (
@@ -1566,7 +1464,6 @@ export function NewJobModal() {
                                           }`}
                                         />
                                       </button>
-
                                       {showActivityCollaboratorDropdown ===
                                         activity.id && (
                                         <div className="absolute top-full left-0 right-0 mt-1 border border-gray-200 rounded-lg bg-white shadow-lg z-30 max-h-60 overflow-y-auto">
@@ -1616,7 +1513,6 @@ export function NewJobModal() {
                                         </div>
                                       )}
                                     </div>
-
                                     {activity.collaborators &&
                                       activity.collaborators.length > 0 && (
                                         <div className="mt-2 space-y-1">
@@ -1627,7 +1523,6 @@ export function NewJobModal() {
                                                   (c) => c.id === collaboratorId
                                                 );
                                               if (!collaborator) return null;
-
                                               return (
                                                 <div
                                                   key={collaboratorId}
@@ -1656,7 +1551,6 @@ export function NewJobModal() {
                                       )}
                                   </div>
                                 )}
-
                               <div>
                                 <label className="block text-sm font-medium mb-1">
                                   {t("mobile.jobs.modal.newJob.form.materials")}
@@ -1683,7 +1577,6 @@ export function NewJobModal() {
                                   )}
                                 ></textarea>
                               </div>
-
                               <div>
                                 <label className="block text-sm font-medium mb-1">
                                   {t("mobile.jobs.modal.newJob.form.notes")}
@@ -1710,7 +1603,6 @@ export function NewJobModal() {
                                   )}
                                 ></textarea>
                               </div>
-
                               {canUploadJobPhotos && (
                                 <div>
                                   <label className="block text-sm font-medium mb-1">
@@ -1734,13 +1626,11 @@ export function NewJobModal() {
                                         e.target.files.length === 0
                                       )
                                         return;
-
                                       // Versione semplificata dell'upload
                                       const files = Array.from(e.target.files);
                                       const fileNames = files.map(
                                         (file) => file.name
                                       );
-
                                       const updatedActivity = {
                                         ...activity,
                                         attachedFiles: activity.attachedFiles
@@ -1750,7 +1640,6 @@ export function NewJobModal() {
                                             ]
                                           : fileNames,
                                       };
-
                                       setActivities(
                                         activities.map((a) =>
                                           a.id === activity.id
@@ -1758,12 +1647,10 @@ export function NewJobModal() {
                                             : a
                                         )
                                       );
-
                                       // Resetta il campo input file
                                       e.target.value = "";
                                     }}
                                   />
-
                                   {activity.attachedFiles &&
                                     activity.attachedFiles.length > 0 && (
                                       <div className="mt-2 text-sm">
@@ -1789,7 +1676,6 @@ export function NewJobModal() {
                             </div>
                           </div>
                         ))}
-
                         {/* Pulsante per aggiungere un'altra attività */}
                         <div className="mt-2 flex justify-center">
                           <button
@@ -1809,7 +1695,6 @@ export function NewJobModal() {
                     )}
                   </div>
                 )}
-
                 {/* Collaboratori DropDown Style - visibile solo se non gestiamo per attività */}
                 {!manageByActivities && collaboratorFeatureEnabled && (
                   <div>
@@ -1844,7 +1729,6 @@ export function NewJobModal() {
                             }`}
                           />
                         </button>
-
                         {showCollaboratorDropdown && (
                           <div className="absolute top-full left-0 right-0 mt-1 border border-gray-200 rounded-lg bg-white shadow-lg z-20 max-h-60 overflow-y-auto">
                             {availableCollaborators.length > 0 ? (
@@ -1890,10 +1774,7 @@ export function NewJobModal() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => {
-                          // Apre solo il dropdown dei collaboratori
-                          // handleCollaboratorDropdownToggle();
-                        }}
+                        onClick={handleAddNewCollaboratorClick}
                         className="shrink-0 h-10 w-10 flex items-center justify-center text-primary border border-gray-300 rounded-lg hover:bg-gray-100"
                         title={t(
                           "mobile.jobs.modal.newJob.form.addNewCollaborator"
@@ -1902,7 +1783,6 @@ export function NewJobModal() {
                         <Plus size={20} />
                       </button>
                     </div>
-
                     {collaborators.length > 0 && (
                       <div className="mt-3 space-y-2">
                         {collaborators.map((collaborator) => (
@@ -1933,7 +1813,6 @@ export function NewJobModal() {
                         ))}
                       </div>
                     )}
-
                     {collaborators.length > 1 && !isPriceTotal && (
                       <p className="mt-2 text-xs text-amber-600 bg-amber-50 p-2 rounded border border-amber-200">
                         <strong>Nota:</strong> Tariffa oraria moltiplicata per{" "}
@@ -1943,7 +1822,6 @@ export function NewJobModal() {
                     )}
                   </div>
                 )}
-
                 {/* Campi data, ora, durata visibili solo se non si gestisce per attività */}
                 {!manageByActivities && (
                   <>
@@ -1968,7 +1846,6 @@ export function NewJobModal() {
                           )}
                         </div>
                       )}
-
                       {canViewJobStartDate && (
                         <div>
                           <label className="block text-sm font-medium mb-1">
@@ -1990,7 +1867,6 @@ export function NewJobModal() {
                         </div>
                       )}
                     </div>
-
                     {canViewJobDuration && (
                       <div>
                         <label className="block text-sm font-medium mb-1">
@@ -2012,7 +1888,6 @@ export function NewJobModal() {
                     )}
                   </>
                 )}
-
                 {/* Campi di costo visibili solo se non si gestisce per attività o se isActivityLevel=false - Permission controlled */}
                 {(!activityManagementEnabled ||
                   !manageByActivities ||
@@ -2067,7 +1942,6 @@ export function NewJobModal() {
                           )}
                         </div>
                       )}
-
                       {/* Nasconde i campi materiali se manageByActivities è true e isActivityLevel è false */}
                       {!(
                         activityManagementEnabled &&
@@ -2092,7 +1966,6 @@ export function NewJobModal() {
                                 {errors.materialsDescription.message}
                               </p>
                             )}
-
                             <div className="mt-3">
                               <label className="block text-sm font-medium mb-1">
                                 {t(
@@ -2118,7 +1991,6 @@ export function NewJobModal() {
                         )}
                     </div>
                   )}
-
                 {/* File allegati visibili solo se non si gestisce per attività - Permission controlled */}
                 {(!activityManagementEnabled || !manageByActivities) &&
                   canUploadJobPhotos && (
@@ -2139,7 +2011,6 @@ export function NewJobModal() {
                         calcolo (.xls, .xlsx), disegni tecnici (.dwg) e
                         certificati (.coc)
                       </p>
-
                       {photos.length > 0 && (
                         <div className="grid grid-cols-3 gap-2 mt-2">
                           {photos.map((photo, index) => (
@@ -2189,7 +2060,6 @@ export function NewJobModal() {
                       )}
                     </div>
                   )}
-
                 {canViewJobDescription && (
                   <div>
                     <label className="block text-sm font-medium mb-1">
@@ -2210,7 +2080,6 @@ export function NewJobModal() {
                     )}
                   </div>
                 )}
-
                 {canViewJobStatus && (
                   <div>
                     <label className="block text-sm font-medium mb-1">
@@ -2240,7 +2109,6 @@ export function NewJobModal() {
                     )}
                   </div>
                 )}
-
                 {canViewJobPriority && (
                   <div>
                     <label className="block text-sm font-medium mb-1">
@@ -2270,7 +2138,6 @@ export function NewJobModal() {
                     )}
                   </div>
                 )}
-
                 {canViewJobEndDate && (
                   <div>
                     <label className="block text-sm font-medium mb-1">
@@ -2291,7 +2158,6 @@ export function NewJobModal() {
                     )}
                   </div>
                 )}
-
                 {canAddJobNotes && (
                   <div>
                     <label className="block text-sm font-medium mb-1">
@@ -2312,7 +2178,6 @@ export function NewJobModal() {
                     )}
                   </div>
                 )}
-
                 {/* Tabella dei costi totali con tutti i dettagli richiesti - Permission controlled */}
                 {canViewJobFinancials && (
                   <div className="py-2 px-4 bg-blue-600/5 rounded-lg border border-primary/20">
@@ -2321,7 +2186,6 @@ export function NewJobModal() {
                         {t("mobile.jobs.modal.newJob.form.costSummary")}:
                       </span>
                     </div>
-
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead className="text-xs text-gray-700 uppercase bg-gray-100">
@@ -2373,7 +2237,6 @@ export function NewJobModal() {
                         </tbody>
                       </table>
                     </div>
-
                     <p className="text-xs text-gray-500 mt-1">
                       {activityManagementEnabled && manageByActivities
                         ? isActivityLevel
@@ -2398,7 +2261,6 @@ export function NewJobModal() {
                     </p>
                   </div>
                 )}
-
                 <div className="pt-4">
                   <button
                     type="submit"
@@ -2433,7 +2295,6 @@ export function NewJobModal() {
                       ? t("mobile.jobs.modal.newJob.form.update")
                       : t("mobile.jobs.modal.newJob.form.create")}
                   </button>
-
                   {/* Permission warning message */}
                   {!permissionsLoading && (
                     <>
@@ -2459,7 +2320,6 @@ export function NewJobModal() {
           </div>
         </div>
       </div>
-
       {/* Form per aggiungere una nuova attività */}
       {showAddActivityForm && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[70]">
@@ -2499,7 +2359,6 @@ export function NewJobModal() {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       {t("mobile.jobs.modal.newJob.form.jobTypesLabel")}
@@ -2534,7 +2393,6 @@ export function NewJobModal() {
                                 );
                               }
                               setActivitySelectedJobTypes(updatedJobTypes);
-
                               // Se c'è almeno un tipo di lavoro selezionato, impostiamo il primo come principale
                               if (updatedJobTypes.length > 0) {
                                 setActivityJobTypeId(
@@ -2553,7 +2411,6 @@ export function NewJobModal() {
                       {t("mobile.jobs.modal.newJob.form.selectJobTypes")}
                     </p>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       {t("mobile.jobs.modal.newJob.form.descriptionLabel")}
@@ -2568,7 +2425,6 @@ export function NewJobModal() {
                       onChange={(e) => setActivityDescription(e.target.value)}
                     ></textarea>
                   </div>
-
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">
@@ -2585,7 +2441,6 @@ export function NewJobModal() {
                         }
                       />
                     </div>
-
                     <div>
                       <label className="block text-sm font-medium mb-1">
                         {t("mobile.jobs.modal.newJob.form.rateLabel")}
@@ -2605,7 +2460,6 @@ export function NewJobModal() {
                       </p>
                     </div>
                   </div>
-
                   <div className="pt-2">
                     <button
                       type="submit"
@@ -2620,7 +2474,6 @@ export function NewJobModal() {
           </div>
         </div>
       )}
-
       {/* Modal per aggiungere un nuovo cliente */}
       {showAddClientModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
@@ -2657,7 +2510,6 @@ export function NewJobModal() {
                   const typeInput = formEl.elements.namedItem(
                     "clientType"
                   ) as HTMLSelectElement;
-
                   const clientData: ClientFormData = {
                     name: nameInput.value,
                     address: addressInput.value,
@@ -2665,7 +2517,6 @@ export function NewJobModal() {
                     phone: phoneInput.value,
                     type: typeInput.value,
                   };
-
                   handleClientAdd(clientData);
                 }}
               >
@@ -2682,7 +2533,6 @@ export function NewJobModal() {
                       placeholder="Es. Mario Rossi o Azienda ABC"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       {t("mobile.jobs.modal.newJob.form.typeLabel")}
@@ -2705,7 +2555,6 @@ export function NewJobModal() {
                       </option>
                     </select>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       {t("mobile.jobs.modal.newJob.form.addressLabel")}
@@ -2717,7 +2566,6 @@ export function NewJobModal() {
                       placeholder="Es. Via Roma 123, Milano"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       {t("mobile.jobs.modal.newJob.form.emailLabel")}
@@ -2729,7 +2577,6 @@ export function NewJobModal() {
                       placeholder="Es. mario.rossi@esempio.it"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       {t("mobile.jobs.modal.newJob.form.phoneLabel")}
@@ -2741,7 +2588,6 @@ export function NewJobModal() {
                       placeholder="Es. 345 123 4567"
                     />
                   </div>
-
                   <div className="pt-2">
                     <button
                       type="submit"
@@ -2756,7 +2602,6 @@ export function NewJobModal() {
           </div>
         </div>
       )}
-
       {/* Modal per aggiungere un nuovo tipo di lavoro */}
       {showAddJobTypeModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
@@ -2784,12 +2629,10 @@ export function NewJobModal() {
                   const descriptionInput = formEl.elements.namedItem(
                     "jobTypeDescription"
                   ) as HTMLTextAreaElement;
-
                   const jobTypeData: JobTypeFormData = {
                     name: nameInput.value,
                     description: descriptionInput.value,
                   };
-
                   handleJobTypeAdd(jobTypeData);
                 }}
               >
@@ -2806,7 +2649,6 @@ export function NewJobModal() {
                       placeholder="Es. Manutenzione Caldaia"
                     />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       {t(
@@ -2820,13 +2662,114 @@ export function NewJobModal() {
                       placeholder="Descrivi questo tipo di lavoro..."
                     ></textarea>
                   </div>
-
                   <div className="pt-2">
                     <button
                       type="submit"
                       className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-600/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                     >
                       {t("mobile.jobs.modal.newJob.form.addJobTypeButton")}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal per aggiungere un nuovo collaboratore */}
+      {showAddCollaboratorModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60]">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-sm mx-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
+            <div className="flex justify-between items-center p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold">
+                {t("mobile.jobs.modal.newJob.form.addNewCollaborator")}
+              </h3>
+              <button
+                className="rounded-full h-8 w-8 flex items-center justify-center text-gray-500 hover:bg-gray-100"
+                onClick={() => setShowAddCollaboratorModal(false)}
+                aria-label={t("mobile.jobs.modal.newJob.form.close")}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="p-4">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const formEl = e.target as HTMLFormElement;
+                  const nameInput = formEl.elements.namedItem(
+                    "collaboratorName"
+                  ) as HTMLInputElement;
+                  const roleInput = formEl.elements.namedItem(
+                    "collaboratorRole"
+                  ) as HTMLInputElement;
+                  const emailInput = formEl.elements.namedItem(
+                    "collaboratorEmail"
+                  ) as HTMLInputElement;
+                  const phoneInput = formEl.elements.namedItem(
+                    "collaboratorPhone"
+                  ) as HTMLInputElement;
+                  const collaboratorData: CollaboratorFormData = {
+                    name: nameInput.value,
+                    role: roleInput.value,
+                    email: emailInput.value,
+                    phone: phoneInput.value,
+                  };
+                  handleCollaboratorAdd(collaboratorData);
+                }}
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {t("mobile.jobs.modal.newJob.form.nameLabel")}
+                    </label>
+                    <input
+                      type="text"
+                      name="collaboratorName"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="Es. Mario Rossi"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {t("mobile.jobs.modal.newJob.form.roleLabel")}
+                    </label>
+                    <input
+                      type="text"
+                      name="collaboratorRole"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="Es. Tecnico Senior"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {t("mobile.jobs.modal.newJob.form.emailLabel")}
+                    </label>
+                    <input
+                      type="email"
+                      name="collaboratorEmail"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="Es. mario.rossi@esempio.it"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {t("mobile.jobs.modal.newJob.form.phoneLabel")}
+                    </label>
+                    <input
+                      type="tel"
+                      name="collaboratorPhone"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="Es. 345 123 4567"
+                    />
+                  </div>
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-600/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    >
+                      {t("mobile.jobs.modal.newJob.form.add")}
                     </button>
                   </div>
                 </div>

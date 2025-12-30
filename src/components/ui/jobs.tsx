@@ -60,7 +60,7 @@ export function Jobs({ isRegistrationMode = false }: JobsProps) {
   const { data: jobTypes = [], isLoading: jobTypesLoading } = useQuery<
     JobType[]
   >({
-    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryKey: [`/api/jobtypes`],
   });
 
   // Query per ottenere le attività

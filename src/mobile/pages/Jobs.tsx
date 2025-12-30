@@ -136,6 +136,8 @@ export default function Jobs(props: any) {
     },
   });
 
+  console.log({ jobs },"jobs data");
+
   const { data: clients = [] } = useQuery({
     queryKey: [`/api/mobile/all-clients`],
     queryFn: async () => {
@@ -292,13 +294,12 @@ export default function Jobs(props: any) {
   // Gestisci la creazione di un nuovo lavoro
   // const handleNewJobSubmit = async (formData: FormData) => {
   //   try {
-  //     const response = await axiosInstance.(
-  //       "POST",
+  //     const response = await axiosInstance.post( 
   //       `${BASE_URL}/api/mobile/jobs`,
   //       formData
   //     );
 
-  //     if (!response.ok) {
+  //     if (!response.data) {
   //       throw new Error("Errore durante la creazione del lavoro");
   //     }
 
