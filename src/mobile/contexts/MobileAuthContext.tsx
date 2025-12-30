@@ -97,7 +97,7 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       console.log("📡 Login response status:", res.status);
       console.log(
         "📡 Login response headers:",
-        Object.fromEntries(res.headers.entries())
+        // Object.fromEntries(res.headers.entries())
       );
 
       if (!res.data) {

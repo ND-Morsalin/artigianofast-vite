@@ -50,6 +50,11 @@ export default function Registration() {
   // Query per ottenere i tipi di lavoro
   const { data: jobTypes } = useQuery<JobType[]>({
     queryKey: [`/api/jobtypes`],
+    queryFn: async () => {
+      const response = await axiosInstance.get(`/api/jobtypes`);
+      if (!response.data) throw new Error("Errore nel recuperare i tipi di lavoro");
+      return response.data;
+    }
   });
 
   // Filtriamo i lavori

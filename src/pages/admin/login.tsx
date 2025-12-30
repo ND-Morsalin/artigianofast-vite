@@ -50,31 +50,31 @@ export default function AdminLoginPage() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
+  setIsLoading(true);
 
+  try {
+    // Try mobile login first (for artisan users)
     try {
-      // Try mobile login first (for artisan users)
-      const mobileResponse = await axiosInstance.post(`${BASE_URL}/api/mobile/login`,{
-          email: data.username,
-          password: data.password,
-        });
+      const mobileResponse = await axiosInstance.post(`${BASE_URL}/api/mobile/login`, {
+        email: data.username,
+        password: data.password,
+      });
+      console.log(mobileResponse);
 
-      if (mobileResponse.data) {
-        const mobileResult = await mobileResponse.data;
+      const mobileResult = mobileResponse.data; 
 
-
-        // Store mobile session ID in localStorage
-        if (mobileResult.mobileSessionId) {
-          localStorage.setItem("mobileSessionId", mobileResult.mobileSessionId);
-          console.log(
-            "✅ Mobile session stored:",
-            mobileResult.mobileSessionId
-          );
-          console.log(
-            "✅ Stored in localStorage, can read:",
-            localStorage.getItem("mobileSessionId")
-          );
-        }
+      // Store mobile session ID in localStorage
+      if (mobileResult.mobileSessionId) {
+        localStorage.setItem("mobileSessionId", mobileResult.mobileSessionId);
+        localStorage.setItem("mobile_data_token",mobileResult?.mobile_data_token || "")
+        console.log(
+          "✅ Mobile session stored:",
+          mobileResult.mobileSessionId
+        );
+        console.log(
+          "✅ Stored in localStorage, can read:",
+          localStorage.getItem("mobileSessionId")
+        );
 
         toast({
           title: "Login successful",
@@ -88,48 +88,51 @@ export default function AdminLoginPage() {
         setLocation("/artisan/dashboard");
         return;
       }
-
-      // If mobile login fails, try admin login
-      const response = await axiosInstance.post(`${BASE_URL}/api/admin/login`, data);
-
-      const result = await response.data;
- 
-      // Check user role and redirect accordingly
-      const userRole = result.user?.role;
-
-     localStorage.setItem( "admin_access_token", result.jwtToken.access_token );
-     localStorage.setItem( "admin_refresh_token", result.jwtToken.refresh_token );
-
-      if (userRole === "superadmin") {
-        toast({
-          title: "Login effettuato con successo",
-          description: "Benvenuto nel pannello Super Amministratore",
-        });
-        // Redirect to Super Admin dashboard
-        setLocation("/admin/dashboard");
-      } else {
-        toast({
-          title: "Login effettuato con successo",
-          description: "Benvenuto nel pannello di amministrazione",
-        });
-        // Default redirect
-        setLocation("/admin/dashboard");
-      }
-    } catch (error) {
-      console.log(error);
-      console.error("Errore login:", error);
-      toast({
-        title: "Errore di accesso",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Credenziali non valide. Riprova.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+    } catch (mobileError) {
+      console.log("Mobile login failed, attempting admin login:", mobileError);
+      // Proceed to admin login if mobile fails (e.g., due to invalid credentials or other errors)
     }
-  };
+
+    // If mobile login fails, try admin login
+    const response = await axiosInstance.post(`/api/admin/login`, data);
+
+    const result = response.data;
+
+    // Check user role and redirect accordingly
+    const userRole = result.user?.role;
+
+    localStorage.setItem("admin_access_token", result.jwtToken.access_token);
+    localStorage.setItem("admin_refresh_token", result.jwtToken.refresh_token);
+
+    if (userRole === "superadmin") {
+      toast({
+        title: "Login effettuato con successo",
+        description: "Benvenuto nel pannello Super Amministratore",
+      });
+      // Redirect to Super Admin dashboard
+      setLocation("/admin/dashboard");
+    } else {
+      toast({
+        title: "Login effettuato con successo",
+        description: "Benvenuto nel pannello di amministrazione",
+      });
+      // Default redirect
+      setLocation("/admin/dashboard");
+    }
+  } catch (error) {
+    console.error("Errore login:", error);
+    toast({
+      title: "Errore di accesso",
+      description:
+        error instanceof Error
+          ? error.message
+          : "Credenziali non valide. Riprova.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50/30 p-4">

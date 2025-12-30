@@ -52,7 +52,13 @@ export function NewJobModal() {
   });
 
   const { data: jobTypes = [] } = useQuery<JobType[]>({
-    queryKey: [`/api/jobtypes`],
+    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/jobtypes`
+      );
+      return response.data;
+    },
     enabled: isOpen,
   });
 

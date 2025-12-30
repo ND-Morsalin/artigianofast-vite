@@ -136,7 +136,13 @@ export function JobActivityRegistration({
 
   // Ottieni i tipi di lavoro
   const { data: jobTypes = [] } = useQuery<any[]>({
-    queryKey: [`/api/jobtypes`],
+    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/jobtypes`
+      );
+      return response.data;
+    },
     enabled: isOpen,
   });
 
@@ -241,6 +247,12 @@ export function JobActivityRegistration({
   // Ottieni i collaboratori
   const { data: collaborators = [] } = useQuery<Collaborator[]>({
     queryKey: [`/api/collaborators`],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/collaborators`
+      );
+      return response.data;
+    },
     enabled: isOpen,
   });
 

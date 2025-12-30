@@ -111,10 +111,11 @@ export default function ClientsPage() {
       axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
+  
   console.log("Current User:", currentUser);
   // Check if user has client creation permission - use correct feature names
   const hasClientPermission =
-    currentUser?.permissions?.includes("client.create") ||
+    currentUser?.permissions["client.create"] ||
     currentUser?.planFeatures?.client_management === true;
 
   // Form setup

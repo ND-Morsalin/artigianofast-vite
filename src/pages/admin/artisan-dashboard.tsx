@@ -120,6 +120,7 @@ export default function ArtisanDashboard() {
       axiosInstance.get(`${BASE_URL}/api/mobile/user`).then((res) => res.data),
     enabled: true,
   });
+  console.log("Current User:", currentUser);
 
   // Navigation handler - use artisan paths
   const handleNavigation = (path: string) => {

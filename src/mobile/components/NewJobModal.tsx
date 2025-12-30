@@ -136,6 +136,7 @@ const getJobTypeSchema = (t: any) =>
       .string()
       .min(1, t("mobile.jobs.modal.newJob.form.jobTypeNameLabel")),
     description: z.string().optional(),
+    sectorIds: z.any().optional(),
   });
 
 type JobFormData = z.infer<ReturnType<typeof getJobSchema>>;
@@ -192,6 +193,11 @@ export function NewJobModal() {
 
   const { data: jobTypes = [] } = useQuery<JobType[]>({
     queryKey: [`/api/jobtypes`],
+    queryFn: async () => {
+      const response = await axiosInstance.get(`/api/jobtypes`);
+      if (!response.data) throw new Error("Errore nel recuperare i tipi di lavoro");
+      return response.data;
+    },
     enabled: isOpen,
   });
 
@@ -232,6 +238,12 @@ export function NewJobModal() {
   // Query per ottenere tutte le attività disponibili
   const { data: allActivities = [] } = useQuery<Activity[]>({
     queryKey: [`/api/mobile/activities`],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        `/api/mobile/activities`
+      );
+      return response.data;
+    },
     enabled: isOpen,
     staleTime: 0, // Disabilita la cache per ottenere sempre dati freschi
     refetchOnMount: true, // Aggiorna sempre i dati quando il componente viene montato
@@ -241,6 +253,12 @@ export function NewJobModal() {
 
   const { data: availableCollaborators = [] } = useQuery<Collaborator[]>({
     queryKey: [`/api/collaborators`],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/collaborators`
+      );
+      return response.data;
+    },
     enabled: isOpen,
   });
 
@@ -718,6 +736,7 @@ export function NewJobModal() {
 
   const handleJobTypeAdd = async (jobType: JobTypeFormData) => {
     try {
+      jobType.sectorIds= [1,2]; // Aggiungi un array vuoto di settori per compatibilità con il back-end
       const response = await axiosInstance.post(`/api/jobtypes`, jobType);
       const newJobType = await response.data;
 
@@ -1873,7 +1892,7 @@ export function NewJobModal() {
                         type="button"
                         onClick={() => {
                           // Apre solo il dropdown dei collaboratori
-                          handleCollaboratorDropdownToggle();
+                          // handleCollaboratorDropdownToggle();
                         }}
                         className="shrink-0 h-10 w-10 flex items-center justify-center text-primary border border-gray-300 rounded-lg hover:bg-gray-100"
                         title={t(

@@ -25,6 +25,7 @@ import { axiosInstance } from "../../lib/axios";
 const jobTypeSchema = z.object({
   name: z.string().min(1, "Il nome è richiesto"),
   description: z.string().optional(),
+  sectorIds: z.any().optional(),
 });
 
 type JobTypeFormValues = z.infer<typeof jobTypeSchema>;
@@ -51,7 +52,7 @@ export default function JobTypeForm() {
     queryKey: [`/api/jobtypes/${jobTypeId}`],
     queryFn: async () => {
       if (!jobTypeId) return undefined;
-      const response = await axiosInstance.get(`api/jobtypes/${jobTypeId}`);
+      const response = await axiosInstance.get(`/api/jobtypes/${jobTypeId}`);
 
       return response.data;
     },
@@ -69,7 +70,8 @@ export default function JobTypeForm() {
   const createJobType = useMutation({
     mutationFn: async (values: JobTypeFormValues) => {
       setIsSaving(true);
-      const response = await axiosInstance.post(` /api/jobtypes`, values);
+      values.sectorIds= [1,2]
+      const response = await axiosInstance.post(`/api/jobtypes`, values);
 
       return response.data;
     },

@@ -87,7 +87,13 @@ export function CalendarJobModal({
 
   // Query per ottenere i tipi di lavoro personalizzati
   const { data: jobTypes = [] } = useQuery<any[]>({
-    queryKey: [`/api/jobtypes`],
+    queryKey: [`${BASE_URL}/api/jobtypes`],
+    queryFn: async () => {
+      const response = await axiosInstance.get(
+        `${BASE_URL}/api/jobtypes`
+      );
+      return response.data;
+    },
     enabled: isOpen,
   });
   console.log(jobTypes);
@@ -178,7 +184,7 @@ export function CalendarJobModal({
     console.log(jobTypeId);
     // In questo caso non facciamo nulla con il tipo di lavoro aggiunto perché
     // stiamo usando i tipi predefiniti (repair, installation, etc.) per il form del job
-    queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
+    queryClient.invalidateQueries({ queryKey: [`${BASE_URL}/api/jobtypes`] });
     setShowJobTypeModal(false);
     toast({
       title: "Tipo di lavoro aggiunto",
