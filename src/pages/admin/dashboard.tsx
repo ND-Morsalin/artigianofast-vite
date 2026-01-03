@@ -134,9 +134,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     const checkUserRole = async () => {
       try {
-        const response = await axiosInstance.get(
-          `/api/admin/session`
-        );
+        const response = await axiosInstance.get(`/api/admin/session`);
         if (response.data) {
           const session = await response.data;
           if (session.user && session.user.role !== "superadmin") {
@@ -189,9 +187,7 @@ export default function AdminDashboard() {
   const { data: plans = [], isLoading: plansLoading } = useQuery({
     queryKey: [`/api/subscription-plans`],
     queryFn: () =>
-      axiosInstance
-        .get(`/api/subscription-plans`)
-        .then((res) => res.data),
+      axiosInstance.get(`/api/subscription-plans`).then((res) => res.data),
     enabled: true, // Always fetch plans since they're needed for administrators section
   });
 
@@ -200,9 +196,7 @@ export default function AdminDashboard() {
     useQuery({
       queryKey: [`/api/user-subscriptions`],
       queryFn: () =>
-        axiosInstance
-          .get(`/api/user-subscriptions`)
-          .then((res) => res.data),
+        axiosInstance.get(`/api/user-subscriptions`).then((res) => res.data),
       enabled: activeTab === "clients" || activeTab === "admins",
     });
 
@@ -217,9 +211,7 @@ export default function AdminDashboard() {
   const { data: administrators = [], isLoading: adminsLoading } = useQuery({
     queryKey: [`/api/administrators`],
     queryFn: () =>
-      axiosInstance
-        .get(`/api/administrators`)
-        .then((res) => res.data),
+      axiosInstance.get(`/api/administrators`).then((res) => res.data),
     enabled: activeTab === "admins",
   });
 
@@ -525,8 +517,8 @@ export default function AdminDashboard() {
                                 }
                               />
                               <Tooltip
-                                formatter={(value: number) => [
-                                  `€${value.toLocaleString()}`,
+                                formatter={(value: number | undefined) => [
+                                  `€${(value ?? 0).toLocaleString()}`,
                                   "Revenue",
                                 ]}
                                 labelStyle={{ color: "#374151" }}

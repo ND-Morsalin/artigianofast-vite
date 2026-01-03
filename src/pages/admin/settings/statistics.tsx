@@ -58,7 +58,8 @@ const COLORS = [
 ];
 
 // Formatta il denaro in euro
-const formatCurrency = (amount: number) => {
+const formatCurrency = (amount?: number | null) => {
+  if (amount == null) return "-";
   return new Intl.NumberFormat("it-IT", {
     style: "currency",
     currency: "EUR",
@@ -406,7 +407,7 @@ export default function StatisticsPage() {
                     )}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number) => [value, "Abbonamenti"]}
+                    formatter={(value: number  | undefined) => [value, "Abbonamenti"]}
                   />
                   <Legend />
                 </PieChart>
@@ -435,7 +436,7 @@ export default function StatisticsPage() {
                     <Cell fill="#00C49F" />
                   </Pie>
                   <Tooltip
-                    formatter={(value: number) => [value, "Abbonamenti"]}
+                    formatter={(value: number  | undefined) => [value, "Abbonamenti"]}
                   />
                   <Legend />
                 </PieChart>
@@ -509,7 +510,7 @@ export default function StatisticsPage() {
                       />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => [value, "Clienti"]} />
+                  <Tooltip formatter={(value: number  | undefined) => [value, "Clienti"]} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
@@ -540,7 +541,7 @@ export default function StatisticsPage() {
                       />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => [value, "Clienti"]} />
+                  <Tooltip formatter={(value: number  | undefined) => [value, "Clienti"]} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
@@ -563,7 +564,7 @@ export default function StatisticsPage() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip formatter={(value: number) => [value, "Clienti"]} />
+                <Tooltip formatter={(value: number  | undefined) => [value, "Clienti"]} />
                 <Legend />
                 <Bar dataKey="value" name="Numero Clienti" fill="#8884d8">
                   <Cell fill="#0088FE" />
@@ -590,7 +591,7 @@ export default function StatisticsPage() {
                 <XAxis dataKey="date" />
                 <YAxis tickFormatter={(value) => `€${value}`} />
                 <Tooltip
-                  formatter={(value: number) => [
+                  formatter={(value: number  | undefined) => [
                     formatCurrency(value),
                     "Fatturato",
                   ]}
@@ -621,7 +622,7 @@ export default function StatisticsPage() {
                   <XAxis dataKey="name" />
                   <YAxis tickFormatter={(value) => `€${value}`} />
                   <Tooltip
-                    formatter={(value: number) => [
+                    formatter={(value: number  | undefined) => [
                       formatCurrency(value),
                       "Fatturato",
                     ]}
@@ -652,7 +653,7 @@ export default function StatisticsPage() {
                   <XAxis dataKey="name" />
                   <YAxis tickFormatter={(value) => `€${value}`} />
                   <Tooltip
-                    formatter={(value: number) => [
+                    formatter={(value: number  | undefined) => [
                       formatCurrency(value),
                       "Fatturato",
                     ]}
@@ -719,7 +720,7 @@ export default function StatisticsPage() {
                   <XAxis dataKey="name" />
                   <YAxis tickFormatter={(value) => `${value} min`} />
                   <Tooltip
-                    formatter={(value: number) => [
+                    formatter={(value: number  | undefined) => [
                       `${value} minuti`,
                       "Tempo Medio",
                     ]}
@@ -754,7 +755,7 @@ export default function StatisticsPage() {
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip
-                    formatter={(value: number) => [
+                    formatter={(value: number | undefined) => [
                       `${value} accessi`,
                       "Media Settimanale",
                     ]}
