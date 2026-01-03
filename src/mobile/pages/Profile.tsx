@@ -45,6 +45,7 @@ import {
 } from "../../components/ui/tabs";
 import { useToast } from "../../hooks/use-toast";
 import { Switch } from "../../components/ui/switch";
+import { Storage } from "../../lib/storage";
 // import { axiosInstance } from "../../lib/axios";
 
 // Schema per la validazione dei dati del profilo
@@ -171,7 +172,7 @@ export default function MobileProfile() {
     try {
       // const response = await axiosInstance.post(`/api/logout`);
       // clear local storage data
-      localStorage.clear();
+      await Storage.clear();
 
       // if (response.data) {
         await logout(); // Aggiorna il contesto locale

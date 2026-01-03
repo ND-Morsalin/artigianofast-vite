@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest, queryClient } from "../../../lib/queryClient";
+import { queryClient } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 import { Button } from "../../../components/ui/button";
 import {
@@ -91,7 +91,7 @@ export default function SectorsPage() {
   // Mutation per creare un nuovo settore
   const createMutation = useMutation({
     mutationFn: (data: SectorFormValues) =>
-      axiosInstance.post( `/api/sectors`, data),
+      axiosInstance.post(`/api/sectors`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sectors`] });
       toast({
@@ -113,8 +113,16 @@ export default function SectorsPage() {
 
   // Mutation per aggiornare un settore esistente
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: SectorFormValues }) =>
-      apiRequest("PATCH", `/api/sectors/${id}`, data),
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: SectorFormValues;
+    }) => {
+      const res = await axiosInstance.patch(`/api/sectors/${id}`, data);
+      return res.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sectors`] });
       toast({
@@ -137,8 +145,10 @@ export default function SectorsPage() {
 
   // Mutation per eliminare un settore
   const deleteMutation = useMutation({
-    mutationFn: (id: number) =>
-      apiRequest("DELETE", `/api/sectors/${id}`),
+    mutationFn: async (id: number) => {
+      const res = await axiosInstance.delete(`/api/sectors/${id}`);
+      return res.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/sectors`] });
       toast({

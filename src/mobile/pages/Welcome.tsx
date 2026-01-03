@@ -15,6 +15,7 @@ import {
   FormItem,
   FormMessage,
 } from "../../components/ui/form";
+import { Storage } from "../../lib/storage";
 
 // Schema di validazione del form di login
 const loginSchema = z.object({
@@ -45,17 +46,20 @@ export default function MobileWelcome() {
 
   // Check if this is first-time setup and redirect accordingly
   useEffect(() => {
-    if (user) {
-      // Check if user has completed first-time setup
-      const hasCompletedSetup = localStorage.getItem("mobileSetupCompleted");
-      if (!hasCompletedSetup) {
-        // First time login - redirect to settings for setup
-        setLocation("/mobile/settings");
-      } else {
-        // Regular login - redirect to dashboard
-        setLocation("/mobile/dashboard");
+    const run = async () => {
+      if (user) {
+        // Check if user has completed first-time setup
+        const hasCompletedSetup = await Storage.get("mobileSetupCompleted");
+        if (!hasCompletedSetup) {
+          // First time login - redirect to settings for setup
+          setLocation("/mobile/settings");
+        } else {
+          // Regular login - redirect to dashboard
+          setLocation("/mobile/dashboard");
+        }
       }
-    }
+    };
+    run();
   }, [user, setLocation]);
 
   const handleSocialLogin = async (provider: "google" | "facebook") => {
@@ -90,7 +94,7 @@ export default function MobileWelcome() {
       setIsLoading(true);
       await login(data.email, data.password);
       // Check if this is first-time setup
-      const hasCompletedSetup = localStorage.getItem("mobileSetupCompleted");
+      const hasCompletedSetup = await Storage.get("mobileSetupCompleted");
       if (!hasCompletedSetup) {
         // First time login - redirect to settings for setup
         setLocation("/mobile/settings");

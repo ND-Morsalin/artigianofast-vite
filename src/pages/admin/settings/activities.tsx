@@ -5,7 +5,7 @@ import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { apiRequest, queryClient } from "../../../lib/queryClient";
+import { queryClient } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 import { Button } from "../../../components/ui/button";
 import {
@@ -183,7 +183,7 @@ export default function AdminActivitiesPage() {
         defaultRate: data.defaultRate?.toString() || null,
         defaultCost: data.defaultCost?.toString() || null,
       };
-      return axiosInstance.post( `/api/activities`, formattedData);
+      return axiosInstance.post(`/api/activities`, formattedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -208,7 +208,13 @@ export default function AdminActivitiesPage() {
 
   // Mutation per aggiornare un'attività esistente
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: ActivityFormValues }) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: ActivityFormValues;
+    }) => {
       // Converti da array di stringhe a stringa JSON nel formato di storage
       const formattedData = {
         ...data,
@@ -220,11 +226,11 @@ export default function AdminActivitiesPage() {
         defaultRate: data.defaultRate?.toString() || null,
         defaultCost: data.defaultCost?.toString() || null,
       };
-      return apiRequest(
-        "PUT",
+      const res = await axiosInstance.put(
         `/api/activities/${id}`,
         formattedData
       );
+      return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -250,8 +256,10 @@ export default function AdminActivitiesPage() {
 
   // Mutation per eliminare un'attività
   const deleteMutation = useMutation({
-    mutationFn: (id: number) =>
-      apiRequest("DELETE", `/api/activities/${id}`),
+    mutationFn: async (id: number) => {
+      const res = await axiosInstance.delete(`/api/activities/${id}`);
+      return res.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/activities`],

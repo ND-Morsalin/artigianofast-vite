@@ -9,6 +9,7 @@ import fr from './locales/fr.json';
 import sq from './locales/sq.json';
 import ar from './locales/ar.json';
 import ro from './locales/ro.json';
+import { Storage } from '../lib/storage';
 
 const resources = {
   en: { translation: en },
@@ -45,10 +46,10 @@ export const languageOptions = [
 ];
 
 // Function to change language
-export const changeLanguage = (languageCode: string) => {
+export const changeLanguage = async(languageCode: string) => {
   console.log('🔄 Changing language to:', languageCode);
   i18n.changeLanguage(languageCode);
-  localStorage.setItem('preferredLanguage', languageCode);
+  await Storage.set('preferredLanguage', languageCode);
   console.log('✅ Language changed to:', i18n.language);
 };
 
@@ -57,9 +58,9 @@ export const getCurrentLanguage = () => {
   return i18n.language;
 };
 
-// Function to initialize language from localStorage
-export const initializeLanguage = () => {
-  const savedLanguage = localStorage.getItem('preferredLanguage');
+// Function to initialize language from await Storage
+export const initializeLanguage = async() => {
+  const savedLanguage = await Storage.get('preferredLanguage');
   console.log('🌍 Initializing language. Saved language:', savedLanguage);
   
   if (savedLanguage && languageOptions.find(lang => lang.code === savedLanguage)) {

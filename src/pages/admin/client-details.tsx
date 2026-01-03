@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest, queryClient } from "../../lib/queryClient";
+import { queryClient } from "../../lib/queryClient";
 import { useToast } from "../../hooks/use-toast";
 import { Button } from "../../components/ui/button";
 import {
@@ -161,12 +161,13 @@ export default function ClientDetailsPage() {
 
   // Mutation per aggiornare il piano personalizzato
   const updatePlanMutation = useMutation({
-    mutationFn: (data: PlanCustomizationFormValues) =>
-      apiRequest(
-        "PUT",
+    mutationFn: async (data: PlanCustomizationFormValues) => {
+      const res = await axiosInstance.put(
         `/api/clients/${clientId}/subscription`,
         data
-      ),
+      );
+      return res.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/clients/${clientId}/subscription`],

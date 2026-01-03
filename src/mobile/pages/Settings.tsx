@@ -59,6 +59,7 @@ import {
   SelectValue,
 } from "../../components/ui/select";
 import { axiosInstance } from "../../lib/axios";
+import { Storage } from "../../lib/storage";
 
 interface UserSettings {
   isDarkMode: boolean;
@@ -142,46 +143,55 @@ export default function Settings() {
 
   // Check if this is first-time setup
   useEffect(() => {
-    const hasCompletedSetup = localStorage.getItem("mobileSetupCompleted");
-    if (!hasCompletedSetup) {
-      setShowSetupWizard(true);
+    async function run() {
+      const hasCompletedSetup = await Storage.get("mobileSetupCompleted");
+      if (!hasCompletedSetup) {
+        setShowSetupWizard(true);
+      }
     }
+    run();
   }, []);
 
   // Carica le impostazioni salvate
   useEffect(() => {
-    const savedSettings = localStorage.getItem("userSettings");
-    if (savedSettings) {
-      try {
-        const parsedSettings = JSON.parse(savedSettings);
-        setSettings((prev) => ({
-          ...prev,
-          ...parsedSettings,
-        }));
-      } catch (error) {
-        console.log(error);
-        console.error("Errore nel parsare le impostazioni salvate:", error);
+    const run = async () => {
+      const savedSettings = await Storage.get("userSettings");
+      if (savedSettings) {
+        try {
+          const parsedSettings = JSON.parse(savedSettings);
+          setSettings((prev) => ({
+            ...prev,
+            ...parsedSettings,
+          }));
+        } catch (error) {
+          console.log(error);
+          console.error("Errore nel parsare le impostazioni salvate:", error);
+        }
       }
-    }
 
-    // Imposta il tema in base alle impostazioni
-    if (settings.isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+      // Imposta il tema in base alle impostazioni
+      if (settings.isDarkMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    };
+    run();
   }, []);
 
   // Salva le impostazioni quando cambiano
   useEffect(() => {
-    localStorage.setItem("userSettings", JSON.stringify(settings));
+    const run = async () => {
+      await Storage.set("userSettings", JSON.stringify(settings));
 
-    // Applica il tema
-    if (settings.isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+      // Applica il tema
+      if (settings.isDarkMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    };
+    run();
   }, [settings]);
 
   // Funzione per aggiornare un'impostazione
@@ -199,11 +209,11 @@ export default function Settings() {
 
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       // Invalida tutte le query per pulire la cache
       queryClient.clear();
       // Pulisci lo storage locale
-      localStorage.removeItem("userSettings");
+      await Storage.remove("userSettings");
       // Reindirizza alla pagina di login
       setLocation("/mobile/login");
       toast({
@@ -275,9 +285,9 @@ export default function Settings() {
   };
 
   // Handle setup wizard completion
-  const handleSetupComplete = () => {
+  const handleSetupComplete = async () => {
     setShowSetupWizard(false);
-    localStorage.setItem("mobileSetupCompleted", "true");
+    await Storage.set("mobileSetupCompleted", "true");
     toast({
       title: "Configurazione completata",
       description:

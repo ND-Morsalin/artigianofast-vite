@@ -1,4 +1,5 @@
 import { QueryClient, type QueryFunction } from "@tanstack/react-query";
+import { Storage } from "./storage";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -65,9 +66,9 @@ export async function apiRequest(
   }
 
   // Get stored mobile session ID for mobile app
-  const mobileSessionId = localStorage.getItem("mobileSessionId");
+  const mobileSessionId = await Storage.get("mobileSessionId");
   console.log("Mobile Session ID:", mobileSessionId);
-  const adminAccessToken = localStorage.getItem("admin_access_token");
+  const adminAccessToken = await Storage.get("admin_access_token");
 
   const tokens = {
     ...(mobileSessionId && { mobileSessionId }),
@@ -113,7 +114,7 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     // Get stored mobile session ID for mobile app
-    const mobileSessionId = localStorage.getItem("mobileSessionId");
+    const mobileSessionId = await Storage.get("mobileSessionId");
 
     const res = await fetch(queryKey[0] as string, {
       credentials: "include",

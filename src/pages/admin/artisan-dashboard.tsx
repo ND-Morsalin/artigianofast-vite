@@ -27,22 +27,25 @@ import { LanguageSelector } from "../../components/ui/language-selector";
 import { useTranslation } from "react-i18next";
 import { useArtisanPermissions } from "../../hooks/useArtisanPermissions";
 import { axiosInstance } from "../../lib/axios";
-
+import { Storage } from "../../lib/storage";
 export default function ArtisanDashboard() {
   const [, setLocation] = useLocation();
   const { t, i18n } = useTranslation();
 
   // Debug: Check if mobileSessionId exists
   useEffect(() => {
-    const sessionId = localStorage.getItem("mobileSessionId");
-    console.log(
-      "🔍 Dashboard loaded - mobileSessionId from localStorage:",
-      sessionId
-    );
-    if (!sessionId) {
-      console.warn("⚠️ No mobile session found! Redirecting to login...");
-      setLocation("/artisan/login");
-    }
+    const run = async () => {
+      const sessionId = await Storage.get("mobileSessionId");
+      console.log(
+        "🔍 Dashboard loaded - mobileSessionId from await Storage:",
+        sessionId
+      );
+      if (!sessionId) {
+        console.warn("⚠️ No mobile session found! Redirecting to login...");
+        setLocation("/artisan/login");
+      }
+    };
+    run();
   }, [setLocation]);
 
   // Get permissions using the hook (same as mobile app)
@@ -134,9 +137,7 @@ export default function ArtisanDashboard() {
   } = useQuery({
     queryKey: [`/api/mobile/clients`],
     queryFn: () =>
-      axiosInstance
-        .get(`/api/mobile/clients`)
-        .then((res) => res.data),
+      axiosInstance.get(`/api/mobile/clients`).then((res) => res.data),
     enabled: canViewClients && !permissionsLoading,
     retry: false,
   });
@@ -148,9 +149,7 @@ export default function ArtisanDashboard() {
   } = useQuery({
     queryKey: [`/api/mobile/all-jobs`],
     queryFn: () =>
-      axiosInstance
-        .get(`/api/mobile/all-jobs`)
-        .then((res) => res.data),
+      axiosInstance.get(`/api/mobile/all-jobs`).then((res) => res.data),
     enabled: canViewJobs && !permissionsLoading,
     retry: false,
   });
@@ -162,9 +161,7 @@ export default function ArtisanDashboard() {
   } = useQuery({
     queryKey: [`/api/mobile/collaborators`],
     queryFn: () =>
-      axiosInstance
-        .get(`/api/mobile/collaborators`)
-        .then((res) => res.data),
+      axiosInstance.get(`/api/mobile/collaborators`).then((res) => res.data),
     enabled: canManageCollaborators && !permissionsLoading,
     retry: false,
   });
@@ -176,9 +173,7 @@ export default function ArtisanDashboard() {
   } = useQuery({
     queryKey: [`/api/mobile/invoices`],
     queryFn: () =>
-      axiosInstance
-        .get(`/api/mobile/invoices`)
-        .then((res) => res.data),
+      axiosInstance.get(`/api/mobile/invoices`).then((res) => res.data),
     enabled: canManageInvoices && !permissionsLoading,
     retry: false,
   });

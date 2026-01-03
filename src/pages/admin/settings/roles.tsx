@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest, queryClient } from "../../../lib/queryClient";
+import { queryClient } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../../components/ui/button";
@@ -319,8 +319,11 @@ export default function AdminRolesPage() {
 
   // Mutation per aggiornare un ruolo esistente
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: RoleFormValues }) =>
-      apiRequest("PUT", `/api/roles/${id}`, data),
+    mutationFn: async ({ id, data }: { id: number; data: RoleFormValues }) =>
+      {
+        const res = await axiosInstance.put(`/api/roles/${id}`, data);
+        return res.data;
+      },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/roles`] });
       toast({
@@ -343,8 +346,11 @@ export default function AdminRolesPage() {
 
   // Mutation per eliminare un ruolo
   const deleteMutation = useMutation({
-    mutationFn: (id: number) =>
-      apiRequest("DELETE", `/api/roles/${id}`),
+    mutationFn: async (id: number) =>
+      {
+        const res = await axiosInstance.delete(`/api/roles/${id}`);
+        return res.data;
+      },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/roles`] });
       toast({

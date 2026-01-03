@@ -1,9 +1,26 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import { Progress } from "../../components/ui/progress";
-import { CheckCircle, ArrowRight, ArrowLeft, Building2, Users, Briefcase, FileText, UserCog, UsersRound } from "lucide-react";
+import {
+  CheckCircle,
+  ArrowRight,
+  ArrowLeft,
+  Building2,
+  Users,
+  Briefcase,
+  FileText,
+  UserCog,
+  UsersRound,
+} from "lucide-react";
+import { Storage } from "../../lib/storage";
 // import { useTranslation } from "react-i18next";
 
 interface SetupStep {
@@ -22,7 +39,7 @@ const setupSteps: SetupStep[] = [
     description: "Configura i tipi di lavoro che la tua azienda offre",
     icon: <Briefcase className="h-6 w-6" />,
     path: "/mobile/settings/jobtypes",
-    required: true
+    required: true,
   },
   {
     id: "activities",
@@ -30,7 +47,7 @@ const setupSteps: SetupStep[] = [
     description: "Definisci le attività associate ai tipi di lavoro",
     icon: <FileText className="h-6 w-6" />,
     path: "/mobile/settings/activities",
-    required: false
+    required: false,
   },
   {
     id: "roles",
@@ -38,7 +55,7 @@ const setupSteps: SetupStep[] = [
     description: "Crea i ruoli del personale e le loro autorizzazioni",
     icon: <UserCog className="h-6 w-6" />,
     path: "/mobile/settings/roles",
-    required: false
+    required: false,
   },
   {
     id: "collaborators",
@@ -46,7 +63,7 @@ const setupSteps: SetupStep[] = [
     description: "Aggiungi i membri del tuo team e assegna i ruoli",
     icon: <UsersRound className="h-6 w-6" />,
     path: "/mobile/settings/collaborators",
-    required: false
+    required: false,
   },
   {
     id: "clients",
@@ -54,7 +71,7 @@ const setupSteps: SetupStep[] = [
     description: "Gestisci la rubrica dei tuoi clienti",
     icon: <Users className="h-6 w-6" />,
     path: "/mobile/settings/clients",
-    required: true
+    required: true,
   },
   {
     id: "company",
@@ -62,8 +79,8 @@ const setupSteps: SetupStep[] = [
     description: "Configura le informazioni della tua azienda",
     icon: <Building2 className="h-6 w-6" />,
     path: "/mobile/settings/company",
-    required: true
-  }
+    required: true,
+  },
 ];
 
 interface SetupWizardProps {
@@ -74,53 +91,61 @@ export default function SetupWizard({ onComplete }: SetupWizardProps) {
   const [, setLocation] = useLocation();
   // const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<string[]>(() => {
-    try {
-      if (typeof window === 'undefined') return [];
-      const saved = localStorage.getItem('mobileSetupCompletedSteps');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Check if setup is already completed and show the wizard.
-    // Avoid calling setState synchronously here because completedSteps
-    // are initialized via the lazy state initializer above.
-    try {
-      if (typeof window !== 'undefined') {
-        const hasCompletedSetup = localStorage.getItem('mobileSetupCompleted');
-        if (hasCompletedSetup) {
-          onComplete();
-          return;
-        }
-      }
-    } catch {
-      // ignore localStorage errors
-    }
+    let mounted = true;
 
-    // Show the wizard after initial sync from localStorage
-    // Defer the state update to the next tick to avoid cascading renders.
-    setTimeout(() => setIsVisible(true), 0);
+    (async () => {
+      try {
+        if (typeof window !== "undefined") {
+          const saved = await Storage.get("mobileSetupCompletedSteps");
+          if (mounted && saved) {
+            setCompletedSteps(JSON.parse(saved));
+          }
+
+          const hasCompletedSetup = await Storage.get(
+            "mobileSetupCompleted"
+          );
+          if (hasCompletedSetup) {
+            onComplete();
+            return;
+          }
+        }
+      } catch {
+        // ignore storage errors
+      } finally {
+        // Show the wizard after initial sync from storage
+        setTimeout(() => {
+          if (mounted) setIsVisible(true);
+        }, 0);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
   }, [onComplete]);
 
-  const handleStepComplete = (stepId: string) => {
+  const handleStepComplete = async (stepId: string) => {
     const newCompletedSteps = [...completedSteps];
     if (!newCompletedSteps.includes(stepId)) {
       newCompletedSteps.push(stepId);
       setCompletedSteps(newCompletedSteps);
-      localStorage.setItem('mobileSetupCompletedSteps', JSON.stringify(newCompletedSteps));
+      await Storage.set(
+        "mobileSetupCompletedSteps",
+        JSON.stringify(newCompletedSteps)
+      );
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < setupSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       // Setup completed
-      localStorage.setItem('mobileSetupCompleted', 'true');
+      await Storage.set("mobileSetupCompleted", "true");
       onComplete();
     }
   };
@@ -167,7 +192,9 @@ export default function SetupWizard({ onComplete }: SetupWizardProps) {
         {/* Progress */}
         <div className="mb-8">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Passo {currentStep + 1} di {setupSteps.length}</span>
+            <span>
+              Passo {currentStep + 1} di {setupSteps.length}
+            </span>
             <span>{Math.round(progress)}% completato</span>
           </div>
           <Progress value={progress} className="h-2" />
@@ -193,9 +220,10 @@ export default function SetupWizard({ onComplete }: SetupWizardProps) {
             ) : (
               <div className="mb-4">
                 <p className="text-gray-600 mb-4">
-                  Clicca su "Configura" per iniziare la configurazione di questo elemento.
+                  Clicca su "Configura" per iniziare la configurazione di questo
+                  elemento.
                 </p>
-                <Button 
+                <Button
                   onClick={() => {
                     setLocation(currentStepData.path);
                     // Mark as completed when navigating to the step
@@ -221,20 +249,22 @@ export default function SetupWizard({ onComplete }: SetupWizardProps) {
                 <div
                   key={step.id}
                   className={`flex items-center p-3 rounded-lg border ${
-                    index === currentStep 
-                      ? 'border-blue-500 bg-blue-50' 
+                    index === currentStep
+                      ? "border-blue-500 bg-blue-50"
                       : completedSteps.includes(step.id)
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-gray-200'
+                      ? "border-green-500 bg-green-50"
+                      : "border-gray-200"
                   }`}
                 >
-                  <div className={`mr-3 ${
-                    completedSteps.includes(step.id) 
-                      ? 'text-green-600' 
-                      : index === currentStep 
-                      ? 'text-blue-600' 
-                      : 'text-gray-400'
-                  }`}>
+                  <div
+                    className={`mr-3 ${
+                      completedSteps.includes(step.id)
+                        ? "text-green-600"
+                        : index === currentStep
+                        ? "text-blue-600"
+                        : "text-gray-400"
+                    }`}
+                  >
                     {completedSteps.includes(step.id) ? (
                       <CheckCircle className="h-5 w-5" />
                     ) : (
@@ -273,13 +303,10 @@ export default function SetupWizard({ onComplete }: SetupWizardProps) {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Precedente
           </Button>
-          
+
           <div className="flex gap-2">
             {canSkip && (
-              <Button
-                variant="outline"
-                onClick={handleSkip}
-              >
+              <Button variant="outline" onClick={handleSkip}>
                 Salta
               </Button>
             )}
@@ -287,7 +314,7 @@ export default function SetupWizard({ onComplete }: SetupWizardProps) {
               onClick={handleNext}
               disabled={!isStepCompleted && currentStepData.required}
             >
-              {currentStep === setupSteps.length - 1 ? 'Completa' : 'Avanti'}
+              {currentStep === setupSteps.length - 1 ? "Completa" : "Avanti"}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </div>

@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { queryClient, apiRequest } from "../../../lib/queryClient";
+import { queryClient } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 import { Button } from "../../../components/ui/button";
 import {
@@ -114,9 +114,7 @@ export default function UsersPage() {
   const { data: administrators = [], isLoading: isLoadingAdmins } = useQuery({
     queryKey: [`/api/administrators`],
     queryFn: async () => {
-      const response = await axiosInstance.get(
-        `/api/administrators`
-      );
+      const response = await axiosInstance.get(`/api/administrators`);
       return await response.data;
     },
   });
@@ -135,9 +133,7 @@ export default function UsersPage() {
     useQuery({
       queryKey: [`/api/user-subscriptions`],
       queryFn: async () => {
-        const response = await axiosInstance.get(
-          `/api/user-subscriptions`
-        );
+        const response = await axiosInstance.get(`/api/user-subscriptions`);
         return await response.data;
       },
       staleTime: 0, // Always fetch fresh data
@@ -147,9 +143,7 @@ export default function UsersPage() {
   const { data: plans = [], isLoading: isLoadingPlans } = useQuery({
     queryKey: [`/api/subscription-plans`],
     queryFn: async () => {
-      const response = await axiosInstance.get(
-        `/api/subscription-plans`
-      );
+      const response = await axiosInstance.get(`/api/subscription-plans`);
       return await response.data;
     },
   });
@@ -292,8 +286,7 @@ export default function UsersPage() {
               : latest
         );
 
-        return apiRequest(
-          "PUT",
+        const res = await axiosInstance.put(
           `/api/user-subscriptions/${latestSubscription.id}`,
           {
             planId: parseInt(data.planId),
@@ -301,6 +294,7 @@ export default function UsersPage() {
             status: "active",
           }
         );
+        return res.data;
       } else {
         // Se non ha sottoscrizioni, crea una nuova
         const response = await axiosInstance.post(`/api/user-subscriptions`, {

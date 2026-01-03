@@ -126,6 +126,7 @@ import JobTypeForm from "./components/JobTypeForm";
 import ActivityForm from "./components/ActivityForm";
 import RoleFormPage from "./pages/RoleFormPage";
 import CollaboratorFormPage from "./pages/CollaboratorFormPage";
+import { Storage } from "../lib/storage";
 
 // Mobile 404 Page
 const Mobile404 = () => (
@@ -164,31 +165,35 @@ export default function MobileApp() {
 
   // Force reload if needed
   useEffect(() => {
-    const lastReload = localStorage.getItem("lastMobileAppReload");
-    const now = Date.now();
+    const run = async () => {
+      const lastReload = await Storage.get("lastMobileAppReload");
+      const now = Date.now();
 
-    if (!lastReload || now - parseInt(lastReload) > 300000) {
-      // 5 minutes
-      console.log("🚨 FORCE RELOAD: Triggering reload due to timeout");
-      localStorage.setItem("lastMobileAppReload", now.toString());
-      // Force a small change to trigger rebuild
-    }
+      if (!lastReload || now - parseInt(lastReload ?? "0") > 300000) {
+        // 5 minutes
+        console.log("🚨 FORCE RELOAD: Triggering reload due to timeout");
+        await Storage.set("lastMobileAppReload", now.toString());
+        // Force a small change to trigger rebuild
+      }
 
-    // Test session handling immediately
-    console.log("🚨 SESSION TEST: Checking if mobileApiCall is available");
-    console.log("🚨 SESSION TEST: mobileApiCall type:", typeof mobileApiCall);
+      // Test session handling immediately
+      console.log("🚨 SESSION TEST: Checking if mobileApiCall is available");
+      console.log("🚨 SESSION TEST: mobileApiCall type:", typeof mobileApiCall);
 
-    // Test localStorage
-    const sessionId = localStorage.getItem("mobileSessionId");
-    console.log("🚨 SESSION TEST: Current session ID:", sessionId);
+      // Test await Storage
+      const sessionId = await Storage.get("mobileSessionId");
+      console.log("🚨 SESSION TEST: Current session ID:", sessionId);
 
-    // Test if we can make an API call
-    if (typeof mobileApiCall === "function") {
-      console.log("🚨 SESSION TEST: mobileApiCall is available, testing...");
-      // Don't actually make the call, just test if it's available
-    } else {
-      console.log("🚨 SESSION TEST: mobileApiCall is NOT available!");
-    }
+      // Test if we can make an API call
+      if (typeof mobileApiCall === "function") {
+        console.log("🚨 SESSION TEST: mobileApiCall is available, testing...");
+        // Don't actually make the call, just test if it's available
+      } else {
+        console.log("🚨 SESSION TEST: mobileApiCall is NOT available!");
+      }
+    };
+
+    run();
   }, []);
 
   // Determina se la pagina corrente dovrebbe nascondere la bottom navigation

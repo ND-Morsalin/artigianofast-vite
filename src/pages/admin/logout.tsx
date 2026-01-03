@@ -11,6 +11,7 @@ import { Button } from "../../components/ui/button";
 import { LogOut, Loader2 } from "lucide-react";
 import { useToast } from "../../hooks/use-toast";
 import { axiosInstance } from "../../lib/axios";
+import { Storage } from "../../lib/storage";
 
 export default function AdminLogout() {
   const [, setLocation] = useLocation();
@@ -28,11 +29,11 @@ export default function AdminLogout() {
             description: "Sessione terminata con successo",
           });
           // clear localstorage data.
-          localStorage.removeItem("accessToken")
-          localStorage.removeItem("refreshToken")
-          localStorage.removeItem("mobileSessionId")
-          localStorage.removeItem("mobile_data_token")
-          localStorage.removeItem("admin_access_token")
+          await Storage.remove("accessToken")
+          await Storage.remove("refreshToken")
+          await Storage.remove("mobileSessionId")
+          await Storage.remove("mobile_data_token")
+          await Storage.remove("admin_access_token")
         }
       } catch (error) {
         console.log(error);

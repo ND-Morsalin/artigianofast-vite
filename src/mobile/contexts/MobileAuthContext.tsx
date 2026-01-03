@@ -8,6 +8,7 @@ import {
 } from "react";
 import { queryClient } from "../../lib/queryClient";
 import { axiosInstance } from "../../lib/axios";
+import { Storage } from "../../lib/storage";
 
 // Use the centralized mobile API utility
 
@@ -114,8 +115,8 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       );
 
       // Verify session ID was stored
-      const storedSessionId = localStorage.getItem("mobileSessionId");
-      console.log("💾 Stored session ID in localStorage:", storedSessionId);
+      const storedSessionId = await Storage.get("mobileSessionId");
+      console.log("💾 Stored session ID in await Storage:", storedSessionId);
 
       setUser(userData);
       return userData;
@@ -165,8 +166,8 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       );
 
       // Verify session ID was stored
-      const storedSessionId = localStorage.getItem("mobileSessionId");
-      console.log("💾 Stored session ID in localStorage:", storedSessionId);
+      const storedSessionId = await Storage.get("mobileSessionId");
+      console.log("💾 Stored session ID in await Storage:", storedSessionId);
 
       setUser(userData);
       return userData;

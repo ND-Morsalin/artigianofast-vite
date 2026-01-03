@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest, queryClient } from "../../lib/queryClient";
+import { queryClient } from "../../lib/queryClient";
 import { useToast } from "../../hooks/use-toast";
 import { Button } from "../../components/ui/button";
 import {
@@ -88,9 +88,7 @@ export default function AdminSubscriptionPlansPage() {
   const { data: plans = [], isLoading } = useQuery({
     queryKey: [`/api/subscription-plans`],
     queryFn: () =>
-      axiosInstance.get( `/api/subscription-plans`).then(
-        (res) => res.data
-      ),
+      axiosInstance.get(`/api/subscription-plans`).then((res) => res.data),
     retry: 3, // retry a few times in case of network issues
     retryDelay: 1000, // 1 second between retries
   });
@@ -114,7 +112,7 @@ export default function AdminSubscriptionPlansPage() {
   // Mutation per creare un nuovo piano
   const createMutation = useMutation({
     mutationFn: (data: FormValues) =>
-      axiosInstance.post( `/api/subscription-plans`, data),
+      axiosInstance.post(`/api/subscription-plans`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/subscription-plans`],
@@ -148,7 +146,6 @@ export default function AdminSubscriptionPlansPage() {
         data
       );
       const response = await axiosInstance.put(
-        
         `/api/subscription-plans/${id}`,
         data
       );
@@ -185,8 +182,12 @@ export default function AdminSubscriptionPlansPage() {
 
   // Mutation per eliminare un piano
   const deleteMutation = useMutation({
-    mutationFn: (id: number) =>
-      apiRequest("DELETE", `/api/subscription-plans/${id}`),
+    mutationFn: async (id: number) => {
+      const response = await axiosInstance.delete(
+        `/api/subscription-plans/${id}`
+      );
+      return response.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [`/api/subscription-plans`],

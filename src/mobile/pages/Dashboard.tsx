@@ -9,6 +9,7 @@ import { Button } from "../../components/ui/button";
 import { User, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { axiosInstance } from "../../lib/axios";
+import { Storage } from "../../lib/storage";
 
 export default function MobileDashboard() {
   const [, setLocation] = useLocation();
@@ -30,21 +31,24 @@ export default function MobileDashboard() {
   // Check if mobileApiCall is available
   console.log("Dashboard: mobileApiCall available:", typeof mobileApiCall);
 
-  // Check localStorage for session ID
-  const storedSessionId = localStorage.getItem("mobileSessionId");
-  console.log("Dashboard: Stored session ID:", storedSessionId);
-
   // Debug session handling
   useEffect(() => {
-    // Test if we can make an API call
-    if (storedSessionId && typeof mobileApiCall === "function") {
-      console.log("Dashboard: API call available with session");
-    } else {
-      console.log(
-        "Dashboard: Cannot make API call - missing session or mobileApiCall"
-      );
+    async function run() {
+      // Check await Storage for session ID
+      const storedSessionId = await Storage.get("mobileSessionId");
+      console.log("Dashboard: Stored session ID:", storedSessionId);
+
+      // Test if we can make an API call
+      if (storedSessionId && typeof mobileApiCall === "function") {
+        console.log("Dashboard: API call available with session");
+      } else {
+        console.log(
+          "Dashboard: Cannot make API call - missing session or mobileApiCall"
+        );
+      }
     }
-  }, [user, storedSessionId]);
+    run();
+  }, [user]);
 
   // Imposta il saluto in base all'ora del giorno
   useEffect(() => {

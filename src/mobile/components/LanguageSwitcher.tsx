@@ -1,14 +1,15 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "../../components/ui/button";
 import { Globe } from "lucide-react";
+import { Storage } from "../../lib/storage";
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
 
-  const toggleLanguage = () => {
+  const toggleLanguage = async () => {
     const newLang = i18n.language === "it" ? "en" : "it";
     i18n.changeLanguage(newLang);
-    localStorage.setItem("preferredLanguage", newLang);
+    await Storage.set("preferredLanguage", newLang);
   };
 
   return (

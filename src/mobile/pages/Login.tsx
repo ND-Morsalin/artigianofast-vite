@@ -27,6 +27,7 @@ import { useMobileAuth } from "../contexts/MobileAuthContext";
 import { useToast } from "../../hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { axiosInstance } from "../../lib/axios";
+import { Storage } from "../../lib/storage";
 
 // Schema di validazione
 const loginSchema = z.object({
@@ -104,17 +105,17 @@ export default function MobileLogin() {
             console.log(mobileResponse);
       
             const mobileResult = mobileResponse.data; 
-            // Store mobile session ID in localStorage
+            // Store mobile session ID in await Storage
       if (mobileResult.mobileSessionId) {
-        localStorage.setItem("mobileSessionId", mobileResult.mobileSessionId);
-        localStorage.setItem("mobile_data_token",mobileResult?.mobile_data_token || "")
+        await Storage.set("mobileSessionId", mobileResult.mobileSessionId);
+        await Storage.set("mobile_data_token",mobileResult?.mobile_data_token || "")
         console.log(
           "✅ Mobile session stored:",
           mobileResult.mobileSessionId
         );
         console.log(
-          "✅ Stored in localStorage, can read:",
-          localStorage.getItem("mobileSessionId")
+          "✅ Stored in await Storage, can read:",
+          await Storage.get("mobileSessionId")
         );
 
         toast({
@@ -123,7 +124,7 @@ export default function MobileLogin() {
         });
       }
       // Check if this is first-time setup
-      const hasCompletedSetup = localStorage.getItem("mobileSetupCompleted");
+      const hasCompletedSetup = await Storage.get("mobileSetupCompleted");
       if (!hasCompletedSetup) {
         // First time login - redirect to settings for setup
         setLocation("/mobile/settings");

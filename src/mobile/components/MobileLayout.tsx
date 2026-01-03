@@ -25,6 +25,7 @@ import {
 import { useMobileAuth } from "../contexts/MobileAuthContext";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { Storage } from "../../lib/storage";
 // import { axiosInstance } from "../../lib/axios";
 
 interface MobileLayoutProps {
@@ -61,7 +62,7 @@ MobileLayoutProps) {
     try {
       // const response = await axiosInstance.post(`/api/logout`);
 // clear local storage or any other cleanup if necessary
-      localStorage.clear();
+      await Storage.clear();
       // if (response.data) {
         await logout(); // Aggiorna il contesto locale
         setLocation("/mobile/welcome");

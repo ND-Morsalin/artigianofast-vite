@@ -3,6 +3,7 @@
 // This ensures all mobile API calls use absolute URLs to connect to the backend server
 
 import { BASE_URL } from "../../constant";
+import { Storage } from "../../lib/storage";
 
 // Auto-detect environment: use localhost for web browser, IP address for mobile
 // const isMobileDevice = () => {
@@ -45,7 +46,7 @@ export const mobileApiCall = async (
   console.log("🌐 Mobile API Call:", { method, fullUrl, endpoint });
 
   // Get stored mobile session ID for mobile app
-  const mobileSessionId = localStorage.getItem("mobileSessionId");
+  const mobileSessionId = await Storage.get("mobileSessionId");
 
   const options: RequestInit = {
     method,
@@ -96,7 +97,7 @@ export const mobileApiCall = async (
         const responseData = await response.clone().json();
 
         if (responseData.mobileSessionId) {
-          localStorage.setItem("mobileSessionId", responseData.mobileSessionId);
+          await Storage.set("mobileSessionId", responseData.mobileSessionId);
           console.log(
             "✅ Mobile session ID stored from",
             endpoint,

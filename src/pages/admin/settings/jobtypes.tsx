@@ -7,7 +7,7 @@ import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { apiRequest, queryClient } from "../../../lib/queryClient";
+import { queryClient } from "../../../lib/queryClient";
 import { useToast } from "../../../hooks/use-toast";
 import { Button } from "../../../components/ui/button";
 import {
@@ -126,7 +126,7 @@ export default function AdminJobTypesPage() {
         ...data,
         sectorIds: JSON.stringify(data.sectorIds),
       };
-      return axiosInstance.post( `/api/jobtypes`, formattedData);
+      return axiosInstance.post(`/api/jobtypes`, formattedData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
@@ -149,8 +149,16 @@ export default function AdminJobTypesPage() {
 
   // Mutation per aggiornare un tipo di lavoro esistente
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: JobTypeFormValues }) =>
-      apiRequest("PUT", `/api/jobtypes/${id}`, data),
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: JobTypeFormValues;
+    }) => {
+      const res = await axiosInstance.put(`/api/jobtypes/${id}`, data);
+      return res.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/jobtypes`] });
       toast({
@@ -173,9 +181,10 @@ export default function AdminJobTypesPage() {
 
   // Mutation per eliminare un tipo di lavoro
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => {
+    mutationFn: async (id: number) => {
       console.log("🔍 Deleting job type with ID:", id);
-      return apiRequest("DELETE", `/api/jobtypes/${id}`);
+      const res = await axiosInstance.delete(`/api/jobtypes/${id}`);
+      return res.data;
     },
     onSuccess: () => {
       console.log("✅ Job type deleted successfully");
