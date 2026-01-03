@@ -45,7 +45,7 @@ import {
 } from "../../components/ui/tabs";
 import { useToast } from "../../hooks/use-toast";
 import { Switch } from "../../components/ui/switch";
-import { axiosInstance } from "../../lib/axios";
+// import { axiosInstance } from "../../lib/axios";
 
 // Schema per la validazione dei dati del profilo
 const profileSchema = z.object({
@@ -169,18 +169,20 @@ export default function MobileProfile() {
   // Gestione del logout
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance.post(`/api/logout`);
+      // const response = await axiosInstance.post(`/api/logout`);
+      // clear local storage data
+      localStorage.clear();
 
-      if (response.data) {
+      // if (response.data) {
         await logout(); // Aggiorna il contesto locale
         toast({
           title: "Logout effettuato",
           description: "Hai effettuato il logout con successo",
         });
         setLocation("/mobile/welcome");
-      } else {
-        throw new Error("Errore durante il logout");
-      }
+      // } else {
+      //   throw new Error("Errore durante il logout");
+      // }
     } catch (error) {
       console.log(error);
       console.error("Errore logout:", error);

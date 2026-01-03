@@ -25,7 +25,7 @@ import {
 import { useMobileAuth } from "../contexts/MobileAuthContext";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { axiosInstance } from "../../lib/axios";
+// import { axiosInstance } from "../../lib/axios";
 
 interface MobileLayoutProps {
   children: ReactNode;
@@ -59,14 +59,16 @@ MobileLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance.post(`/api/logout`);
-
-      if (response.data) {
+      // const response = await axiosInstance.post(`/api/logout`);
+// clear local storage or any other cleanup if necessary
+      localStorage.clear();
+      // if (response.data) {
         await logout(); // Aggiorna il contesto locale
         setLocation("/mobile/welcome");
-      } else {
-        throw new Error("Errore durante il logout");
-      }
+      // } else {
+      //   throw new Error("Errore durante il logout");
+      // }
+      
     } catch (err) {
       console.error("Errore durante il logout:", err);
     }

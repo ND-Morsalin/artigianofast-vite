@@ -27,6 +27,12 @@ export default function AdminLogout() {
             title: "Logout effettuato",
             description: "Sessione terminata con successo",
           });
+          // clear localstorage data.
+          localStorage.removeItem("accessToken")
+          localStorage.removeItem("refreshToken")
+          localStorage.removeItem("mobileSessionId")
+          localStorage.removeItem("mobile_data_token")
+          localStorage.removeItem("admin_access_token")
         }
       } catch (error) {
         console.log(error);

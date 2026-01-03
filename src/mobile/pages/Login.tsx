@@ -26,6 +26,7 @@ import { Separator } from "../../components/ui/separator";
 import { useMobileAuth } from "../contexts/MobileAuthContext";
 import { useToast } from "../../hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { axiosInstance } from "../../lib/axios";
 
 // Schema di validazione
 const loginSchema = z.object({
@@ -96,6 +97,31 @@ export default function MobileLogin() {
     try {
       setError(null);
       await login(data.email, data.password);
+       const mobileResponse = await axiosInstance.post(`/api/mobile/login`, {
+              email: data.email,
+              password: data.password,
+            });
+            console.log(mobileResponse);
+      
+            const mobileResult = mobileResponse.data; 
+            // Store mobile session ID in localStorage
+      if (mobileResult.mobileSessionId) {
+        localStorage.setItem("mobileSessionId", mobileResult.mobileSessionId);
+        localStorage.setItem("mobile_data_token",mobileResult?.mobile_data_token || "")
+        console.log(
+          "✅ Mobile session stored:",
+          mobileResult.mobileSessionId
+        );
+        console.log(
+          "✅ Stored in localStorage, can read:",
+          localStorage.getItem("mobileSessionId")
+        );
+
+        toast({
+          title: "Login successful",
+          description: "Benvenuto su ProjectPro!",
+        });
+      }
       // Check if this is first-time setup
       const hasCompletedSetup = localStorage.getItem("mobileSetupCompleted");
       if (!hasCompletedSetup) {

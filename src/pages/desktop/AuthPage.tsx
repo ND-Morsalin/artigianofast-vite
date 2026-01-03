@@ -20,7 +20,10 @@ import {
 } from "../../components/ui/tabs";
 import { useToast } from "../../hooks/use-toast";
 import { Link } from "wouter";
-import { Workflow, Briefcase, Calendar, Users, Shield } from "lucide-react";
+import {
+  Workflow,
+  // Briefcase, Calendar, Users, Shield
+} from "lucide-react";
 import { LanguageSelector } from "../../components/ui/language-selector";
 import { axiosInstance } from "../../lib/axios";
 
@@ -512,7 +515,7 @@ export default function AuthPage() {
 
       <footer className="bg-gray-100 border-t py-6">
         <div className="container mx-auto px-4 text-center text-sm text-gray-500">
-          <div className="flex justify-center gap-6 mb-4">
+          {/* <div className="flex justify-center gap-6 mb-4">
             <div className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
               <span>{t("footer.workManagement", "Gestione lavori")}</span>
@@ -529,7 +532,7 @@ export default function AuthPage() {
               <Shield className="h-4 w-4" />
               <span>{t("footer.security", "Sicurezza")}</span>
             </div>
-          </div>
+          </div> */}
           <p>
             © {new Date().getFullYear()} ProjectPro.{" "}
             {t("footer.allRightsReserved", "Tutti i diritti riservati.")}
