@@ -35,7 +35,7 @@ export default function ClientsSettings() {
     queryKey: [`/api/mobile/all-clients`],
     queryFn: async () => {
       try {
-        const response = await axiosInstance.get("/all-clients");
+        const response = await axiosInstance.get("/api/mobile/all-clients");
         if (!response.data) {
           throw new Error("Errore nel recuperare i clienti");
         }

@@ -115,6 +115,8 @@ export default function Settings() {
     retry: false,
   });
 
+  console.log({ planConfig }, "Plan configuration in settings");
+
   // Check if user has settings.view permission
   const hasSettingsPermission =
     planConfig?.features?.permissions?.["settings.view"] === true;
@@ -125,10 +127,10 @@ export default function Settings() {
   // Fetch abbonamento utente
   const { data: subscription, isLoading: isSubscriptionLoading } =
     useQuery<UserSubscription>({
-      queryKey: [`/api/subscription`],
+      queryKey: [`/api/mobile/subscription`],
       queryFn: async () => {
         try {
-          const response = await axiosInstance.get(`/api/subscription`);
+          const response = await axiosInstance.get(`/api/mobile/subscription`);
 
           return response.data;
         } catch (error) {

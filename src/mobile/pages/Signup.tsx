@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -145,8 +146,7 @@ export default function MobileSignup() {
       });
       setLocation("/mobile/plans");
     } catch (error: any) {
-      let errorMessage = error.message;
-
+      const errorMessage = error.message;
       if (
         errorMessage.includes("Email già in uso") ||
         errorMessage.includes("già registrata")
@@ -201,6 +201,7 @@ export default function MobileSignup() {
   const onSubmit = async (data: SignupFormValues) => {
     // Rimuoviamo confirmPassword dai dati da inviare
     const { confirmPassword, ...signupData } = data;
+    console.log({confirmPassword, signupData});
     await handleSignup(signupData);
   };
 

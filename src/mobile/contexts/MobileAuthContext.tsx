@@ -159,6 +159,8 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const userData = await res.data;
+      await Storage.set("mobileSessionId", userData.mobileSessionId);
+      await Storage.set("mobile_data_token", userData?.mobile_data_token || "");
       console.log("✅ Registration successful, user data:", userData);
       console.log(
         "🔑 Mobile session ID from response:",
@@ -249,10 +251,7 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await axiosInstance.put(
-        `/api/mobile/user`,
-        userData
-      );
+      const res = await axiosInstance.put(`/api/mobile/user`, userData);
 
       if (!res.data) {
         const errorData = await res.data;
@@ -285,13 +284,10 @@ export const MobileAuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       setError(null);
 
-      const res = await axiosInstance.post(
-        `/api/mobile/change-password`,
-        {
-          currentPassword,
-          newPassword,
-        }
-      );
+      const res = await axiosInstance.post(`/api/mobile/change-password`, {
+        currentPassword,
+        newPassword,
+      });
 
       if (!res.data) {
         const errorData = await res.data;
