@@ -22,6 +22,11 @@ axiosInstance.interceptors.request.use(
     const mobileSessionId = await Storage.get("mobileSessionId");
     const mobileDataToken = await Storage.get("mobile_data_token");
     const adminAccessToken = await Storage.get("admin_access_token");
+    const platform = await Storage.get("platform");
+
+    if (platform) {
+      config.headers["x-platform"] = platform;
+    }
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
