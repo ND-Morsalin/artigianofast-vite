@@ -6,6 +6,6 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   preview: {
-    allowedHosts: ['artigianofast.peakfinancetrade.com'],  // Add your host here
+    allowedHosts: ['artigianofast.peakfinancetrade.com',"artigianofast.com","www.artigianofast.com"],  // Add your host here
   },
 });
