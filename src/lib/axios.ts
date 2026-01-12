@@ -39,10 +39,10 @@ axiosInstance.interceptors.request.use(
       config.headers["x-mobile-session-id"] = mobileSessionId;
     }
     if (mobileDataToken) {
-      config.headers["x-mobile_data_token"] = mobileDataToken;
+      config.headers["x-mobile-data-token"] = mobileDataToken;
     }
     if (adminAccessToken) {
-      config.headers["x-admin_access_token"] = adminAccessToken;
+      config.headers["x-admin-access-token"] = adminAccessToken;
     }              
 
     return config;
